@@ -46,7 +46,13 @@ Mentroid/
    git clone https://github.com/omroy07/Mentroid-.git
    cd Mentroid
    ```
-2. **Serve Locally**
+2. **Protect Your API Keys (Crucial)**
+   Before adding your personal testing keys, run the following command. This tells git to ignore your local credential changes so you don't accidentally commit your private keys to GitHub:
+   ```bash
+   git update-index --assume-unchanged emailjs-config.js
+   ```
+   *(If you ever need to track changes to this file again, run `git update-index --no-assume-unchanged emailjs-config.js`)*.
+3. **Serve Locally**
    Since this is a static HTML/JS site, you don't need a complex build step. You can use any static server.
    *Using Python:*
    ```bash
@@ -56,7 +62,7 @@ Mentroid/
    ```bash
    npx http-server -p 8000
    ```
-3. **Access the Application**
+4. **Access the Application**
    Open your browser and navigate to `http://localhost:8000`.
 
 ## 🔑 Environment Variables
@@ -80,14 +86,14 @@ window.MENTROID_CONTACT = {
 };
 ```
 
-| Key | Description |
-| :--- | :--- |
-| `toEmail` | The target email address for business inquiries. |
-| `web3formsAccessKey` | API key from Web3Forms (if using the simpler form delivery option). |
-| `publicKey` | Public key provided by the EmailJS dashboard. |
-| `serviceId` | The ID of the connected email service in EmailJS. |
-| `adminTemplateId` | EmailJS template ID for the notification sent to the site admin. |
-| `confirmationTemplateId` | EmailJS template ID for the auto-reply sent to the user. |
+| Object Key | Type | Description |
+| :--- | :--- | :--- |
+| `toEmail` | String | The target business email destination for lead routing. |
+| `web3formsAccessKey` | String | API token provided by the Web3Forms dashboard (Option B). |
+| `emailjs.publicKey` | String | Public API key fetched from the EmailJS Account settings (Option A). |
+| `emailjs.serviceId` | String | Connected email carrier ID (e.g., service_xxxx) inside EmailJS. |
+| `emailjs.adminTemplateId`| String | Template ID used to route complete client briefs to management. |
+| `emailjs.confirmationTemplateId`| String | Template ID for sending automated "thank you" replies back to users. |
 
 ## 📸 Visuals
 ![Mentroid Hero Section UI](assets/Mentroid-hero-section.png)
