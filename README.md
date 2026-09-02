@@ -1,6 +1,39 @@
-# Mentroid
+# Mentroid: Empowering Businesses with Intelligent AI Solutions
+🌐 **Official Website:** [https://www.mentroid.co.in](https://www.mentroid.co.in)
 
-Mentroid is a next-generation AI solutions company based in Sehore, India. It serves as a digital storefront to showcase AI/ML services, consulting packages, and past projects. The application features a hands-free Voice Assistant, an interactive Chatbot using a local knowledge base, and dynamic 3D CSS animations to create a highly engaging, modern user experience. Its target audience includes businesses, startups, and individuals seeking scalable AI solutions, ML model training, or technology consulting.
+Mentroid is an AI & Machine Learning service provider turning innovation into impact across India through chatbot development, ML solutions, workflow automation, and strategic consulting. 
+
+This repository serves as the digital storefront and live capability showcase for Mentroid's overarching services. The application features a hands-free Voice Assistant, an interactive Chatbot using a local knowledge base, and dynamic 3D CSS animations to create a highly engaging, modern user experience. Its target audience includes businesses, startups, and individuals seeking scalable AI solutions, ML model training, or technology consulting.
+
+## 💡 What We Do & Our Core Services
+
+We build RAG & LLM-based chatbots, develop custom ML models, create AI automation tools, enhance and develop modern websites, deliver data analytics & predictive solutions, and provide technical guidance.
+
+### 🤖 1. RAG & LLM-Based Chatbots
+* Document Q&A Systems
+* Knowledge Base Assistants
+* Multi-Agent AI Systems
+* PDF and Website Chatbots
+
+### 🧠 2. Machine Learning Solutions
+* Predictive Analytics
+* Recommendation Systems
+* Computer Vision
+* NLP Applications
+* Deep Learning Models
+
+### ⚡ 3. AI Automation Tools
+* Workflow Automation
+* AI Agents
+* Report Generation
+* CRM Automation
+* Business Process Optimization
+
+### 🌐 4. Website Development & Enhancement
+* Full-Stack Web Applications
+* API Development
+* Dashboard Systems
+* AI Integration
 
 ## ✨ Major Features
 * **Interactive Voice Assistant**: A fully integrated speech-to-text and text-to-speech assistant (`voice-assistant.js`) allowing hands-free site navigation, content reading, and contact form dictation.
@@ -10,10 +43,20 @@ Mentroid is a next-generation AI solutions company based in Sehore, India. It se
 * **Responsive Mobile Drawer & Navigation**: A fully adaptive navigation system with a mobile drawer and smooth scrolling across various sections.
 
 ## 🛠️ Technology Stack
+
+### 💻 Repository Stack (Local Build)
+This specific repository is a pure static frontend designed to run seamlessly in any browser without complex build steps:
 * **Frontend**: HTML5, CSS3 (Vanilla, Custom Properties, 3D Transforms), JavaScript (ES6+ Vanilla)
-* **Backend**: None (Pure Static Web Application)
-* **Database**: None
+* **Backend/Database**: None (Pure Static Web Application)
 * **DevOps/Tools**: Any Static Hosting Provider (e.g., Vercel, Netlify, GitHub Pages), Web Speech API for voice interactions, EmailJS / Web3Forms APIs for form submissions.
+
+### 🏢 Mentroid Client Services Stack
+For production client projects, Mentroid deploys a broader, scalable enterprise stack:
+* **AI & Machine Learning**: TensorFlow, PyTorch, OpenAI, Scikit-learn
+* **Frontend**: React.js, Tailwind CSS
+* **Backend**: Flask, Node.js, Express
+* **Database**: MongoDB, Firebase, MySQL
+* **Cloud Infrastructure**: AWS, Vercel, Netlify
 
 ## 📁 Project Structure
 ```text
@@ -104,3 +147,8 @@ window.MENTROID_CONTACT = {
 3. **Code Style**: This project uses Vanilla JavaScript and CSS. Ensure that you maintain the existing architectural style (e.g., isolating feature logic into separate `.js` files and utilizing CSS variables for theme consistency).
 4. **Test Voice & Chat**: If your changes impact the UI, test the `voice-assistant.js` commands and the `chatbot.js` keyword triggers to ensure they don't break functionality.
 5. **Submit a PR**: Push your changes and open a Pull Request with a clear description of the problem solved or the feature added.
+
+---
+<div align="center">
+  <b>🌐 <a href="https://www.mentroid.co.in">Visit the Official Mentroid Website</a></b>
+</div>
