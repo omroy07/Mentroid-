@@ -43,7 +43,7 @@ Mentroid/
 ## 🚀 Local Setup & Installation
 1. **Clone the Repository**
    ```bash
-   git clone <repository_url>
+   git clone https://github.com/omroy07/Mentroid-.git
    cd Mentroid
    ```
 2. **Serve Locally**
