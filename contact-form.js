@@ -11,6 +11,7 @@
 
   const submitBtn = document.getElementById('contact-submit');
   const statusEl  = document.getElementById('contact-form-status');
+  var isSubmitting = false;
 
   /* ── Shared helpers (also used by quote form via window.MentroidMail) ── */
   function isBlank(val) {
@@ -139,6 +140,7 @@
   /* ── Submit ── */
   form.addEventListener('submit', function (e) {
     e.preventDefault();
+    if (isSubmitting) return; // belt-and-braces: disabled button/fields already block this in practice
     clearStatus();
     if (!validate()) return;
 
@@ -159,7 +161,9 @@
       email:       form.from_email.value.trim(),
     };
 
+    isSubmitting = true;
     setLoading(true);
+    setStatus('info', 'Sending your message…');
 
     send(params)
       .then(function () {
@@ -174,7 +178,10 @@
           setStatus('error', 'Could not send your message. Please try again or email mentroid@mentroid.co.in directly.');
         }
       })
-      .finally(function () { setLoading(false); });
+      .finally(function () {
+        isSubmitting = false;
+        setLoading(false);
+      });
   });
 
   form.addEventListener('input', clearStatus);

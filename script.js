@@ -16,12 +16,43 @@ drawer.querySelectorAll('a').forEach(a => {
 });
 
 // Filter pills – services
-document.querySelectorAll('.svc-filter').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.svc-filter').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+(function () {
+  const filterBtns = document.querySelectorAll('.svc-filter');
+  const emptyState = document.getElementById('svcEmpty');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filter = btn.dataset.filter || 'all';
+      // Queried fresh on every click, not captured once at page load —
+      // this stays correct even if cards are ever added/removed from
+      // the DOM later, instead of silently working off a stale snapshot.
+      const cards = document.querySelectorAll('#services .svc-card');
+      const catLabels = document.querySelectorAll('#services .cat-label');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const matches = filter === 'all' || card.dataset.category === filter;
+        card.hidden = !matches;
+        if (matches) visibleCount++;
+      });
+
+      // Hide a category heading entirely if none of the cards under it
+      // are showing, so filtering never leaves an empty "💻 Product
+      // Development" label floating above nothing.
+      catLabels.forEach(label => {
+        const grid = label.nextElementSibling;
+        if (!grid) return;
+        const anyVisible = Array.from(grid.querySelectorAll('.svc-card')).some(c => !c.hidden);
+        label.hidden = !anyVisible;
+      });
+
+      if (emptyState) emptyState.hidden = visibleCount > 0;
+    });
   });
-});
+})();
 
 // Dept tabs – team
 document.querySelectorAll('.dept-tab').forEach(tab => {
@@ -228,6 +259,7 @@ applyTheme(localStorage.getItem('mentroid-theme') || 'dark');
   const submitBtn = document.getElementById('quote-submit');
   const statusEl  = document.getElementById('quote-form-status');
   const pkgInput  = document.getElementById('qf-package');
+  let isSubmitting = false;
 
   if (!modal) return;
 
@@ -390,10 +422,13 @@ applyTheme(localStorage.getItem('mentroid-theme') || 'dark');
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
+    if (isSubmitting) return; // belt-and-braces: disabled button/fields already block this in practice
     clearStatus();
     if (!validate()) return;
 
+    isSubmitting = true;
     setLoading(true);
+    setStatus('info', 'Sending your request…');
     sendQuote()
       .then(function () {
         setStatus('success', '🎉 Quote request sent! We\'ll get back to you within 24 hours.');
@@ -408,7 +443,10 @@ applyTheme(localStorage.getItem('mentroid-theme') || 'dark');
           setStatus('error', 'Could not send your request. Please try again or email mentroid@mentroid.co.in directly.');
         }
       })
-      .finally(function () { setLoading(false); });
+      .finally(function () {
+        isSubmitting = false;
+        setLoading(false);
+      });
   });
 
   form.addEventListener('input', clearStatus);
