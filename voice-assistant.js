@@ -454,6 +454,27 @@
         isListening = false;
         setOrbState('idle');
         updateBtn();
+      } else if (e.error === 'audio-capture') {
+        addPopupEntry('system', '⚠️ No microphone was found. Please connect a microphone and try again.');
+        isListening = false;
+        setOrbState('idle');
+        updateBtn();
+      } else if (e.error === 'network') {
+        addPopupEntry('system', '⚠️ Voice recognition needs an internet connection. Please check your connection and try again.');
+        isListening = false;
+        setOrbState('idle');
+        updateBtn();
+      } else if (e.error === 'no-speech' || e.error === 'aborted') {
+        // Expected and frequent — the browser just heard silence, or we
+        // intentionally stopped recognition ourselves. isListening stays
+        // true and rec.onend's own restart logic (below) already picks
+        // this back up automatically. Surfacing an error here would be
+        // noisy and wrong for something this routine.
+      } else {
+        addPopupEntry('system', '⚠️ Voice recognition hit a snag. Please try again.');
+        isListening = false;
+        setOrbState('idle');
+        updateBtn();
       }
     };
 

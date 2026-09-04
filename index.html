@@ -170,18 +170,18 @@
         product development.</p>
 
       <div class="svc-filters">
-        <button class="svc-filter active">All Services</button>
-        <button class="svc-filter">AI & ML</button>
-        <button class="svc-filter">Development</button>
-        <button class="svc-filter">IoT</button>
-        <button class="svc-filter">Media</button>
+        <button class="svc-filter active" data-filter="all">All Services</button>
+        <button class="svc-filter" data-filter="ai-ml">AI & ML</button>
+        <button class="svc-filter" data-filter="development">Development</button>
+        <button class="svc-filter" data-filter="iot">IoT</button>
+        <button class="svc-filter" data-filter="media">Media</button>
       </div>
 
       <!-- AI & ML cluster -->
        <p class="cat-label">🤖 AI & Machine Learning</p>
       <div class="svc-grid">
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="ai-ml">
           <span class="svc-badge b-ai">Core AI</span>
           <div class="svc-icon">🧠</div>
           <h3>Custom Chatbot Development</h3>
@@ -195,7 +195,7 @@
          <a href="services/chatbot-development.html" class="svc-cta">Learn More → </a>
         </div>
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="ai-ml">
           <span class="svc-badge b-ai">ML Training</span>
           <div class="svc-icon">📊</div>
           <h3>Machine Learning Models</h3>
@@ -209,7 +209,7 @@
          <a href="services/ml-models.html" class="svc-cta">Learn More → </a>
         </div>
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="ai-ml">
           <span class="svc-badge b-ai">GenAI</span>
           <div class="svc-icon">✨</div>
           <h3>AI/ML & GenAI Projects</h3>
@@ -223,7 +223,7 @@
           <a href="services/genai-projects.html" class="svc-cta">Learn More →</a>
         </div>
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="ai-ml">
           <span class="svc-badge b-ai">Consulting</span>
           <div class="svc-icon">🎯</div>
           <h3>AI Career & Tech Consulting</h3>
@@ -243,7 +243,7 @@
       <p class="cat-label">💻 Product Development</p>
       <div class="svc-grid">
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="development">
           <span class="svc-badge b-dev">Web</span>
           <div class="svc-icon">🌐</div>
           <h3>Website Development</h3>
@@ -257,7 +257,7 @@
           <a href="#contact" class="svc-cta">Get a Quote →</a>
         </div>
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="development">
           <span class="svc-badge b-dev">Mobile</span>
           <div class="svc-icon">📱</div>
           <h3>App Development</h3>
@@ -271,7 +271,7 @@
           <a href="#contact" class="svc-cta">Get a Quote →</a>
         </div>
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="iot">
           <span class="svc-badge b-iot">IoT + ML</span>
           <div class="svc-icon">🔌</div>
           <h3>IoT + ML Solutions</h3>
@@ -285,7 +285,7 @@
           <a href="#contact" class="svc-cta">Explore →</a>
         </div>
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="media">
           <span class="svc-badge b-media">Media</span>
           <div class="svc-icon">🎬</div>
           <h3>Photo / Video Editing</h3>
@@ -300,6 +300,11 @@
         </div>
 
     </div>
+
+      <p class="svc-empty" id="svcEmpty" hidden>
+        🔍 No services in this category yet — check back soon, or
+        <a href="#contact">get in touch</a> to discuss what you need.
+      </p>
   </section> 
 
   <!-- ══ PROJECTS ══ -->
