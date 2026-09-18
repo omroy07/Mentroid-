@@ -16,12 +16,43 @@ drawer.querySelectorAll('a').forEach(a => {
 });
 
 // Filter pills – services
-document.querySelectorAll('.svc-filter').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.svc-filter').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+(function () {
+  const filterBtns = document.querySelectorAll('.svc-filter');
+  const emptyState = document.getElementById('svcEmpty');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filter = btn.dataset.filter || 'all';
+      // Queried fresh on every click, not captured once at page load —
+      // this stays correct even if cards are ever added/removed from
+      // the DOM later, instead of silently working off a stale snapshot.
+      const cards = document.querySelectorAll('#services .svc-card');
+      const catLabels = document.querySelectorAll('#services .cat-label');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const matches = filter === 'all' || card.dataset.category === filter;
+        card.hidden = !matches;
+        if (matches) visibleCount++;
+      });
+
+      // Hide a category heading entirely if none of the cards under it
+      // are showing, so filtering never leaves an empty "💻 Product
+      // Development" label floating above nothing.
+      catLabels.forEach(label => {
+        const grid = label.nextElementSibling;
+        if (!grid) return;
+        const anyVisible = Array.from(grid.querySelectorAll('.svc-card')).some(c => !c.hidden);
+        label.hidden = !anyVisible;
+      });
+
+      if (emptyState) emptyState.hidden = visibleCount > 0;
+    });
   });
-});
+})();
 
 // Dept tabs – team
 document.querySelectorAll('.dept-tab').forEach(tab => {
@@ -228,6 +259,7 @@ applyTheme(localStorage.getItem('mentroid-theme') || 'dark');
   const submitBtn = document.getElementById('quote-submit');
   const statusEl  = document.getElementById('quote-form-status');
   const pkgInput  = document.getElementById('qf-package');
+  let isSubmitting = false;
 
   if (!modal) return;
 
@@ -327,13 +359,25 @@ applyTheme(localStorage.getItem('mentroid-theme') || 'dark');
   function validate() {
     const v = getValues();
     if (form._honey && form._honey.value) return false;
-    if (!v.name)   { setStatus('error', 'Please enter your full name.'); form.from_name.focus(); return false; }
-    if (!v.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) {
-      setStatus('error', 'Please enter a valid email address.'); form.from_email.focus(); return false;
+
+    const result = window.MentroidValidate
+      ? window.MentroidValidate.validateQuoteForm({
+          name: v.name,
+          email: v.email,
+          mobile: v.mobile,
+          location: v.location,
+          problem: v.problem,
+          general_details: v.general_details,
+          solution: v.solution,
+        })
+      : { valid: true, field: null, message: null }; // fail open only if the shared module failed to load
+
+    if (!result.valid) {
+      setStatus('error', result.message);
+      const invalidField = form[result.field];
+      if (invalidField && typeof invalidField.focus === 'function') invalidField.focus();
+      return false;
     }
-    if (!v.mobile) { setStatus('error', 'Please enter your mobile number.'); form.mobile.focus(); return false; }
-    if (!v.location) { setStatus('error', 'Please select your location.'); form.location.focus(); return false; }
-    if (!v.problem) { setStatus('error', 'Please describe your problem statement.'); form.problem_statement.focus(); return false; }
     return true;
   }
 
@@ -390,10 +434,13 @@ applyTheme(localStorage.getItem('mentroid-theme') || 'dark');
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
+    if (isSubmitting) return; // belt-and-braces: disabled button/fields already block this in practice
     clearStatus();
     if (!validate()) return;
 
+    isSubmitting = true;
     setLoading(true);
+    setStatus('info', 'Sending your request…');
     sendQuote()
       .then(function () {
         setStatus('success', '🎉 Quote request sent! We\'ll get back to you within 24 hours.');
@@ -408,7 +455,10 @@ applyTheme(localStorage.getItem('mentroid-theme') || 'dark');
           setStatus('error', 'Could not send your request. Please try again or email mentroid@mentroid.co.in directly.');
         }
       })
-      .finally(function () { setLoading(false); });
+      .finally(function () {
+        isSubmitting = false;
+        setLoading(false);
+      });
   });
 
   form.addEventListener('input', clearStatus);

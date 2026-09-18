@@ -170,18 +170,18 @@
         product development.</p>
 
       <div class="svc-filters">
-        <button class="svc-filter active">All Services</button>
-        <button class="svc-filter">AI & ML</button>
-        <button class="svc-filter">Development</button>
-        <button class="svc-filter">IoT</button>
-        <button class="svc-filter">Media</button>
+        <button class="svc-filter active" data-filter="all">All Services</button>
+        <button class="svc-filter" data-filter="ai-ml">AI & ML</button>
+        <button class="svc-filter" data-filter="development">Development</button>
+        <button class="svc-filter" data-filter="iot">IoT</button>
+        <button class="svc-filter" data-filter="media">Media</button>
       </div>
 
       <!-- AI & ML cluster -->
        <p class="cat-label">🤖 AI & Machine Learning</p>
       <div class="svc-grid">
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="ai-ml">
           <span class="svc-badge b-ai">Core AI</span>
           <div class="svc-icon">🧠</div>
           <h3>Custom Chatbot Development</h3>
@@ -195,7 +195,7 @@
          <a href="services/chatbot-development.html" class="svc-cta">Learn More → </a>
         </div>
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="ai-ml">
           <span class="svc-badge b-ai">ML Training</span>
           <div class="svc-icon">📊</div>
           <h3>Machine Learning Models</h3>
@@ -209,7 +209,7 @@
          <a href="services/ml-models.html" class="svc-cta">Learn More → </a>
         </div>
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="ai-ml">
           <span class="svc-badge b-ai">GenAI</span>
           <div class="svc-icon">✨</div>
           <h3>AI/ML & GenAI Projects</h3>
@@ -223,7 +223,7 @@
           <a href="services/genai-projects.html" class="svc-cta">Learn More →</a>
         </div>
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="ai-ml">
           <span class="svc-badge b-ai">Consulting</span>
           <div class="svc-icon">🎯</div>
           <h3>AI Career & Tech Consulting</h3>
@@ -243,7 +243,7 @@
       <p class="cat-label">💻 Product Development</p>
       <div class="svc-grid">
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="development">
           <span class="svc-badge b-dev">Web</span>
           <div class="svc-icon">🌐</div>
           <h3>Website Development</h3>
@@ -257,7 +257,7 @@
           <a href="#contact" class="svc-cta">Get a Quote →</a>
         </div>
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="development">
           <span class="svc-badge b-dev">Mobile</span>
           <div class="svc-icon">📱</div>
           <h3>App Development</h3>
@@ -271,7 +271,7 @@
           <a href="#contact" class="svc-cta">Get a Quote →</a>
         </div>
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="iot">
           <span class="svc-badge b-iot">IoT + ML</span>
           <div class="svc-icon">🔌</div>
           <h3>IoT + ML Solutions</h3>
@@ -285,7 +285,7 @@
           <a href="#contact" class="svc-cta">Explore →</a>
         </div>
 
-        <div class="svc-card">
+        <div class="svc-card" data-category="media">
           <span class="svc-badge b-media">Media</span>
           <div class="svc-icon">🎬</div>
           <h3>Photo / Video Editing</h3>
@@ -300,6 +300,11 @@
         </div>
 
     </div>
+
+      <p class="svc-empty" id="svcEmpty" hidden>
+        🔍 No services in this category yet — check back soon, or
+        <a href="#contact">get in touch</a> to discuss what you need.
+      </p>
   </section> 
 
   <!-- ══ PROJECTS ══ -->
@@ -1012,19 +1017,19 @@
         <input type="text" name="_honey" class="form-honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <div class="form-group">
           <label for="contact-name">Your Name</label>
-          <input type="text" id="contact-name" name="from_name" placeholder="John Doe" autocomplete="name" required />
+          <input type="text" id="contact-name" name="from_name" placeholder="John Doe" autocomplete="name" maxlength="100" required />
         </div>
         <div class="form-group">
           <label for="contact-email">Email Address</label>
-          <input type="email" id="contact-email" name="from_email" placeholder="john@example.com" autocomplete="email" required />
+          <input type="email" id="contact-email" name="from_email" placeholder="john@example.com" autocomplete="email" maxlength="254" required />
         </div>
         <div class="form-group">
           <label for="contact-subject">Subject</label>
-          <input type="text" id="contact-subject" name="subject" placeholder="What's this about?" required />
+          <input type="text" id="contact-subject" name="subject" placeholder="What's this about?" maxlength="150" required />
         </div>
         <div class="form-group">
           <label for="contact-message">Message</label>
-          <textarea id="contact-message" name="message" placeholder="Tell us about your project or question..." required></textarea>
+          <textarea id="contact-message" name="message" placeholder="Tell us about your project or question..." maxlength="5000" required></textarea>
         </div>
         <button type="submit" class="form-submit" id="contact-submit">Send Message</button>
         <p id="contact-form-status" class="form-status" role="status" aria-live="polite" hidden></p>
@@ -1117,18 +1122,18 @@
         <div class="qmodal-row">
           <div class="form-group">
             <label for="qf-name">Full Name <span class="req">*</span></label>
-            <input type="text" id="qf-name" name="from_name" placeholder="John Doe" autocomplete="name" required />
+            <input type="text" id="qf-name" name="from_name" placeholder="John Doe" autocomplete="name" maxlength="100" required />
           </div>
           <div class="form-group">
             <label for="qf-email">Email Address <span class="req">*</span></label>
-            <input type="email" id="qf-email" name="from_email" placeholder="john@example.com" autocomplete="email" required />
+            <input type="email" id="qf-email" name="from_email" placeholder="john@example.com" autocomplete="email" maxlength="254" required />
           </div>
         </div>
 
         <div class="qmodal-row">
           <div class="form-group">
             <label for="qf-mobile">Mobile Number <span class="req">*</span></label>
-            <input type="tel" id="qf-mobile" name="mobile" placeholder="+91 98765 43210" autocomplete="tel" required />
+            <input type="tel" id="qf-mobile" name="mobile" placeholder="+91 98765 43210" autocomplete="tel" maxlength="20" required />
           </div>
           <div class="form-group">
             <label for="qf-designation">Designation / Role</label>
@@ -1193,17 +1198,17 @@
 
         <div class="form-group">
           <label for="qf-details">General Details</label>
-          <input type="text" id="qf-details" name="general_details" placeholder="Brief overview of your business or project" />
+          <input type="text" id="qf-details" name="general_details" placeholder="Brief overview of your business or project" maxlength="1000" />
         </div>
 
         <div class="form-group">
           <label for="qf-problem">Problem Statement <span class="req">*</span></label>
-          <textarea id="qf-problem" name="problem_statement" placeholder="Describe the challenge or pain point you're facing..." required></textarea>
+          <textarea id="qf-problem" name="problem_statement" placeholder="Describe the challenge or pain point you're facing..." maxlength="3000" required></textarea>
         </div>
 
         <div class="form-group">
           <label for="qf-solution">Expected Solution</label>
-          <textarea id="qf-solution" name="expected_solution" placeholder="What kind of solution are you looking for? (optional)"></textarea>
+          <textarea id="qf-solution" name="expected_solution" placeholder="What kind of solution are you looking for? (optional)" maxlength="2000"></textarea>
         </div>
 
         <div class="qmodal-footer">
@@ -1215,6 +1220,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="validation.js"></script>
   <script src="emailjs-config.js"></script>
   <script src="contact-form.js"></script>
   <script src="script.js"></script>

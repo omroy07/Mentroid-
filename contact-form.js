@@ -11,6 +11,7 @@
 
   const submitBtn = document.getElementById('contact-submit');
   const statusEl  = document.getElementById('contact-form-status');
+  var isSubmitting = false;
 
   /* ── Shared helpers (also used by quote form via window.MentroidMail) ── */
   function isBlank(val) {
@@ -123,22 +124,30 @@
   function validate() {
     if (form._honey && form._honey.value) return false;
 
-    const name    = form.from_name.value.trim();
-    const email   = form.from_email.value.trim();
-    const subject = form.subject.value.trim();
-    const message = form.message.value.trim();
+    var values = {
+      from_name:  form.from_name.value,
+      from_email: form.from_email.value,
+      subject:    form.subject.value,
+      message:    form.message.value,
+    };
 
-    if (!name)    { setStatus('error', 'Please enter your name.');              form.from_name.focus();    return false; }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                    setStatus('error', 'Please enter a valid email address.');  form.from_email.focus();   return false; }
-    if (!subject) { setStatus('error', 'Please enter a subject.');              form.subject.focus();      return false; }
-    if (!message) { setStatus('error', 'Please enter your message.');           form.message.focus();      return false; }
+    var result = window.MentroidValidate
+      ? window.MentroidValidate.validateContactForm(values)
+      : { valid: true, field: null, message: null }; // fail open only if the shared module failed to load
+
+    if (!result.valid) {
+      setStatus('error', result.message);
+      var invalidField = form[result.field];
+      if (invalidField && typeof invalidField.focus === 'function') invalidField.focus();
+      return false;
+    }
     return true;
   }
 
   /* ── Submit ── */
   form.addEventListener('submit', function (e) {
     e.preventDefault();
+    if (isSubmitting) return; // belt-and-braces: disabled button/fields already block this in practice
     clearStatus();
     if (!validate()) return;
 
@@ -159,7 +168,9 @@
       email:       form.from_email.value.trim(),
     };
 
+    isSubmitting = true;
     setLoading(true);
+    setStatus('info', 'Sending your message…');
 
     send(params)
       .then(function () {
@@ -174,7 +185,10 @@
           setStatus('error', 'Could not send your message. Please try again or email mentroid@mentroid.co.in directly.');
         }
       })
-      .finally(function () { setLoading(false); });
+      .finally(function () {
+        isSubmitting = false;
+        setLoading(false);
+      });
   });
 
   form.addEventListener('input', clearStatus);
