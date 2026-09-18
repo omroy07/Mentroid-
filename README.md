@@ -13,6 +13,16 @@ Mentroid is an AI & Machine Learning service provider dedicated to helping busin
 - 📊 Deliver Data Analytics & Predictive Solutions
 - 🔍 Provide AI Consulting and Technical Guidance
 
+## Testing
+
+The dependency-free test suite has exactly 20 cases covering shared contact/quote validation and mocked EmailJS/Web3Forms delivery behavior. It never sends a real email.
+
+```bash
+npm test
+```
+
+GitHub Actions runs this command for every pull request and for pushes to `main`. Enable the repository's `Test / test` status check in branch protection to require a passing suite before merging a PR.
+
 ---
 
 ## 🌟 Transform Your Ideas into Intelligent Solutions
