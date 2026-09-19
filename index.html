@@ -54,10 +54,12 @@
       <a href="#testimonials">Reviews</a>
       <a href="#team">Team</a>
       <a href="#faq">FAQ</a>
+      <a href="portal.html">Portal</a>
       <a href="#contact" class="nav-cta">Contact</a>
     </div>
 
     <div class="nav-right">
+      <div id="nav-user-area" class="nav-user-area"></div>
       <a href="#contact" class="nav-join">Join Us</a>
       <button class="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -78,7 +80,9 @@
     <a href="#testimonials">Reviews</a>
     <a href="#team">Team</a>
     <a href="#faq">FAQ</a>
+    <a href="portal.html">Portal</a>
     <a href="#contact" class="nav-cta">Contact</a>
+    <div id="drawer-user-area" style="padding: 0.75rem 0;"></div>
     <a href="#contact" class="nav-join nav-join--drawer">Join Us</a>
   </div>
 
@@ -1219,6 +1223,91 @@
     </div>
   </div>
 
+  <!-- ══ SHARED AUTH MODAL ══ -->
+  <div id="auth-modal" class="auth-modal-overlay" aria-hidden="true">
+    <div class="auth-modal-box" role="dialog" aria-labelledby="auth-modal-title">
+      <button type="button" class="auth-modal-close" id="auth-modal-close-btn" aria-label="Close modal">&times;</button>
+      
+      <!-- Modal Tabs -->
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" id="tab-login-btn">Sign In</button>
+        <button type="button" class="auth-tab-btn" id="tab-register-btn">Create Account</button>
+      </div>
+
+      <!-- Quick Demo Logins Banner -->
+      <div class="demo-logins-bar">
+        <span class="demo-label">Quick Demo Logins:</span>
+        <button type="button" class="demo-chip" id="demo-chip-client">👤 Client Account</button>
+        <button type="button" class="demo-chip" id="demo-chip-admin">👑 Admin Account</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="form-login" class="auth-form">
+        <h2 id="auth-modal-title">Sign In to Mentroid</h2>
+        <p class="auth-subtitle">Access your protected projects and client portal.</p>
+
+        <div class="form-group">
+          <label for="login-email">Email Address</label>
+          <input type="email" id="login-email" required placeholder="name@domain.com" autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <div class="password-input-wrap">
+            <input type="password" id="login-password" required placeholder="Enter password" autocomplete="current-password">
+            <button type="button" class="toggle-password-btn" data-target="login-password" aria-label="Toggle password visibility">👁️</button>
+          </div>
+        </div>
+
+        <div id="login-error-msg" class="auth-feedback-msg error" style="display: none;"></div>
+
+        <button type="submit" class="btn-primary auth-submit-btn" id="btn-submit-login">Sign In →</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="form-register" class="auth-form" style="display: none;">
+        <h2>Create Mentroid Account</h2>
+        <p class="auth-subtitle">All passwords are salted and hashed (PBKDF2/SHA-256).</p>
+
+        <div class="form-group">
+          <label for="reg-name">Full Name</label>
+          <input type="text" id="reg-name" required placeholder="Jane Doe" autocomplete="name" minlength="2">
+        </div>
+
+        <div class="form-group">
+          <label for="reg-email">Email Address</label>
+          <input type="email" id="reg-email" required placeholder="name@company.com" autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="reg-password">Secure Password</label>
+          <div class="password-input-wrap">
+            <input type="password" id="reg-password" required placeholder="Min. 8 chars with mixed cases & symbols" autocomplete="new-password">
+            <button type="button" class="toggle-password-btn" data-target="reg-password" aria-label="Toggle password visibility">👁️</button>
+          </div>
+          <!-- Live Password Strength Meter -->
+          <div class="strength-meter-box">
+            <div class="strength-bar"><div class="strength-bar-fill" id="strength-bar-fill"></div></div>
+            <ul class="strength-checklist" id="strength-checklist">
+              <li id="rule-len">At least 8 characters</li>
+              <li id="rule-case">Uppercase and lowercase letters</li>
+              <li id="rule-num">At least one number</li>
+              <li id="rule-sym">At least one special character (!@#$%^&*)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="reg-error-msg" class="auth-feedback-msg error" style="display: none;"></div>
+        <div id="reg-success-msg" class="auth-feedback-msg success" style="display: none;"></div>
+
+        <button type="submit" class="btn-primary auth-submit-btn" id="btn-submit-register">Create Account →</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="auth-toast" class="auth-toast" role="alert" aria-live="polite"></div>
+
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="validation.js"></script>
   <script src="emailjs-config.js"></script>
@@ -1227,6 +1316,8 @@
   <script src="projects-slider.js"></script>
   <script src="chatbot.js"></script>
   <script src="voice-assistant.js"></script>
+  <script src="auth.js"></script>
+  <script src="auth-ui.js"></script>
 
 </body>
 

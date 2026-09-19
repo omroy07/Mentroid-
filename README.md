@@ -63,15 +63,19 @@ For production client projects, Mentroid deploys a broader, scalable enterprise 
 Mentroid/
 ├── README.md               # Project documentation and setup guide
 ├── index.html              # Main entry point and structural layout of the landing page
+├── portal.html             # Protected client & admin portal (route-guarded)
 ├── style.css               # Core stylesheet including 3D animations, UI components, and responsive design
 ├── script.js               # General site interactions, mobile menu, and UI event listeners
+├── auth.js                 # Authentication & authorization engine (RBAC, PBKDF2 hashing, signed tokens)
+├── auth-ui.js              # Auth modal controller, password strength meter, and nav state
 ├── chatbot.js              # Chatbot engine, knowledge base dictionary, and chat UI logic
 ├── voice-assistant.js      # SpeechRecognition and SpeechSynthesis logic for hands-free navigation
 ├── contact-form.js         # Form validation and API payload submission logic
 ├── emailjs-config.js       # Configuration variables for EmailJS and Web3Forms integrations
 ├── projects-slider.js      # Interactive slider component for the projects showcase section
 ├── assets/                 # Static media files (images, webm videos, logos)
-└── services/               # Detailed HTML pages for specific service offerings
+├── services/               # Detailed HTML pages for specific service offerings
+└── tests/                  # Dependency-free test suites (validation & auth)
 ```
 
 ## 🔄 Data & Architectural Workflow
@@ -150,7 +154,9 @@ window.MENTROID_CONTACT = {
 
 ## Testing
 
-The dependency-free test suite has exactly 20 cases covering shared contact/quote validation and mocked EmailJS/Web3Forms delivery behavior. It never sends a real email.
+The dependency-free test suite has 40 unit and integration cases:
+* **Form Validation (`tests/validation.test.js`)**: 20 cases covering shared contact/quote validation, regex limits, and mocked EmailJS/Web3Forms delivery behavior.
+* **Authentication & Authorization (`tests/auth.test.js`)**: 20 cases covering password complexity, PBKDF2/SHA-256 salted hashing (no plaintext storage), HMAC-SHA256 signed token generation & expiration, RBAC role authorization (visitor, client, admin), HTTP status codes (200, 201, 400, 401, 403, 404, 409), and private route guards.
 
 ```bash
 npm test
