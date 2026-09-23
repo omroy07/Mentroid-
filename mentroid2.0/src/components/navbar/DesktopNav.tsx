@@ -1,95 +1,105 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
 
 import {
-  menuOrder,
-  type ActiveMenuKey,
-  type MenuKey,
-} from "./Navbar";
+  ChevronDown,
+} from "lucide-react";
 
 import { navigation } from "@/data/navigation";
 
+import type {
+  MenuKey,
+} from "./Navbar";
+
 type DesktopNavProps = {
-  activeMenu: MenuKey;
-  onMenuToggle: (
-    menu: ActiveMenuKey
+  activeMenu: MenuKey | null;
+  heroActive: boolean;
+  onOpenMenu: (
+    menu: MenuKey
   ) => void;
 };
 
+const menuOrder: MenuKey[] = [
+  "services",
+  "solutions",
+  "expertise",
+  "industries",
+  "company",
+];
+
 export default function DesktopNav({
   activeMenu,
-  onMenuToggle,
+  heroActive,
+  onOpenMenu,
 }: DesktopNavProps) {
   return (
-    <div className="ml-10 hidden lg:flex">
-      <nav
-        aria-label="Main navigation"
-        className="flex items-center"
+    <nav
+      className="
+        hidden
+        min-w-0
+        flex-1
+        items-center
+        justify-center
+        lg:flex
+      "
+    >
+      <div
+        className="
+          flex
+          min-w-0
+          items-center
+          gap-1
+          xl:gap-2
+        "
       >
         {menuOrder.map((key) => {
-          const item = navigation[key];
-
-          const isActive =
-            activeMenu === key;
+          const item =
+            navigation[key];
 
           return (
             <button
               key={key}
               type="button"
-              onClick={() => onMenuToggle(key)}
-              aria-expanded={isActive}
-              aria-haspopup="true"
-              className="
+              onMouseEnter={() =>
+                onOpenMenu(key)
+              }
+              className={`
                 group
-                relative
                 flex
+                shrink-0
                 items-center
                 gap-1.5
-                px-4
-                py-3
-                text-[13px]
+                rounded-md
+                px-3
+                py-2.5
+                text-[14px]
                 font-medium
-                text-[var(--text-secondary)]
-                transition-colors
+                transition-all
                 duration-200
-                hover:text-[var(--foreground)]
-              "
+                ${
+                  activeMenu === key
+                    ? heroActive
+                      ? "bg-white/10 text-white"
+                      : "bg-black/[0.05] text-black"
+                    : heroActive
+                    ? "text-white/75 hover:bg-white/10 hover:text-white"
+                    : "text-[var(--text-secondary)] hover:bg-black/[0.04] hover:text-[var(--foreground)]"
+                }
+              `}
             >
               {item.title}
 
               <ChevronDown
-                size={13}
+                size={14}
                 strokeWidth={1.8}
                 className={`
-                  transition-all
-                  duration-200
-                  ${
-                    isActive
-                      ? "rotate-180 text-[var(--accent-blue)]"
-                      : "text-[var(--text-secondary)] group-hover:text-[var(--foreground)]"
-                  }
-                `}
-              />
-
-              {/* Active line */}
-
-              <span
-                className={`
-                  absolute
-                  bottom-1
-                  left-4
-                  right-4
-                  h-[1.5px]
-                  origin-center
-                  bg-[var(--accent-blue)]
                   transition-transform
                   duration-200
                   ${
-                    isActive
-                      ? "scale-x-100"
-                      : "scale-x-0"
+                    activeMenu === key
+                      ? "rotate-180"
+                      : ""
                   }
                 `}
               />
@@ -97,24 +107,29 @@ export default function DesktopNav({
           );
         })}
 
-        {/* Work */}
+        {/* WORK */}
 
         <Link
           href="/work"
-          className="
-            px-4
-            py-3
-            text-[13px]
+          className={`
+            shrink-0
+            rounded-md
+            px-3
+            py-2.5
+            text-[14px]
             font-medium
-            text-[var(--text-secondary)]
-            transition-colors
+            transition-all
             duration-200
-            hover:text-[var(--foreground)]
-          "
+            ${
+              heroActive
+                ? "text-white/75 hover:bg-white/10 hover:text-white"
+                : "text-[var(--text-secondary)] hover:bg-black/[0.04] hover:text-[var(--foreground)]"
+            }
+          `}
         >
           Work
         </Link>
-      </nav>
-    </div>
+      </div>
+    </nav>
   );
 }

@@ -1,329 +1,304 @@
 "use client";
 
-import Link from "next/link";
 import {
-  ArrowRight,
-  BrainCircuit,
-  Building2,
-  Workflow,
-  Zap,
+  AnimatePresence,
+  motion,
+} from "framer-motion";
+
+import {
+  ArrowUpRight,
 } from "lucide-react";
-import type { ElementType } from "react";
 
-import type { ActiveMenuKey } from "./Navbar";
+import type {
+  MenuData,
+  MenuKey,
+} from "./Navbar";
 
-type MenuItem = {
-  title: string;
-  description?: string;
-  icon?: ElementType;
-  href: string;
-};
-
-type MenuGroup = {
-  title: string;
-  items: MenuItem[];
-};
-
-type MegaMenuData = {
-  title: string;
-  description: string;
-  groups: MenuGroup[];
-};
+import {
+  fallbackPreviewImages,
+  menuPreviewImages,
+} from "./Navbar";
 
 type MegaMenuProps = {
-  menu: MegaMenuData;
-  menuKey: ActiveMenuKey;
+  menu: MenuData;
+  menuKey: MenuKey;
+  previewImage: string;
+  heroActive: boolean;
+  onPreviewChange: (
+    image: string
+  ) => void;
   onNavigate: () => void;
 };
 
 export default function MegaMenu({
   menu,
   menuKey,
+  previewImage,
+  heroActive,
+  onPreviewChange,
   onNavigate,
 }: MegaMenuProps) {
   return (
-    <div className="mx-auto max-w-[1440px] px-6 py-10 sm:px-8 lg:px-10">
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[280px_1fr] lg:gap-16">
-        {/* =====================================
-            INTRO
-        ===================================== */}
+    <div
+      className={`
+        w-full
+        max-w-full
+        overflow-x-clip
+        transition-all
+        duration-300
+        ${
+          heroActive
+            ? "bg-[#0b0d0c]/80 backdrop-blur-xl"
+            : "bg-white/[0.94] backdrop-blur-2xl"
+        }
+      `}
+    >
+      <div
+        className="
+          mx-auto
+          grid
+          w-full
+          max-w-[1440px]
+          min-w-0
+          grid-cols-1
+          gap-8
+          overflow-hidden
+          px-6
+          py-8
+          lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]
+          lg:gap-10
+          lg:px-10
+          lg:py-10
+        "
+      >
+        {/* =================================================
+            LEFT CONTENT
+        ================================================= */}
 
-        <div className="lg:border-r lg:border-[var(--border)] lg:pr-12">
-          {/* Eyebrow */}
+        <div
+          className="
+            min-w-0
+            grid
+            grid-cols-2
+            gap-x-8
+            lg:gap-x-10
+          "
+        >
+          {menu.groups.map(
+            (group) => (
+              <div
+                key={group.title}
+                className="min-w-0"
+              >
+                {/* GROUP TITLE */}
 
-          <div className="mb-5 flex items-center gap-3">
-            <span
-              className="
-                h-[1px]
-                w-7
-                bg-[var(--accent-blue)]
-              "
-            />
-
-            <span
-              className="
-                text-[10px]
-                font-semibold
-                uppercase
-                tracking-[0.18em]
-                text-[var(--accent-blue)]
-              "
-            >
-              Mentroid
-            </span>
-          </div>
-
-          {/* Title */}
-
-          <h2
-            className="
-              text-3xl
-              font-semibold
-              tracking-[-0.045em]
-              text-[var(--foreground)]
-            "
-          >
-            {menu.title}
-          </h2>
-
-          {/* Description */}
-
-          <p
-            className="
-              mt-4
-              max-w-[245px]
-              text-[13px]
-              leading-6
-              text-[var(--text-secondary)]
-            "
-          >
-            {menu.description}
-          </p>
-
-          {/* Explore */}
-
-          <Link
-            href={getExploreHref(menuKey)}
-            onClick={onNavigate}
-            className="
-              group
-              mt-7
-              inline-flex
-              items-center
-              gap-2
-              text-[12px]
-              font-semibold
-              text-[var(--foreground)]
-            "
-          >
-            Explore {menu.title}
-
-            <span
-              className="
-                flex
-                h-6
-                w-6
-                items-center
-                justify-center
-                rounded-full
-                bg-[var(--foreground)]
-                text-white
-                transition-colors
-                group-hover:bg-[var(--accent-blue)]
-              "
-            >
-              <ArrowRight size={12} />
-            </span>
-          </Link>
-        </div>
-
-        {/* =====================================
-            GROUPS
-        ===================================== */}
-
-        <div className="grid grid-cols-1 gap-x-14 gap-y-10 md:grid-cols-2">
-          {menu.groups.map((group) => (
-            <div key={group.title}>
-              {/* Group title */}
-
-              <div className="mb-5 flex items-center gap-3">
-                <span
-                  className="
+                <p
+                  className={`
+                    mb-4
                     text-[10px]
-                    font-semibold
+                    font-medium
                     uppercase
-                    tracking-[0.16em]
-                    text-[var(--text-secondary)]
-                  "
+                    tracking-[0.14em]
+                    ${
+                      heroActive
+                        ? "text-white/40"
+                        : "text-black/45"
+                    }
+                  `}
                 >
                   {group.title}
-                </span>
+                </p>
 
-                <span
-                  className="
-                    h-px
-                    flex-1
-                    bg-[var(--border)]
-                  "
-                />
-              </div>
+                {/* ITEMS */}
 
-              {/* Items */}
+                <div className="space-y-0.5">
+                  {group.items.map(
+                    (
+                      item,
+                      index
+                    ) => {
+                      const image =
+                        item.image ||
+                        fallbackPreviewImages[
+                          index %
+                            fallbackPreviewImages.length
+                        ] ||
+                        menuPreviewImages[
+                          menuKey
+                        ];
 
-              <div className="space-y-1">
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-
-                  return (
-                    <Link
-                      key={item.title}
-                      href={item.href}
-                      onClick={onNavigate}
-                      className="
-                        group
-                        flex
-                        items-start
-                        gap-4
-                        border-b
-                        border-transparent
-                        py-3
-                        transition-colors
-                        duration-200
-                        hover:border-[var(--border)]
-                      "
-                    >
-                      {/* Icon */}
-
-                      {Icon && (
-                        <div
-                          className="
-                            mt-0.5
+                      return (
+                        <a
+                          key={
+                            item.title
+                          }
+                          href={
+                            item.href
+                          }
+                          onMouseEnter={() =>
+                            onPreviewChange(
+                              image
+                            )
+                          }
+                          onFocus={() =>
+                            onPreviewChange(
+                              image
+                            )
+                          }
+                          onClick={
+                            onNavigate
+                          }
+                          className={`
+                            group
+                            relative
                             flex
-                            h-9
-                            w-9
-                            shrink-0
+                            min-w-0
                             items-center
-                            justify-center
-                            border
-                            border-[var(--border)]
-                            text-[var(--accent-blue)]
-                            transition-all
+                            py-1.5
+                            text-[15px]
+                            leading-6
+                            tracking-[-0.015em]
+                            transition-colors
                             duration-200
-                            group-hover:border-[var(--accent-blue)]
-                            group-hover:bg-[rgba(22,140,255,0.05)]
-                          "
+                            ${
+                              heroActive
+                                ? "text-white/75 hover:text-white"
+                                : "text-[#111] hover:text-black"
+                            }
+                          `}
                         >
-                          <Icon
-                            size={16}
-                            strokeWidth={1.7}
-                          />
-                        </div>
-                      )}
+                          {/* ACTIVE INDICATOR */}
 
-                      {/* Content */}
-
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-3">
                           <span
-                            className="
-                              text-[13px]
-                              font-semibold
-                              tracking-[-0.01em]
-                              text-[var(--foreground)]
-                            "
-                          >
+                            className={`
+                              absolute
+                              -left-3
+                              h-[2px]
+                              w-0
+                              transition-all
+                              duration-300
+                              group-hover:w-1.5
+                              ${
+                                heroActive
+                                  ? "bg-white"
+                                  : "bg-black"
+                              }
+                            `}
+                          />
+
+                          <span className="truncate">
                             {item.title}
                           </span>
 
-                          <ArrowRight
-                            size={14}
-                            className="
+                          <ArrowUpRight
+                            size={13}
+                            className={`
+                              ml-1
                               shrink-0
-                              -translate-x-2
-                              text-[var(--accent-blue)]
+                              -translate-x-1
                               opacity-0
                               transition-all
                               duration-200
                               group-hover:translate-x-0
-                              group-hover:opacity-100
-                            "
+                              group-hover:opacity-60
+                              ${
+                                heroActive
+                                  ? "text-white"
+                                  : "text-black"
+                              }
+                            `}
                           />
-                        </div>
-
-                        {item.description && (
-                          <p
-                            className="
-                              mt-1
-                              max-w-[340px]
-                              text-[11px]
-                              leading-5
-                              text-[var(--text-secondary)]
-                            "
-                          >
-                            {item.description}
-                          </p>
-                        )}
-                      </div>
-                    </Link>
-                  );
-                })}
+                        </a>
+                      );
+                    }
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
+        </div>
+
+        {/* =================================================
+            RIGHT PREVIEW
+        ================================================= */}
+
+        <div
+          className="
+            relative
+            min-w-0
+            min-h-[240px]
+            overflow-hidden
+            rounded-[12px]
+            bg-black/10
+            lg:min-h-[290px]
+          "
+        >
+          <AnimatePresence mode="sync">
+            <motion.img
+              key={previewImage}
+              src={previewImage}
+              alt=""
+              initial={{
+                opacity: 0,
+                scale: 1.04,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+              }}
+              exit={{
+                opacity: 0,
+                scale: 1.02,
+              }}
+              transition={{
+                duration: 0.3,
+                ease: "easeOut",
+              }}
+              className="
+                absolute
+                inset-0
+                h-full
+                w-full
+                object-cover
+              "
+            />
+          </AnimatePresence>
+
+          {/* CINEMATIC OVERLAY */}
+
+          <div
+            className="
+              pointer-events-none
+              absolute
+              inset-0
+              bg-black/15
+            "
+          />
+
+          {/* LABEL */}
+
+          <div
+            className="
+              absolute
+              bottom-4
+              left-4
+              rounded-full
+              border
+              border-white/15
+              bg-black/25
+              px-3
+              py-1.5
+              text-[9px]
+              uppercase
+              tracking-[0.18em]
+              text-white
+              backdrop-blur-md
+            "
+          >
+            Mentroid Intelligence
+          </div>
         </div>
       </div>
     </div>
   );
-}
-
-/* =====================================================
-   MENU ICON
-===================================================== */
-
-function MenuIcon({
-  menuKey,
-}: {
-  menuKey: ActiveMenuKey;
-}) {
-  if (menuKey === "services") {
-    return <Zap size={18} />;
-  }
-
-  if (menuKey === "solutions") {
-    return <Workflow size={18} />;
-  }
-
-  if (menuKey === "expertise") {
-    return <BrainCircuit size={18} />;
-  }
-
-  return <Building2 size={18} />;
-}
-
-/* =====================================================
-   EXPLORE URL
-===================================================== */
-
-function getExploreHref(
-  menuKey: ActiveMenuKey
-) {
-  switch (menuKey) {
-    case "services":
-      return "/services";
-
-    case "solutions":
-      return "/solutions";
-
-    case "expertise":
-      return "/expertise";
-
-    case "industries":
-      return "/industries";
-
-    case "company":
-      return "/about";
-
-    default:
-      return "/";
-  }
 }

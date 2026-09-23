@@ -1,23 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import {
+  useState,
+} from "react";
+
 import Link from "next/link";
+
 import {
   AnimatePresence,
   motion,
 } from "framer-motion";
+
 import {
-  ArrowRight,
   ArrowUpRight,
   ChevronDown,
 } from "lucide-react";
 
-import {
-  menuOrder,
-  type ActiveMenuKey,
+import { navigation } from "@/data/navigation";
+
+import type {
+  MenuKey,
+  MenuData,
 } from "./Navbar";
 
-import { navigation } from "@/data/navigation";
+const menuOrder: MenuKey[] = [
+  "services",
+  "solutions",
+  "expertise",
+  "industries",
+  "company",
+];
 
 type MobileNavProps = {
   onClose: () => void;
@@ -26,36 +38,34 @@ type MobileNavProps = {
 export default function MobileNav({
   onClose,
 }: MobileNavProps) {
-  const [openSection, setOpenSection] =
-    useState<ActiveMenuKey | null>(null);
-
-  const toggleSection = (
-    key: ActiveMenuKey
-  ) => {
-    setOpenSection((current) =>
-      current === key ? null : key
-    );
-  };
+  const [
+    openSection,
+    setOpenSection,
+  ] = useState<MenuKey | null>(
+    null
+  );
 
   return (
     <div
       className="
         h-full
         overflow-y-auto
-        bg-white
+        overflow-x-clip
         px-5
-        pb-8
-        pt-2
-        sm:px-8
+        pb-10
+        pt-5
       "
     >
-      {/* =====================================
-          MOBILE NAV
-      ===================================== */}
+      {/* =================================================
+          MAIN MENU
+      ================================================= */}
 
       <div>
         {menuOrder.map((key) => {
-          const menu = navigation[key];
+          const menu =
+            navigation[
+              key
+            ] as MenuData;
 
           const isOpen =
             openSection === key;
@@ -65,28 +75,27 @@ export default function MobileNav({
               key={key}
               className="
                 border-b
-                border-[var(--border)]
+                border-black/[0.08]
               "
             >
-              {/* Header */}
-
               <button
                 type="button"
                 onClick={() =>
-                  toggleSection(key)
+                  setOpenSection(
+                    isOpen
+                      ? null
+                      : key
+                  )
                 }
-                aria-expanded={isOpen}
                 className="
                   flex
                   w-full
                   items-center
                   justify-between
-                  py-5
+                  py-4
                   text-left
                   text-[15px]
-                  font-semibold
-                  tracking-[-0.01em]
-                  text-[var(--foreground)]
+                  font-medium
                 "
               >
                 {menu.title}
@@ -98,14 +107,12 @@ export default function MobileNav({
                     duration-200
                     ${
                       isOpen
-                        ? "rotate-180 text-[var(--accent-blue)]"
-                        : "text-[var(--text-secondary)]"
+                        ? "rotate-180"
+                        : ""
                     }
                   `}
                 />
               </button>
-
-              {/* Content */}
 
               <AnimatePresence
                 initial={false}
@@ -124,151 +131,60 @@ export default function MobileNav({
                       height: 0,
                       opacity: 0,
                     }}
-                    transition={{
-                      duration: 0.25,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                    className="overflow-hidden"
+                    className="
+                      overflow-hidden
+                    "
                   >
-                    <div className="pb-5">
-                      {/* Description */}
-
-                      <p
-                        className="
-                          mb-5
-                          max-w-[360px]
-                          text-[12px]
-                          leading-5
-                          text-[var(--text-secondary)]
-                        "
-                      >
-                        {menu.description}
-                      </p>
-
+                    <div className="pb-4">
                       {menu.groups.map(
                         (group) => (
                           <div
-                            key={group.title}
-                            className="
-                              mb-6
-                              last:mb-0
-                            "
+                            key={
+                              group.title
+                            }
+                            className="mb-5"
                           >
-                            {/* Group */}
-
                             <p
                               className="
-                                mb-3
-                                text-[9px]
-                                font-semibold
+                                mb-2
+                                text-[10px]
                                 uppercase
-                                tracking-[0.17em]
-                                text-[var(--text-secondary)]
+                                tracking-[0.12em]
+                                text-black/45
                               "
                             >
-                              {group.title}
+                              {
+                                group.title
+                              }
                             </p>
 
-                            {/* Items */}
-
-                            <div className="space-y-1">
-                              {group.items.map(
-                                (item) => {
-                                  const Icon =
-                                    item.icon;
-
-                                  return (
-                                    <Link
-                                      key={
-                                        item.title
-                                      }
-                                      href={
-                                        item.href
-                                      }
-                                      onClick={
-                                        onClose
-                                      }
-                                      className="
-                                        group
-                                        flex
-                                        items-center
-                                        gap-3
-                                        py-2.5
-                                      "
-                                    >
-                                      {/* Icon */}
-
-                                      {Icon && (
-                                        <span
-                                          className="
-                                            flex
-                                            h-8
-                                            w-8
-                                            shrink-0
-                                            items-center
-                                            justify-center
-                                            border
-                                            border-[var(--border)]
-                                            text-[var(--accent-blue)]
-                                          "
-                                        >
-                                          <Icon
-                                            size={15}
-                                            strokeWidth={
-                                              1.7
-                                            }
-                                          />
-                                        </span>
-                                      )}
-
-                                      {/* Text */}
-
-                                      <span className="min-w-0 flex-1">
-                                        <span
-                                          className="
-                                            block
-                                            text-[12px]
-                                            font-medium
-                                            text-[var(--foreground)]
-                                          "
-                                        >
-                                          {
-                                            item.title
-                                          }
-                                        </span>
-
-                                        {item.description && (
-                                          <span
-                                            className="
-                                              mt-0.5
-                                              block
-                                              text-[10px]
-                                              leading-4
-                                              text-[var(--text-secondary)]
-                                            "
-                                          >
-                                            {
-                                              item.description
-                                            }
-                                          </span>
-                                        )}
-                                      </span>
-
-                                      <ArrowRight
-                                        size={13}
-                                        className="
-                                          text-[var(--text-secondary)]
-                                          transition-all
-                                          duration-200
-                                          group-hover:translate-x-1
-                                          group-hover:text-[var(--accent-blue)]
-                                        "
-                                      />
-                                    </Link>
-                                  );
-                                }
-                              )}
-                            </div>
+                            {group.items.map(
+                              (item) => (
+                                <Link
+                                  key={
+                                    item.title
+                                  }
+                                  href={
+                                    item.href
+                                  }
+                                  onClick={
+                                    onClose
+                                  }
+                                  className="
+                                    block
+                                    py-2.5
+                                    text-[14px]
+                                    text-black/75
+                                    transition-colors
+                                    hover:text-black
+                                  "
+                                >
+                                  {
+                                    item.title
+                                  }
+                                </Link>
+                              )
+                            )}
                           </div>
                         )
                       )}
@@ -280,123 +196,68 @@ export default function MobileNav({
           );
         })}
 
-        {/* =====================================
-            WORK
-        ===================================== */}
+        {/* WORK */}
 
         <Link
           href="/work"
           onClick={onClose}
           className="
-            flex
-            items-center
-            justify-between
+            block
             border-b
-            border-[var(--border)]
-            py-5
+            border-black/[0.08]
+            py-4
             text-[15px]
-            font-semibold
-            text-[var(--foreground)]
+            font-medium
           "
         >
           Work
-
-          <ArrowRight
-            size={17}
-            className="text-[var(--text-secondary)]"
-          />
         </Link>
 
-        {/* =====================================
-            CLIENT PORTAL
-        ===================================== */}
+        {/* CLIENT PORTAL */}
 
         <Link
           href="/portal"
           onClick={onClose}
           className="
-            flex
-            items-center
-            justify-between
+            block
             border-b
-            border-[var(--border)]
-            py-5
+            border-black/[0.08]
+            py-4
             text-[15px]
-            font-semibold
-            text-[var(--foreground)]
+            font-medium
           "
         >
           Client Portal
-
-          <ArrowRight
-            size={17}
-            className="text-[var(--text-secondary)]"
-          />
         </Link>
       </div>
 
-      {/* =====================================
+      {/* =================================================
           CTA
-      ===================================== */}
+      ================================================= */}
 
-      <div className="pt-6">
-        <Link
-          href="/contact"
-          onClick={onClose}
-          className="
-            group
-            flex
-            w-full
-            items-center
-            justify-between
-            border
-            border-[var(--foreground)]
-            px-5
-            py-3.5
-            text-[13px]
-            font-semibold
-            text-[var(--foreground)]
-            transition-all
-            duration-200
-            hover:bg-[var(--foreground)]
-            hover:text-white
-          "
-        >
-          Let's Talk
-
-          <span
-            className="
-              flex
-              h-7
-              w-7
-              items-center
-              justify-center
-              rounded-full
-              bg-[var(--foreground)]
-              text-white
-              transition-colors
-              group-hover:bg-[var(--accent-blue)]
-            "
-          >
-            <ArrowUpRight size={14} />
-          </span>
-        </Link>
-      </div>
-
-      {/* =====================================
-          FOOTER MESSAGE
-      ===================================== */}
-
-      <p
+      <Link
+        href="/contact"
+        onClick={onClose}
         className="
-          mt-7
-          text-[10px]
-          tracking-wide
-          text-[var(--text-secondary)]
+          mt-6
+          flex
+          w-full
+          items-center
+          justify-center
+          gap-2
+          rounded-lg
+          bg-[#07111f]
+          px-5
+          py-3.5
+          text-sm
+          font-semibold
+          text-white
         "
       >
-        Intelligent systems. Automated workflows.
-      </p>
+        Let's Talk
+
+        <ArrowUpRight size={16} />
+      </Link>
     </div>
   );
 }

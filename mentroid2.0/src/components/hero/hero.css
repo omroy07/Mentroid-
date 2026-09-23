@@ -1,0 +1,124 @@
+.hero-shape {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* =========================================================
+   MAIN ORGANIC BLUE SHAPE
+========================================================= */
+
+.hero-shape-main {
+  width: 85vw;
+  height: 65vh;
+
+  right: -12%;
+  top: 18%;
+
+  background: #b9ddff;
+
+  border-radius: 48% 52% 61% 39% / 42% 39% 61% 58%;
+
+  filter: blur(45px);
+
+  transform: rotate(-8deg);
+
+  opacity: 0.85;
+}
+
+/* =========================================================
+   SECONDARY SHAPE
+========================================================= */
+
+.hero-shape-secondary {
+  width: 55vw;
+  height: 55vh;
+
+  left: 20%;
+  bottom: -30%;
+
+  background: #d5eaff;
+
+  border-radius: 63% 37% 45% 55% / 49% 55% 45% 51%;
+
+  filter: blur(55px);
+
+  transform: rotate(14deg);
+
+  opacity: 0.8;
+}
+
+/* =========================================================
+   CENTER WHITE LIGHT
+========================================================= */
+
+.hero-light {
+  position: absolute;
+
+  width: 55vw;
+  height: 45vh;
+
+  left: 30%;
+  top: 32%;
+
+  background: #ffffff;
+
+  border-radius: 50%;
+
+  filter: blur(70px);
+
+  opacity: 0.75;
+}
+
+/* =========================================================
+   GRAIN
+========================================================= */
+
+.hero-grain {
+  position: absolute;
+  inset: 0;
+
+  opacity: 0.035;
+
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.7'/%3E%3C/svg%3E");
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+  .hero-shape-main {
+    width: 125vw;
+    height: 48vh;
+
+    right: -45%;
+    top: 30%;
+
+    filter: blur(38px);
+
+    opacity: 0.75;
+  }
+
+  .hero-shape-secondary {
+    width: 100vw;
+    height: 38vh;
+
+    left: -20%;
+    bottom: -10%;
+
+    filter: blur(45px);
+  }
+
+  .hero-light {
+    width: 100vw;
+    height: 45vh;
+
+    left: 0;
+    top: 35%;
+
+    filter: blur(60px);
+  }
+}
