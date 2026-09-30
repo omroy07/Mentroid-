@@ -533,7 +533,16 @@ export default function Solutions() {
             >
               
 
-              
+              <span
+                className="
+                  text-[9px]
+                  uppercase
+                  tracking-[0.24em]
+                  text-black/40
+                "
+              >
+               
+              </span>
             </div>
 
             <h2
