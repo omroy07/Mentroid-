@@ -5,9 +5,7 @@ import {
   motion,
 } from "framer-motion";
 
-import {
-  ArrowUpRight,
-} from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
 import type {
   MenuData,
@@ -23,10 +21,7 @@ type MegaMenuProps = {
   menu: MenuData;
   menuKey: MenuKey;
   previewImage: string;
-  heroActive: boolean;
-  onPreviewChange: (
-    image: string
-  ) => void;
+  onPreviewChange: (image: string) => void;
   onNavigate: () => void;
 };
 
@@ -34,24 +29,22 @@ export default function MegaMenu({
   menu,
   menuKey,
   previewImage,
-  heroActive,
   onPreviewChange,
   onNavigate,
 }: MegaMenuProps) {
   return (
     <div
-      className={`
+      className="
         w-full
         max-w-full
         overflow-x-clip
-        transition-all
-        duration-300
-        ${
-          heroActive
-            ? "bg-[#0b0d0c]/80 backdrop-blur-xl"
-            : "bg-white/[0.94] backdrop-blur-2xl"
-        }
-      `}
+        border-t
+        border-white/[0.08]
+        bg-[#0b0d0c]/95
+        text-white
+        shadow-[0_20px_70px_rgba(0,0,0,0.22)]
+        backdrop-blur-xl
+      "
     >
       <div
         className="
@@ -65,6 +58,7 @@ export default function MegaMenu({
           overflow-hidden
           px-6
           py-8
+          sm:px-8
           lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]
           lg:gap-10
           lg:px-10
@@ -84,138 +78,113 @@ export default function MegaMenu({
             lg:gap-x-10
           "
         >
-          {menu.groups.map(
-            (group) => (
-              <div
-                key={group.title}
-                className="min-w-0"
+          {menu.groups.map((group) => (
+            <div
+              key={group.title}
+              className="min-w-0"
+            >
+              {/* =================================================
+                  GROUP TITLE
+              ================================================= */}
+
+              <p
+                className="
+                  mb-4
+                  text-[10px]
+                  font-medium
+                  uppercase
+                  tracking-[0.14em]
+                  text-white/40
+                "
               >
-                {/* GROUP TITLE */}
+                {group.title}
+              </p>
 
-                <p
-                  className={`
-                    mb-4
-                    text-[10px]
-                    font-medium
-                    uppercase
-                    tracking-[0.14em]
-                    ${
-                      heroActive
-                        ? "text-white/40"
-                        : "text-black/45"
-                    }
-                  `}
-                >
-                  {group.title}
-                </p>
+              {/* =================================================
+                  ITEMS
+              ================================================= */}
 
-                {/* ITEMS */}
+              <div className="space-y-0.5">
+                {group.items.map(
+                  (item, index) => {
+                    const image =
+                      item.image ||
+                      fallbackPreviewImages[
+                        index %
+                          fallbackPreviewImages.length
+                      ] ||
+                      menuPreviewImages[
+                        menuKey
+                      ];
 
-                <div className="space-y-0.5">
-                  {group.items.map(
-                    (
-                      item,
-                      index
-                    ) => {
-                      const image =
-                        item.image ||
-                        fallbackPreviewImages[
-                          index %
-                            fallbackPreviewImages.length
-                        ] ||
-                        menuPreviewImages[
-                          menuKey
-                        ];
+                    return (
+                      <a
+                        key={item.title}
+                        href={item.href}
+                        onMouseEnter={() =>
+                          onPreviewChange(image)
+                        }
+                        onFocus={() =>
+                          onPreviewChange(image)
+                        }
+                        onClick={onNavigate}
+                        className="
+                          group
+                          relative
+                          flex
+                          min-w-0
+                          items-center
+                          py-1.5
+                          text-[15px]
+                          leading-6
+                          tracking-[-0.015em]
+                          text-white/75
+                          transition-colors
+                          duration-200
+                          hover:text-white
+                        "
+                      >
+                        {/* ACTIVE INDICATOR */}
 
-                      return (
-                        <a
-                          key={
-                            item.title
-                          }
-                          href={
-                            item.href
-                          }
-                          onMouseEnter={() =>
-                            onPreviewChange(
-                              image
-                            )
-                          }
-                          onFocus={() =>
-                            onPreviewChange(
-                              image
-                            )
-                          }
-                          onClick={
-                            onNavigate
-                          }
-                          className={`
-                            group
-                            relative
-                            flex
-                            min-w-0
-                            items-center
-                            py-1.5
-                            text-[15px]
-                            leading-6
-                            tracking-[-0.015em]
-                            transition-colors
+                        <span
+                          className="
+                            absolute
+                            -left-3
+                            h-[2px]
+                            w-0
+                            bg-white
+                            transition-all
+                            duration-300
+                            group-hover:w-1.5
+                          "
+                        />
+
+                        <span className="truncate">
+                          {item.title}
+                        </span>
+
+                        <ArrowUpRight
+                          size={13}
+                          strokeWidth={1.7}
+                          className="
+                            ml-1
+                            shrink-0
+                            -translate-x-1
+                            text-white
+                            opacity-0
+                            transition-all
                             duration-200
-                            ${
-                              heroActive
-                                ? "text-white/75 hover:text-white"
-                                : "text-[#111] hover:text-black"
-                            }
-                          `}
-                        >
-                          {/* ACTIVE INDICATOR */}
-
-                          <span
-                            className={`
-                              absolute
-                              -left-3
-                              h-[2px]
-                              w-0
-                              transition-all
-                              duration-300
-                              group-hover:w-1.5
-                              ${
-                                heroActive
-                                  ? "bg-white"
-                                  : "bg-black"
-                              }
-                            `}
-                          />
-
-                          <span className="truncate">
-                            {item.title}
-                          </span>
-
-                          <ArrowUpRight
-                            size={13}
-                            className={`
-                              ml-1
-                              shrink-0
-                              -translate-x-1
-                              opacity-0
-                              transition-all
-                              duration-200
-                              group-hover:translate-x-0
-                              group-hover:opacity-60
-                              ${
-                                heroActive
-                                  ? "text-white"
-                                  : "text-black"
-                              }
-                            `}
-                          />
-                        </a>
-                      );
-                    }
-                  )}
-                </div>
+                            group-hover:translate-x-0
+                            group-hover:opacity-60
+                          "
+                        />
+                      </a>
+                    );
+                  }
+                )}
               </div>
-            )
-          )}
+            </div>
+          ))}
         </div>
 
         {/* =================================================
@@ -229,7 +198,9 @@ export default function MegaMenu({
             min-h-[240px]
             overflow-hidden
             rounded-[12px]
-            bg-black/10
+            bg-white/[0.04]
+            ring-1
+            ring-white/[0.08]
             lg:min-h-[290px]
           "
         >
@@ -271,7 +242,22 @@ export default function MegaMenu({
               pointer-events-none
               absolute
               inset-0
-              bg-black/15
+              bg-black/20
+            "
+          />
+
+          {/* EDGE GRADIENT */}
+
+          <div
+            className="
+              pointer-events-none
+              absolute
+              inset-x-0
+              bottom-0
+              h-24
+              bg-gradient-to-t
+              from-black/50
+              to-transparent
             "
           />
 
@@ -285,7 +271,7 @@ export default function MegaMenu({
               rounded-full
               border
               border-white/15
-              bg-black/25
+              bg-black/30
               px-3
               py-1.5
               text-[9px]

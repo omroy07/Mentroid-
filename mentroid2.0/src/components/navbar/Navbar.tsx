@@ -7,7 +7,11 @@ import {
 } from "react";
 
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
+
+import {
+  AnimatePresence,
+  motion,
+} from "framer-motion";
 
 import {
   ArrowUpRight,
@@ -102,27 +106,105 @@ export const fallbackPreviewImages = [
 ========================================================= */
 
 export default function Navbar() {
+  /* =======================================================
+     TIMERS
+  ======================================================= */
+
   const closeTimer =
     useRef<ReturnType<typeof setTimeout> | null>(
       null
     );
 
-  const [activeMenu, setActiveMenu] =
-    useState<MenuKey | null>(null);
-
-  const [mobileOpen, setMobileOpen] =
-    useState(false);
-
-  const [heroActive, setHeroActive] =
-    useState(true);
-
-  const [previewImage, setPreviewImage] =
-    useState(
-      menuPreviewImages.services
+  const hideTimer =
+    useRef<ReturnType<typeof setTimeout> | null>(
+      null
     );
 
   /* =======================================================
+     STATE
+  ======================================================= */
+
+  const [
+    activeMenu,
+    setActiveMenu,
+  ] = useState<MenuKey | null>(null);
+
+  const [
+    mobileOpen,
+    setMobileOpen,
+  ] = useState(false);
+
+  /*
+    TRUE = hero / dark background
+    FALSE = light section
+
+    This controls ONLY the nav item color.
+  */
+
+  const [
+    heroActive,
+    setHeroActive,
+  ] = useState(true);
+
+  /*
+    Controls whether desktop navbar is visible.
+  */
+
+  const [
+    navVisible,
+    setNavVisible,
+  ] = useState(false);
+
+  /*
+    Used so mobile navbar doesn't get hidden.
+  */
+
+  const [
+    isMobile,
+    setIsMobile,
+  ] = useState(false);
+
+  const [
+    previewImage,
+    setPreviewImage,
+  ] = useState(
+    menuPreviewImages.services
+  );
+
+  /* =======================================================
+     DEVICE DETECTION
+  ======================================================= */
+
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsMobile(
+        window.innerWidth < 1024
+      );
+    };
+
+    checkDevice();
+
+    window.addEventListener(
+      "resize",
+      checkDevice
+    );
+
+    return () => {
+      window.removeEventListener(
+        "resize",
+        checkDevice
+      );
+    };
+  }, []);
+
+  /* =======================================================
      HERO DETECTION
+     
+     IMPORTANT:
+     This DOES NOT hide/show the navbar.
+
+     It ONLY tells DesktopNav whether
+     text should be white or dark.
   ======================================================= */
 
   useEffect(() => {
@@ -150,7 +232,9 @@ export default function Navbar() {
     window.addEventListener(
       "scroll",
       handleScroll,
-      { passive: true }
+      {
+        passive: true,
+      }
     );
 
     window.addEventListener(
@@ -172,6 +256,103 @@ export default function Navbar() {
   }, []);
 
   /* =======================================================
+     MOBILE NAVBAR
+  ======================================================= */
+
+  useEffect(() => {
+    if (isMobile) {
+      setNavVisible(true);
+    } else {
+      setNavVisible(false);
+    }
+  }, [isMobile]);
+
+  /* =======================================================
+     REVEAL NAVBAR
+  ======================================================= */
+
+  const showNavbar = () => {
+    if (isMobile) {
+      return;
+    }
+
+    if (hideTimer.current) {
+      clearTimeout(
+        hideTimer.current
+      );
+
+      hideTimer.current = null;
+    }
+
+    setNavVisible(true);
+  };
+
+  /* =======================================================
+     HIDE NAVBAR
+  ======================================================= */
+
+  const hideNavbar = () => {
+    if (isMobile) {
+      return;
+    }
+
+    if (activeMenu) {
+      return;
+    }
+
+    if (hideTimer.current) {
+      clearTimeout(
+        hideTimer.current
+      );
+    }
+
+    hideTimer.current =
+      setTimeout(() => {
+        setNavVisible(false);
+      }, 450);
+  };
+
+  /* =======================================================
+     TOP REVEAL ZONE
+  ======================================================= */
+
+  useEffect(() => {
+    if (isMobile) {
+      return;
+    }
+
+    const handleMouseMove = (
+      event: MouseEvent
+    ) => {
+      /*
+        Invisible top area.
+
+        If cursor enters the first 55px
+        of the viewport, reveal navbar.
+      */
+
+      if (event.clientY <= 55) {
+        showNavbar();
+      }
+    };
+
+    window.addEventListener(
+      "mousemove",
+      handleMouseMove,
+      {
+        passive: true,
+      }
+    );
+
+    return () => {
+      window.removeEventListener(
+        "mousemove",
+        handleMouseMove
+      );
+    };
+  }, [isMobile]);
+
+  /* =======================================================
      ESCAPE
   ======================================================= */
 
@@ -179,9 +360,15 @@ export default function Navbar() {
     const handleKeyDown = (
       event: KeyboardEvent
     ) => {
-      if (event.key === "Escape") {
-        setActiveMenu(null);
-        setMobileOpen(false);
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      setActiveMenu(null);
+      setMobileOpen(false);
+
+      if (!isMobile) {
+        setNavVisible(false);
       }
     };
 
@@ -196,7 +383,7 @@ export default function Navbar() {
         handleKeyDown
       );
     };
-  }, []);
+  }, [isMobile]);
 
   /* =======================================================
      BODY LOCK
@@ -204,23 +391,40 @@ export default function Navbar() {
 
   useEffect(() => {
     document.body.style.overflow =
-      mobileOpen ? "hidden" : "";
+      mobileOpen
+        ? "hidden"
+        : "";
 
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow =
+        "";
     };
   }, [mobileOpen]);
 
   /* =======================================================
-     MENU OPEN
+     OPEN MENU
   ======================================================= */
 
   const openMenu = (
     menu: MenuKey
   ) => {
     if (closeTimer.current) {
-      clearTimeout(closeTimer.current);
+      clearTimeout(
+        closeTimer.current
+      );
+
+      closeTimer.current = null;
     }
+
+    if (hideTimer.current) {
+      clearTimeout(
+        hideTimer.current
+      );
+
+      hideTimer.current = null;
+    }
+
+    setNavVisible(true);
 
     setActiveMenu(menu);
 
@@ -230,26 +434,50 @@ export default function Navbar() {
   };
 
   /* =======================================================
-     DELAYED CLOSE
+     CANCEL CLOSE
+  ======================================================= */
+
+  const cancelClose = () => {
+    if (closeTimer.current) {
+      clearTimeout(
+        closeTimer.current
+      );
+
+      closeTimer.current = null;
+    }
+
+    if (hideTimer.current) {
+      clearTimeout(
+        hideTimer.current
+      );
+
+      hideTimer.current = null;
+    }
+
+    if (!isMobile) {
+      setNavVisible(true);
+    }
+  };
+
+  /* =======================================================
+     CLOSE MENU WITH DELAY
   ======================================================= */
 
   const scheduleClose = () => {
     if (closeTimer.current) {
-      clearTimeout(closeTimer.current);
+      clearTimeout(
+        closeTimer.current
+      );
     }
 
     closeTimer.current =
       setTimeout(() => {
         setActiveMenu(null);
-      }, 140);
-  };
 
-  const cancelClose = () => {
-    if (closeTimer.current) {
-      clearTimeout(closeTimer.current);
-
-      closeTimer.current = null;
-    }
+        if (!isMobile) {
+          hideNavbar();
+        }
+      }, 180);
   };
 
   /* =======================================================
@@ -259,342 +487,464 @@ export default function Navbar() {
   const closeNavigation = () => {
     setActiveMenu(null);
     setMobileOpen(false);
+
+    if (!isMobile) {
+      setNavVisible(false);
+    }
   };
 
+  /* =======================================================
+     MOBILE MENU
+  ======================================================= */
+
+  const toggleMobile = () => {
+    setMobileOpen(
+      (current) => {
+        const next =
+          !current;
+
+        if (next) {
+          setNavVisible(true);
+        }
+
+        return next;
+      }
+    );
+
+    setActiveMenu(null);
+  };
+
+  /* =======================================================
+     NAVBAR VISIBILITY
+  ======================================================= */
+
+  const shouldShow =
+    isMobile ||
+    mobileOpen ||
+    navVisible;
+
+  /* =======================================================
+     RENDER
+  ======================================================= */
+
   return (
-    <header
-      className="
-        fixed
-        inset-x-0
-        top-0
-        z-[100]
-        w-full
-        max-w-full
-        overflow-x-clip
-      "
-      onMouseEnter={cancelClose}
-      onMouseLeave={scheduleClose}
-    >
-      {/* =================================================
-          MAIN NAVBAR
-      ================================================= */}
-
-      <motion.nav
-        initial={{
-          y: -20,
-          opacity: 0,
-        }}
-        animate={{
-          y: 0,
-          opacity: 1,
-        }}
-        transition={{
-          duration: 0.45,
-          ease: [
-            0.22,
-            1,
-            0.36,
-            1,
-          ],
-        }}
-        className="
-          w-full
-          max-w-full
-          transition-all
-          duration-300
-        "
-      >
-        <div
-          className="
-            mx-auto
-            grid
-            w-full
-            max-w-[1440px]
-            grid-cols-[auto_minmax(0,1fr)_auto]
-            items-center
-            gap-4
-            px-5
-            py-[15px]
-            sm:px-8
-            lg:px-10
-          "
-        >
-          {/* =================================================
-              LOGO
-          ================================================= */}
-
-          <div className="relative z-20 flex shrink-0 items-center">
-            <Link
-              href="/"
-              onClick={closeNavigation}
-              className="group flex items-center"
-            >
-              <div className="flex h-11 w-[132px] items-center">
-                <img
-                  src="/assets/mentroid-logo.png"
-                  width={52}
-                  height={52}
-                  alt="Mentroid"
-                  className="
-                    h-11
-                    w-11
-                    object-contain
-                    transition-transform
-                    duration-300
-                    group-hover:scale-105
-                  "
-                />
-
-                <span
-                  className={`
-                    ml-1
-                    text-[21px]
-                    font-semibold
-                    tracking-[-0.045em]
-                    transition-colors
-                    duration-300
-                    ${
-                      heroActive
-                        ? "text-white"
-                        : "text-[var(--foreground)]"
-                    }
-                  `}
-                >
-                  Mentroid
-                </span>
-              </div>
-            </Link>
-          </div>
-
-          {/* =================================================
-              DESKTOP NAV
-          ================================================= */}
-
-          <DesktopNav
-            activeMenu={activeMenu}
-            heroActive={heroActive}
-            onOpenMenu={openMenu}
-          />
-
-          {/* =================================================
-              RIGHT ACTIONS
-          ================================================= */}
-
-          <div className="relative z-20 flex shrink-0 items-center gap-2">
-            <Link
-              href="/portal"
-              className={`
-                hidden
-                rounded-md
-                px-3
-                py-2.5
-                text-[13px]
-                font-medium
-                transition-colors
-                xl:block
-                ${
-                  heroActive
-                    ? "text-white/75 hover:text-white"
-                    : "text-[var(--text-secondary)] hover:text-[var(--foreground)]"
-                }
-              `}
-            >
-              Client Portal
-            </Link>
-
-            <Link
-              href="/contact"
-              className="
-                group
-                relative
-                inline-flex
-                h-10
-                items-center
-                justify-center
-                gap-2
-                overflow-hidden
-                rounded-[8px]
-                bg-[#07111f]
-                px-4
-                text-sm
-                font-semibold
-                text-white
-                transition-colors
-                duration-300
-                hover:bg-[#168cff]
-              "
-            >
-              <span
-                className="
-                  absolute
-                  inset-0
-                  translate-y-full
-                  bg-current
-                  opacity-20
-                  transition-transform
-                  duration-300
-                  group-hover:translate-y-0
-                "
-              />
-
-              <span
-                className="
-                  relative
-                  z-[1]
-                  flex
-                  items-center
-                  gap-2
-                "
-              >
-                Let's Talk
-
-                <ArrowUpRight size={15} />
-              </span>
-            </Link>
-
-            {/* MOBILE BUTTON */}
-
-            <button
-              type="button"
-              onClick={() => {
-                setMobileOpen(
-                  (value) => !value
-                );
-
-                setActiveMenu(null);
-              }}
-              className={`
-                flex
-                size-10
-                items-center
-                justify-center
-                rounded-lg
-                lg:hidden
-                ${
-                  heroActive
-                    ? "bg-white/10 text-white"
-                    : "border border-black/10 bg-white text-black"
-                }
-              `}
-              aria-label={
-                mobileOpen
-                  ? "Close menu"
-                  : "Open menu"
-              }
-            >
-              {mobileOpen ? (
-                <X size={20} />
-              ) : (
-                <Menu size={20} />
-              )}
-            </button>
-          </div>
-        </div>
-      </motion.nav>
-
+    <>
       {/* =====================================================
-          DESKTOP MEGA MENU
+          INVISIBLE DESKTOP REVEAL ZONE
+
+          The navbar is hidden, but this area allows the
+          user to bring it back by moving the cursor upward.
       ===================================================== */}
 
-      <AnimatePresence>
-        {activeMenu && (
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: -8,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            exit={{
-              opacity: 0,
-              y: -8,
-            }}
-            transition={{
-              duration: 0.22,
+      <div
+        className="
+          fixed
+          inset-x-0
+          top-0
+          z-[95]
+          hidden
+          h-[55px]
+          lg:block
+        "
+        onMouseEnter={showNavbar}
+      />
+
+      {/* =====================================================
+          NAVIGATION HEADER
+      ===================================================== */}
+
+      <header
+        className="
+          fixed
+          inset-x-0
+          top-0
+          z-[100]
+          w-full
+          max-w-full
+          overflow-x-clip
+        "
+        onMouseEnter={cancelClose}
+        onMouseLeave={scheduleClose}
+      >
+        {/* =================================================
+            MAIN NAVBAR
+        ================================================= */}
+
+        <motion.nav
+          initial={false}
+          animate={{
+            y: shouldShow
+              ? 0
+              : -110,
+
+            opacity:
+              shouldShow
+                ? 1
+                : 0,
+          }}
+          transition={{
+            y: {
+              duration: 0.55,
               ease: [
                 0.22,
                 1,
                 0.36,
                 1,
               ],
-            }}
-            onMouseEnter={cancelClose}
-            onMouseLeave={scheduleClose}
-            className="
-              absolute
-              left-0
-              right-0
-              top-full
-              hidden
-              w-full
-              max-w-full
-              overflow-x-clip
-              lg:block
-            "
-          >
-            <MegaMenu
-              menu={
-                navigation[
-                  activeMenu
-                ] as MenuData
-              }
-              menuKey={activeMenu}
-              previewImage={previewImage}
-              heroActive={heroActive}
-              onPreviewChange={
-                setPreviewImage
-              }
-              onNavigate={
-                closeNavigation
-              }
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+            },
 
-      {/* =====================================================
-          MOBILE NAVIGATION
-      ===================================================== */}
-
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{
-              opacity: 0,
-              height: 0,
-            }}
-            animate={{
-              opacity: 1,
-              height:
-                "calc(100dvh - 76px)",
-            }}
-            exit={{
-              opacity: 0,
-              height: 0,
-            }}
-            transition={{
+            opacity: {
               duration: 0.3,
-            }}
+              ease: "easeOut",
+            },
+          }}
+          className="
+            w-full
+            max-w-full
+            bg-transparent
+          "
+        >
+          <div
             className="
-              absolute
-              left-0
-              right-0
-              top-[76px]
-              overflow-hidden
-              bg-white
-              lg:hidden
+              mx-auto
+              grid
+              w-full
+              max-w-[1440px]
+              grid-cols-[auto_minmax(0,1fr)_auto]
+              items-center
+              gap-4
+              px-5
+              py-[15px]
+              sm:px-8
+              lg:px-10
             "
           >
-            <MobileNav
-              onClose={
-                closeNavigation
+            {/* =================================================
+                LOGO
+
+                IMPORTANT:
+                Logo color never changes.
+            ================================================= */}
+
+            <div
+              className="
+                relative
+                z-20
+                flex
+                shrink-0
+                items-center
+              "
+            >
+              <Link
+                href="/"
+                onClick={
+                  closeNavigation
+                }
+                className="
+                  group
+                  flex
+                  items-center
+                "
+              >
+                <div
+                  className="
+                    flex
+                    h-11
+                    w-[132px]
+                    items-center
+                  "
+                >
+                  <img
+                    src="/assets/mentroid-logo.png"
+                    width={52}
+                    height={52}
+                    alt="Mentroid"
+                    className="
+                      h-11
+                      w-11
+                      object-contain
+                      transition-transform
+                      duration-300
+                      group-hover:scale-105
+                    "
+                  />
+
+                 <span
+  className={`
+    ml-1
+    text-[21px]
+    font-semibold
+    tracking-[-0.045em]
+    transition-colors
+    duration-300
+    ${
+      heroActive
+        ? "text-white"
+        : "text-[#07111f]"
+    }
+  `}
+>
+  Mentroid
+</span>
+                </div>
+              </Link>
+            </div>
+
+            {/* =================================================
+                DESKTOP NAV
+
+                heroActive ONLY controls the nav item
+                text color.
+            ================================================= */}
+
+            <DesktopNav
+              activeMenu={
+                activeMenu
+              }
+              heroActive={
+                heroActive
+              }
+              onOpenMenu={
+                openMenu
               }
             />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+
+            {/* =================================================
+                RIGHT ACTIONS
+            ================================================= */}
+
+            <div
+              className="
+                relative
+                z-20
+                flex
+                shrink-0
+                items-center
+                gap-2
+              "
+            >
+              {/* =================================================
+                  LET'S TALK
+
+                  Always same color.
+              ================================================= */}
+
+              <Link
+                href="/contact"
+                className="
+                  group
+                  relative
+                  inline-flex
+                  h-10
+                  items-center
+                  justify-center
+                  gap-2
+                  overflow-hidden
+                  rounded-[8px]
+                  bg-[#07111f]
+                  px-4
+                  text-sm
+                  font-semibold
+                  text-white
+                  transition-colors
+                  duration-300
+                  hover:bg-[#111]
+                "
+              >
+                <span
+                  className="
+                    absolute
+                    inset-0
+                    translate-y-full
+                    bg-current
+                    opacity-20
+                    transition-transform
+                    duration-300
+                    group-hover:translate-y-0
+                  "
+                />
+
+                <span
+                  className="
+                    relative
+                    z-[1]
+                    flex
+                    items-center
+                    gap-2
+                  "
+                >
+                  Let's Talk
+
+                  <ArrowUpRight
+                    size={15}
+                    strokeWidth={1.7}
+                  />
+                </span>
+              </Link>
+
+              {/* =================================================
+                  MOBILE BUTTON
+
+                  Fixed dark style.
+              ================================================= */}
+
+              <button
+                type="button"
+                onClick={
+                  toggleMobile
+                }
+                className="
+                  flex
+                  size-10
+                  items-center
+                  justify-center
+                  rounded-lg
+                  bg-[#07111f]
+                  text-white
+                  lg:hidden
+                "
+                aria-label={
+                  mobileOpen
+                    ? "Close menu"
+                    : "Open menu"
+                }
+              >
+                {mobileOpen ? (
+                  <X
+                    size={20}
+                    strokeWidth={1.8}
+                  />
+                ) : (
+                  <Menu
+                    size={20}
+                    strokeWidth={1.8}
+                  />
+                )}
+              </button>
+            </div>
+          </div>
+        </motion.nav>
+
+        {/* =====================================================
+            DESKTOP MEGA MENU
+
+            Fixed dark theme.
+            It does NOT change based on heroActive.
+        ===================================================== */}
+
+        <AnimatePresence>
+          {activeMenu && (
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: -8,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              exit={{
+                opacity: 0,
+                y: -8,
+              }}
+              transition={{
+                duration: 0.22,
+                ease: [
+                  0.22,
+                  1,
+                  0.36,
+                  1,
+                ],
+              }}
+              onMouseEnter={
+                cancelClose
+              }
+              onMouseLeave={
+                scheduleClose
+              }
+              className="
+                absolute
+                left-0
+                right-0
+                top-full
+                hidden
+                w-full
+                max-w-full
+                overflow-x-clip
+                lg:block
+              "
+            >
+              <MegaMenu
+                menu={
+                  navigation[
+                    activeMenu
+                  ] as MenuData
+                }
+                menuKey={
+                  activeMenu
+                }
+                previewImage={
+                  previewImage
+                }
+                onPreviewChange={
+                  setPreviewImage
+                }
+                onNavigate={
+                  closeNavigation
+                }
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* =====================================================
+            MOBILE NAVIGATION
+        ===================================================== */}
+
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{
+                opacity: 0,
+                height: 0,
+              }}
+              animate={{
+                opacity: 1,
+                height:
+                  "calc(100dvh - 76px)",
+              }}
+              exit={{
+                opacity: 0,
+                height: 0,
+              }}
+              transition={{
+                duration: 0.3,
+                ease: [
+                  0.22,
+                  1,
+                  0.36,
+                  1,
+                ],
+              }}
+              className="
+                absolute
+                left-0
+                right-0
+                top-[76px]
+                overflow-hidden
+                bg-white
+                lg:hidden
+              "
+            >
+              <MobileNav
+                onClose={
+                  closeNavigation
+                }
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+    </>
   );
 }

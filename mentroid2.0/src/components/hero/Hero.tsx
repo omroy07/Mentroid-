@@ -125,27 +125,17 @@ export default function Hero() {
        * ========================================================
        */
 
-      const tl = gsap.timeline({
-        defaults: {
-          overwrite: "auto",
-        },
-
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 1,
-          pin: pin,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-
-          /*
-           * Prevent horizontal movement
-           * from affecting page layout.
-           */
-          pinSpacing: true,
-        },
-      });
+     const tl = gsap.timeline({
+  scrollTrigger: {
+    trigger: section,
+    start: "top top",
+    end: "bottom bottom",
+    scrub: 1,
+    pin: pin,
+    anticipatePin: 1,
+    invalidateOnRefresh: true,
+  },
+});
 
       /*
        * ========================================================
@@ -281,13 +271,50 @@ export default function Hero() {
        * ========================================================
        */
 
-      tl.to(media[2], {
-        scale: 1.12,
-        xPercent: -3,
-        yPercent: -4,
-        duration: 1,
-        ease: "none",
-      });
+  /*
+ * ========================================================
+ * FINAL HERO → INTELLIGENCE SYSTEM TRANSITION
+ * ========================================================
+ */
+
+/*
+ * 1. Let the final Hero scene breathe.
+ */
+tl.to(
+  media[2],
+  {
+    scale: 1.08,
+    xPercent: -2,
+    yPercent: -2,
+    duration: 0.5,
+    ease: "none",
+  }
+);
+
+// Remove final scene typography.
+tl.to(
+  content[2],
+  {
+    autoAlpha: 0,
+    y: -60,
+    duration: 0.25,
+    ease: "none",
+  }
+);
+
+// THE IMPORTANT PART:
+// Directly scrub the final visual from 1.08 → 2.6.
+// tl.to(
+//   media[2],
+//   {
+//     scale: 2.6,
+//     xPercent: -3,
+//     yPercent: -3,
+//     duration: 1.8,
+//     ease: "none",
+//   }
+// );
+
 
       /*
        * ========================================================
@@ -539,7 +566,7 @@ export default function Hero() {
                     <div className="overflow-hidden">
                       <h1
                         className="
-                          text-[clamp(3.5rem,8vw,4.8rem)]
+                          text-[clamp(3.5rem,8vw,6.8rem)]
                           font-medium
                           leading-[0.88]
                           tracking-[-0.075em]

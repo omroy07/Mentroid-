@@ -1,23 +1,16 @@
 "use client";
 
 import Link from "next/link";
-
-import {
-  ChevronDown,
-} from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import { navigation } from "@/data/navigation";
 
-import type {
-  MenuKey,
-} from "./Navbar";
+import type { MenuKey } from "./Navbar";
 
 type DesktopNavProps = {
   activeMenu: MenuKey | null;
   heroActive: boolean;
-  onOpenMenu: (
-    menu: MenuKey
-  ) => void;
+  onOpenMenu: (menu: MenuKey) => void;
 };
 
 const menuOrder: MenuKey[] = [
@@ -33,6 +26,24 @@ export default function DesktopNav({
   heroActive,
   onOpenMenu,
 }: DesktopNavProps) {
+  /*
+    heroActive = true
+      → dark/hero background
+      → white navigation text
+
+    heroActive = false
+      → light/white background
+      → dark navigation text
+  */
+
+  const navText = heroActive
+    ? "text-white/75"
+    : "text-[#07111f]";
+
+  const navHover = heroActive
+    ? "hover:bg-white/10 hover:text-white"
+    : "hover:bg-black/[0.05] hover:text-[#07111f]";
+
   return (
     <nav
       className="
@@ -54,16 +65,15 @@ export default function DesktopNav({
         "
       >
         {menuOrder.map((key) => {
-          const item =
-            navigation[key];
+          const item = navigation[key];
+
+          const isActive = activeMenu === key;
 
           return (
             <button
               key={key}
               type="button"
-              onMouseEnter={() =>
-                onOpenMenu(key)
-              }
+              onMouseEnter={() => onOpenMenu(key)}
               className={`
                 group
                 flex
@@ -75,20 +85,22 @@ export default function DesktopNav({
                 py-2.5
                 text-[14px]
                 font-medium
+                tracking-[-0.01em]
                 transition-all
                 duration-200
+
                 ${
-                  activeMenu === key
+                  isActive
                     ? heroActive
                       ? "bg-white/10 text-white"
-                      : "bg-black/[0.05] text-black"
-                    : heroActive
-                    ? "text-white/75 hover:bg-white/10 hover:text-white"
-                    : "text-[var(--text-secondary)] hover:bg-black/[0.04] hover:text-[var(--foreground)]"
+                      : "bg-black/[0.05] text-[#07111f]"
+                    : `${navText} ${navHover}`
                 }
               `}
             >
-              {item.title}
+              <span>
+                {item.title}
+              </span>
 
               <ChevronDown
                 size={14}
@@ -96,10 +108,11 @@ export default function DesktopNav({
                 className={`
                   transition-transform
                   duration-200
+
                   ${
-                    activeMenu === key
+                    isActive
                       ? "rotate-180"
-                      : ""
+                      : "rotate-0"
                   }
                 `}
               />
@@ -107,7 +120,9 @@ export default function DesktopNav({
           );
         })}
 
-        {/* WORK */}
+        {/* =====================================================
+            WORK
+        ===================================================== */}
 
         <Link
           href="/work"
@@ -118,13 +133,12 @@ export default function DesktopNav({
             py-2.5
             text-[14px]
             font-medium
+            tracking-[-0.01em]
             transition-all
             duration-200
-            ${
-              heroActive
-                ? "text-white/75 hover:bg-white/10 hover:text-white"
-                : "text-[var(--text-secondary)] hover:bg-black/[0.04] hover:text-[var(--foreground)]"
-            }
+
+            ${navText}
+            ${navHover}
           `}
         >
           Work
