@@ -572,6 +572,7 @@ gsap.set(imageInners[0], {
     <section
       ref={sectionRef}
       id="industries"
+      data-navbar-theme="light"
       className="
         relative
         h-[850vh]

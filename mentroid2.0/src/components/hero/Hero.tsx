@@ -360,6 +360,7 @@ tl.to(
     <section
       ref={sectionRef}
       id="hero"
+      data-navbar-theme="dark" 
       className="
         relative
         h-[400vh]
@@ -465,6 +466,7 @@ tl.to(
             absolute
             inset-0
             z-[2]
+            
             bg-black/25
           "
         />

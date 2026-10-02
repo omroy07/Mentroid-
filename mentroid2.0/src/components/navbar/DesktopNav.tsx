@@ -9,7 +9,7 @@ import type { MenuKey } from "./Navbar";
 
 type DesktopNavProps = {
   activeMenu: MenuKey | null;
-  heroActive: boolean;
+  navTheme: "dark" | "light";
   onOpenMenu: (menu: MenuKey) => void;
 };
 
@@ -23,7 +23,7 @@ const menuOrder: MenuKey[] = [
 
 export default function DesktopNav({
   activeMenu,
-  heroActive,
+  navTheme,
   onOpenMenu,
 }: DesktopNavProps) {
   /*
@@ -36,14 +36,15 @@ export default function DesktopNav({
       → dark navigation text
   */
 
-  const navText = heroActive
-    ? "text-white/75"
+const navText =
+  navTheme === "dark"
+    ? "text-white"
     : "text-[#07111f]";
-
-  const navHover = heroActive
+    
+const navHover =
+  navTheme === "dark"
     ? "hover:bg-white/10 hover:text-white"
     : "hover:bg-black/[0.05] hover:text-[#07111f]";
-
   return (
     <nav
       className="
@@ -91,10 +92,10 @@ export default function DesktopNav({
 
                 ${
                   isActive
-                    ? heroActive
-                      ? "bg-white/10 text-white"
-                      : "bg-black/[0.05] text-[#07111f]"
-                    : `${navText} ${navHover}`
+  ? navTheme === "dark"
+    ? "bg-white/10 text-white"
+    : "bg-black/[0.05] text-[#07111f]"
+  : `${navText} ${navHover}`
                 }
               `}
             >

@@ -479,6 +479,7 @@ export default function Proof() {
     <section
       ref={sectionRef}
       id="proof"
+      data-navbar-theme="light"
       className="
         relative
         h-[1050vh]

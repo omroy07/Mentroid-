@@ -321,6 +321,7 @@ export default function IntelligenceSystem() {
     <section
       ref={sectionRef}
       id="intelligence-system"
+       data-navbar-theme="dark"
       className="
         relative
         z-20

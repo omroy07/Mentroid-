@@ -304,6 +304,7 @@ const [isVideoOpen, setIsVideoOpen] = useState(false);
     <section
       ref={sectionRef}
       id="client-stories"
+       data-navbar-theme="light"
       className="
         relative
         w-full

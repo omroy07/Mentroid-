@@ -461,6 +461,7 @@ export default function Solutions() {
     <section
       ref={sectionRef}
       id="solutions"
+       data-navbar-theme="light"
       className="
         relative
         h-[1050vh]
@@ -484,7 +485,7 @@ export default function Solutions() {
             TOP META
         ======================================================= */}
 
-        {/* <div
+        <div
           className="
             absolute
             left-6
@@ -503,7 +504,7 @@ export default function Solutions() {
          
 
           
-        </div> */}
+        </div>
 
         {/* ======================================================
             INTRO

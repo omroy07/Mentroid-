@@ -141,10 +141,8 @@ export default function Navbar() {
     This controls ONLY the nav item color.
   */
 
-  const [
-    heroActive,
-    setHeroActive,
-  ] = useState(true);
+const [navTheme, setNavTheme] =
+  useState<"dark" | "light">("dark");
 
   /*
     Controls whether desktop navbar is visible.
@@ -197,64 +195,133 @@ export default function Navbar() {
     };
   }, []);
 
-  /* =======================================================
-     HERO DETECTION
-     
-     IMPORTANT:
-     This DOES NOT hide/show the navbar.
+ 
+/* =======================================================
+   NAVBAR THEME DETECTION
 
-     It ONLY tells DesktopNav whether
-     text should be white or dark.
-  ======================================================= */
+   Every major section should have:
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const hero =
-        document.getElementById("hero");
+   data-navbar-theme="dark"
+   OR
+   data-navbar-theme="light"
 
-      if (!hero) {
-        setHeroActive(false);
-        return;
-      }
+   The section closest to the navbar determines
+   the navbar text color.
+======================================================= */
 
-      const rect =
-        hero.getBoundingClientRect();
+useEffect(() => {
+  let ticking = false;
 
-      const insideHero =
-        rect.top <= 80 &&
-        rect.bottom > 80;
-
-      setHeroActive(insideHero);
-    };
-
-    handleScroll();
-
-    window.addEventListener(
-      "scroll",
-      handleScroll,
-      {
-        passive: true,
-      }
+  const updateNavbarTheme = () => {
+    const sections = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        "[data-navbar-theme]"
+      )
     );
 
-    window.addEventListener(
-      "resize",
+    if (!sections.length) {
+      return;
+    }
+
+    /*
+      We check a point near the top of the viewport.
+
+      This is intentional because the navbar itself
+      lives at the top of the screen.
+    */
+
+    const checkPoint = 140;
+
+    let activeSection: HTMLElement | null = null;
+
+    for (const section of sections) {
+      const rect = section.getBoundingClientRect();
+
+      if (
+        rect.top <= checkPoint &&
+        rect.bottom >= checkPoint
+      ) {
+        activeSection = section;
+        break;
+      }
+    }
+
+    /*
+      If no section contains the point,
+      find the section closest to it.
+    */
+
+    if (!activeSection) {
+      let closestDistance = Infinity;
+
+      for (const section of sections) {
+        const rect = section.getBoundingClientRect();
+
+        const distance =
+          rect.top > checkPoint
+            ? rect.top - checkPoint
+            : checkPoint - rect.bottom;
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          activeSection = section;
+        }
+      }
+    }
+
+    if (!activeSection) {
+      return;
+    }
+
+    const theme =
+      activeSection.dataset.navbarTheme;
+
+    if (theme === "dark") {
+      setNavTheme("dark");
+    }
+
+    if (theme === "light") {
+      setNavTheme("light");
+    }
+
+    ticking = false;
+  };
+
+  const handleScroll = () => {
+    if (!ticking) {
+      window.requestAnimationFrame(
+        updateNavbarTheme
+      );
+
+      ticking = true;
+    }
+  };
+
+  updateNavbarTheme();
+
+  window.addEventListener(
+    "scroll",
+    handleScroll,
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "resize",
+    handleScroll
+  );
+
+  return () => {
+    window.removeEventListener(
+      "scroll",
       handleScroll
     );
 
-    return () => {
-      window.removeEventListener(
-        "scroll",
-        handleScroll
-      );
-
-      window.removeEventListener(
-        "resize",
-        handleScroll
-      );
-    };
-  }, []);
-
+    window.removeEventListener(
+      "resize",
+      handleScroll
+    );
+  };
+}, []);
   /* =======================================================
      MOBILE NAVBAR
   ======================================================= */
@@ -669,7 +736,7 @@ export default function Navbar() {
                     "
                   />
 
-                 <span
+       <span
   className={`
     ml-1
     text-[21px]
@@ -678,7 +745,7 @@ export default function Navbar() {
     transition-colors
     duration-300
     ${
-      heroActive
+      navTheme === "dark"
         ? "text-white"
         : "text-[#07111f]"
     }
@@ -696,18 +763,11 @@ export default function Navbar() {
                 heroActive ONLY controls the nav item
                 text color.
             ================================================= */}
-
-            <DesktopNav
-              activeMenu={
-                activeMenu
-              }
-              heroActive={
-                heroActive
-              }
-              onOpenMenu={
-                openMenu
-              }
-            />
+<DesktopNav
+  activeMenu={activeMenu}
+  navTheme={navTheme}
+  onOpenMenu={openMenu}
+/>
 
             {/* =================================================
                 RIGHT ACTIONS

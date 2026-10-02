@@ -631,6 +631,7 @@ export default function LetsBuild() {
     <section
       ref={sectionRef}
       id="lets-build"
+      data-navbar-theme="dark"
       className="
         relative
         h-[560vh]

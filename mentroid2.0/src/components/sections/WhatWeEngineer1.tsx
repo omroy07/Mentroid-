@@ -219,6 +219,7 @@ export default function WhatWeEngineer() {
     <section
       ref={sectionRef}
       id="what-we-engineer"
+       data-navbar-theme="dark"
       className="
         relative
         h-[750vh]

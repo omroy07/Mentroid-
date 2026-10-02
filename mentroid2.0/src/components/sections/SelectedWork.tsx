@@ -734,6 +734,7 @@ export default function SelectedWork() {
     <section
       ref={sectionRef}
       id="selected-work"
+       data-navbar-theme="light"
       className="
         relative
         h-[700vh]

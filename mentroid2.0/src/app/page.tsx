@@ -12,9 +12,11 @@ import Proof from "@/components/sections/Proof";
 import LetsBuild from "@/components/sections/LetsBuild";
 import ClientStories from "@/components/sections/ClientStories";
 import KeyFacts from "@/components/sections/KeyFacts";
+import NeuralCore from "@/components/3d/NeuralCore";
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+    <main className="min-h-screen ">
+      {/* <NeuralCore/> */}
       <Navbar />
       <Hero/>
       <IntelligenceSystem/>

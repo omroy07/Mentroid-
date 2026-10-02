@@ -539,6 +539,7 @@ tl.to(
     <section
       ref={sectionRef}
       id="mentroid-proof"
+      data-navbar-theme="light"
       className="
         relative
         h-[620vh]

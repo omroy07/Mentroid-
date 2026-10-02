@@ -356,7 +356,7 @@ export default function Footer() {
       {/* MAIN FOOTER                                                         */}
       {/* ------------------------------------------------------------------ */}
 
-      <section>
+      <section data-navbar-theme="dark" >
         <div className="mx-auto max-w-[1500px] px-5 py-16 sm:px-8 md:py-20 lg:px-12">
           <div className="grid gap-16 lg:grid-cols-[280px_1fr] xl:grid-cols-[340px_1fr]">
             {/* BRAND */}
