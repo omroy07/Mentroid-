@@ -735,7 +735,7 @@ export default function LetsBuild() {
         >
           <img
             ref={imageInnerRef}
-            src="/assets/proof/01.jpg"
+            src="/assets/proof/01.webp"
             alt=""
             className="
               h-full

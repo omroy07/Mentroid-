@@ -502,7 +502,7 @@ export default function WhatWeEngineer() {
   "
 >
   <Image
-    src={`/assets/whatweengineer/${item.number}.jpg`}
+    src={`/assets/whatweengineer/${item.number}.webp`}
     alt={item.label}
     fill
     priority={index === 0}

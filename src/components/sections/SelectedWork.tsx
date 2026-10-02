@@ -15,7 +15,7 @@ const projects = [
     category: "Healthcare / AI",
     description:
       "Intelligent healthcare technology designed to turn complex information into actionable insight.",
-    image: "/assets/selected-work/01.jpg",
+    image: "/assets/selected-work/01.webp",
     tags: ["AI", "Healthcare", "ML"],
   },
   {
@@ -24,7 +24,7 @@ const projects = [
     category: "Education / AI",
     description:
       "An intelligent learning experience built around personalized knowledge and engagement.",
-    image: "/assets/selected-work/02.jpg",
+    image: "/assets/selected-work/02.webp",
     tags: ["AI", "Education", "SaaS"],
   },
   {
@@ -33,7 +33,7 @@ const projects = [
     category: "Agriculture / ML",
     description:
       "Machine learning systems helping transform agricultural data into practical decisions.",
-    image: "/assets/selected-work/03.jpg",
+    image: "/assets/selected-work/03.webp",
     tags: ["ML", "Agriculture", "Analytics"],
   },
   {
@@ -42,7 +42,7 @@ const projects = [
     category: "Computer Vision",
     description:
       "Computer vision technology engineered to understand visual information at scale.",
-    image: "/assets/selected-work/04.jpg",
+    image: "/assets/selected-work/04.webp",
     tags: ["Computer Vision", "AI", "ML"],
   },
 ];

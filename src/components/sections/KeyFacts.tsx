@@ -10,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger);
 const cards = [
   {
   id: "left",
-  image: "/assets/solutions/01.jpg",
+  image: "/assets/solutions/01.webp",
   eyebrow: "AI & ML SOLUTIONS",
   title: "Intelligence.\nBuilt to scale.",
   description: "AI systems, machine learning models, and intelligent workflows built around real business needs.",
@@ -26,7 +26,7 @@ const cards = [
 
 {
   id: "right",
-  image: "/assets/solutions/02.jpg",
+  image: "/assets/solutions/02.webp",
   eyebrow: "OUR TEAM",
   title: "Different minds.\nOne vision.",
   number: "14+",
@@ -729,7 +729,7 @@ tl.to(
         "
       >
         <Image
-          src="/assets/solutions/01.jpg"
+          src="/assets/solutions/01.webp"
           alt="Mentroid featured work"
           fill
           sizes="(max-width: 768px) calc(100vw - 40px), 33vw"
@@ -969,7 +969,7 @@ tl.to(
         "
       >
         <Image
-          src="/assets/solutions/02.jpg"
+          src="/assets/solutions/02.webp"
           alt="Mentroid team"
           fill
           sizes="(max-width: 768px) calc(100vw - 40px), 33vw"

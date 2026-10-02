@@ -23,7 +23,7 @@ const scenes: Scene[] = [
     accent: "for what’s next.",
     description:
       "Mentroid builds intelligent systems that turn complex business problems into practical AI solutions.",
-    media: "/videos/ai.mp4",
+    media: "/videos/ai.webm",
     type: "video",
   },
   {
@@ -32,7 +32,7 @@ const scenes: Scene[] = [
     accent: "AI that acts.",
     description:
       "From AI agents and RAG systems to custom copilots, we build AI that can reason, respond and execute.",
-    media: "/videos/agentic-ai.mp4",
+    media: "/videos/agentic-ai.webm",
     type: "video",
   },
   {
@@ -41,7 +41,7 @@ const scenes: Scene[] = [
     accent: "to automation.",
     description:
       "Connect data, people and workflows through intelligent automation designed around your business.",
-    media: "/videos/automation.mp4",
+    media: "/videos/automation.webm",
     type: "video",
   },
 ];

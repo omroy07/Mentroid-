@@ -219,7 +219,7 @@ export const navigation = {
             icon: Sparkles,
             href: "/expertise/generative-ai",
             image:
-              "/assets/navbar/Ai-development.jpg",
+              "/assets/navbar/Ai-development.webp",
           },
 
           {

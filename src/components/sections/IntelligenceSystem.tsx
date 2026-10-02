@@ -15,7 +15,7 @@ const scenes = [
     accent: "actually work.",
     description:
       "Mentroid designs intelligent systems around real business problems — from customer experiences to complex operational workflows.",
-    video: "/videos/ai.mp4",
+    video: "/videos/ai.webm",
     side: "right",
     tag: "AI / SYSTEMS",
   },
@@ -26,7 +26,7 @@ const scenes = [
     accent: "starts with data.",
     description:
       "We connect your knowledge, documents, conversations and business systems into a foundation AI can actually use.",
-    video: "/videos/agentic-ai.mp4",
+    video: "/videos/agentic-ai.webm",
     side: "left",
     tag: "DATA / KNOWLEDGE",
   },
@@ -37,7 +37,7 @@ const scenes = [
     accent: "to action.",
     description:
       "AI agents connect intelligence to tools and workflows, allowing systems to reason, decide and execute.",
-    video: "/videos/automation.mp4",
+    video: "/videos/automation.webm",
     side: "right",
     tag: "AGENTS / ACTION",
   },

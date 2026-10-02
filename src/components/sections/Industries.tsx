@@ -15,7 +15,7 @@ const industries = [
     statement: "Intelligence for better decisions.",
     description:
       "AI systems that help healthcare organizations turn complex information into useful, actionable insight.",
-    image: "/assets/industries/01.jpg",
+    image: "/assets/industries/01.webp",
   },
   {
     number: "02",
@@ -23,7 +23,7 @@ const industries = [
     statement: "Data that understands the field.",
     description:
       "Machine learning and predictive systems built around agricultural data, operations and outcomes.",
-    image: "/assets/industries/02.jpg",
+    image: "/assets/industries/02.webp",
   },
   {
     number: "03",
@@ -31,7 +31,7 @@ const industries = [
     statement: "Learning that adapts.",
     description:
       "Intelligent learning experiences that connect knowledge, personalization and engagement.",
-    image: "/assets/industries/03.jpg",
+    image: "/assets/industries/03.webp",
   },
   {
     number: "04",
@@ -39,7 +39,7 @@ const industries = [
     statement: "Intelligence behind every decision.",
     description:
       "AI-powered systems for analysis, automation, customer experience and operational intelligence.",
-    image: "/assets/industries/04.jpg",
+    image: "/assets/industries/04.webp",
   },
    {
     number: "05",
@@ -47,7 +47,7 @@ const industries = [
     statement: "Enterprise intelligence without enterprise complexity.",
     description:
       "Practical AI systems designed around the unique workflows and resources of growing businesses.",
-    image: "/assets/industries/05.jpg",
+    image: "/assets/industries/05.webp",
   },
   {
     number: "06",
@@ -55,7 +55,7 @@ const industries = [
     statement: "Build intelligence into the product.",
     description:
       "AI-native product experiences and scalable systems designed to move quickly from idea to production.",
-    image: "/assets/industries/06.jpg",
+    image: "/assets/industries/06.webp",
   },
    {
     number: "07",
@@ -63,7 +63,7 @@ const industries = [
     statement: "Every interaction becomes intelligent.",
     description:
       "Personalization, recommendations, customer support and automation designed for modern commerce.",
-    image: "/assets/industries/07.jpg",
+    image: "/assets/industries/07.webp",
   },
   {
     number: "08",
@@ -71,7 +71,7 @@ const industries = [
     statement: "Automate expertise, not relationships.",
     description:
       "Intelligent workflows that help professional teams work faster without losing the human layer.",
-    image: "/assets/industries/08.jpg",
+    image: "/assets/industries/08.webp",
   },
 
 ];

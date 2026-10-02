@@ -15,7 +15,7 @@ const solutions = [
     accent: "Customer Support",
     description:
       "Give customers instant, intelligent support across the channels they already use.",
-    image: "/assets/solutions/01.jpg",
+    image: "/assets/solutions/01.webp",
   },
   {
     number: "02",
@@ -24,7 +24,7 @@ const solutions = [
     accent: "Qualification",
     description:
       "Identify, understand and prioritize high-intent leads automatically.",
-    image: "/assets/solutions/02.jpg",
+    image: "/assets/solutions/02.webp",
   },
   {
     number: "03",
@@ -33,7 +33,7 @@ const solutions = [
     accent: "Automation",
     description:
       "Connect intelligence to your sales workflow and eliminate repetitive manual work.",
-    image: "/assets/solutions/03.jpg",
+    image: "/assets/solutions/03.webp",
   },
   {
     number: "04",
@@ -42,7 +42,7 @@ const solutions = [
     accent: "Assistant",
     description:
       "Turn your internal knowledge into an intelligent system your team can actually use.",
-    image: "/assets/solutions/04.jpg",
+    image: "/assets/solutions/04.webp",
   },
   {
     number: "05",
@@ -51,7 +51,7 @@ const solutions = [
     accent: "Automation",
     description:
       "Automate the processes that slow your teams down and connect the systems behind them.",
-    image: "/assets/solutions/05.jpg",
+    image: "/assets/solutions/05.webp",
   },
   {
     number: "06",
@@ -60,7 +60,7 @@ const solutions = [
     accent: "Recommendation",
     description:
       "Use your data to deliver personalized recommendations and better decisions.",
-    image: "/assets/solutions/06.jpg",
+    image: "/assets/solutions/06.webp",
   },
   {
     number: "07",
@@ -69,7 +69,7 @@ const solutions = [
     accent: "Assistant",
     description:
       "Bring intelligent conversations directly into the channel your customers already trust.",
-    image: "/assets/solutions/07.jpg",
+    image: "/assets/solutions/07.webp",
   },
   {
     number: "08",
@@ -78,7 +78,7 @@ const solutions = [
     accent: "Platforms",
     description:
       "Build a complete AI platform around the unique requirements of your organization.",
-    image: "/assets/solutions/08.jpg",
+    image: "/assets/solutions/08.webp",
   },
 ];
 

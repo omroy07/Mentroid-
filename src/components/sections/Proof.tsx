@@ -20,7 +20,7 @@ const projects = [
     title: "Nitya CloudTech",
     description:
       "A digital education experience engineered around learning, discovery and conversion.",
-    image: "/assets/proof/01.jpg",
+    image: "/assets/proof/01.webp",
   },
   {
     id: "02",
@@ -28,7 +28,7 @@ const projects = [
     title: "Vishnu Jewellers",
     description:
       "A refined digital commerce experience built around a premium jewellery identity.",
-    image: "/assets/proof/02.jpg",
+    image: "/assets/proof/02.webp",
   },
   {
     id: "03",
@@ -36,7 +36,7 @@ const projects = [
     title: "Estate Plotrix",
     description:
       "A property platform designed around discovery, information and conversion.",
-    image: "/assets/proof/03.jpg",
+    image: "/assets/proof/03.webp",
   },
   {
     id: "04",
@@ -44,7 +44,7 @@ const projects = [
     title: "Urban House Hotel",
     description:
       "A refined hospitality platform focused on discovery, trust and digital engagement.",
-    image: "/assets/proof/04.jpg",
+    image: "/assets/proof/04.webp",
   },
   {
     id: "05",
@@ -52,7 +52,7 @@ const projects = [
     title: "Little Scholars",
     description:
       "A digital school experience designed to bring information and engagement together.",
-    image: "/assets/proof/05.jpg",
+    image: "/assets/proof/05.webp",
   },
   {
     id: "06",
@@ -60,7 +60,7 @@ const projects = [
     title: "Hotel Dharam Inn",
     description:
       "A focused hospitality experience built around clarity, information and conversion.",
-    image: "/assets/proof/06.jpg",
+    image: "/assets/proof/06.webp",
   },
   {
     id: "07",
@@ -68,7 +68,7 @@ const projects = [
     title: "Rangriwaazz",
     description:
       "A contemporary fashion commerce experience with a strong visual identity.",
-    image: "/assets/proof/07.jpg",
+    image: "/assets/proof/07.webp",
   },
 ];
 
