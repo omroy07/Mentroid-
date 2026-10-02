@@ -75,19 +75,19 @@ export const menuPreviewImages: Record<
   string
 > = {
   services:
-    "/assets/navbar/AI-automation.webp",
+    "/assets/navbar/Ai-automation.webp",
 
   solutions:
     "/assets/navbar/Ai-development.webp",
 
   expertise:
-    "/assets/navbar/AI-automation.webp",
+    "/assets/navbar/Ai-automation.webp",
 
   industries:
     "/assets/navbar/Ai-development.webp",
 
   company:
-    "/assets/navbar/AI-automation.webp",
+    "/assets/navbar/Ai-automation.webp",
 };
 
 /* =========================================================
