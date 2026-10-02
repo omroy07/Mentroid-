@@ -55,7 +55,7 @@ export default function SelectedWork() {
   const gridRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
 
-  const cardRefs = useRef<HTMLDivElement[]>([]);
+  const cardRefs = useRef<HTMLElement[]>([]);
   const imageRefs = useRef<HTMLDivElement[]>([]);
   const infoRefs = useRef<HTMLDivElement[]>([]);
 

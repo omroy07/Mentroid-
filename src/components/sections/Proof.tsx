@@ -80,7 +80,7 @@ export default function Proof() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
 
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const cardsRef = useRef<(HTMLElement | null)[]>([]);
 
   const giantTextRef = useRef<HTMLDivElement | null>(null);
 
@@ -97,7 +97,7 @@ export default function Proof() {
 
     const ctx = gsap.context(() => {
       const cards = cardsRef.current.filter(
-        (card): card is HTMLDivElement => card !== null
+        (card): card is HTMLElement => card !== null
       );
 
       if (cards.length === 0) return;

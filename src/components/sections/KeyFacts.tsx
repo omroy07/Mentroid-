@@ -48,7 +48,7 @@ export default function KeyFacts() {
   const stripsRef = useRef<HTMLDivElement[]>([]);
 
   const headingRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<HTMLDivElement[]>([]);
+  const cardRefs = useRef<HTMLElement[]>([]);
   const cardImageRefs = useRef<HTMLDivElement[]>([]);
   const cardContentRefs = useRef<HTMLDivElement[]>([]);
 
@@ -729,7 +729,7 @@ tl.to(
         "
       >
         <Image
-          src={cards[0].image}
+          src="/assets/solutions/01.jpg"
           alt="Mentroid featured work"
           fill
           sizes="(max-width: 768px) calc(100vw - 40px), 33vw"
@@ -969,7 +969,7 @@ tl.to(
         "
       >
         <Image
-          src={cards[2].image}
+          src="/assets/solutions/02.jpg"
           alt="Mentroid team"
           fill
           sizes="(max-width: 768px) calc(100vw - 40px), 33vw"

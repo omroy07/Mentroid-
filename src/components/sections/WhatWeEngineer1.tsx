@@ -66,7 +66,7 @@ export default function WhatWeEngineer() {
   const introRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
-  const panelsRef = useRef<HTMLDivElement[]>([]);
+  const panelsRef = useRef<HTMLElement[]>([]);
   const visualRef = useRef<HTMLDivElement[]>([]);
 
   useLayoutEffect(() => {
