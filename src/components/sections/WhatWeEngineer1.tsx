@@ -506,10 +506,7 @@ export default function WhatWeEngineer() {
     alt={item.label}
     fill
     priority={index === 0}
-    sizes="
-      (max-width: 768px) calc(100vw - 48px),
-      31vw
-    "
+    sizes="(max-width: 768px) calc(100vw - 48px),31vw"
     className="
       object-cover
       grayscale
