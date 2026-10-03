@@ -1,7 +1,9 @@
+
 "use client";
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 const faqs = [
   {
@@ -37,66 +39,155 @@ export default function FAQ() {
   return (
     <section
       id="faq"
-      className="bg-white py-24 sm:py-28 lg:py-32"
+      className="relative overflow-hidden bg-black"
     >
-      <div className="mx-auto max-w-4xl px-5 sm:px-6">
+      {/* Ambient background */}
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-1/4 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-blue-500/10 blur-[140px]"
+        animate={{
+          scale: [1, 1.15, 1],
+          opacity: [0.35, 0.55, 0.35],
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
 
+      <div className="relative 
+              w-full
+              max-w-full
+              px-6
+              md:px-10
+              lg:px-14
+            ">
         {/* Heading */}
-        <div className="text-center">
-          <p className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-[var(--accent-blue)]">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="text-center"
+        >
+          <p className="mb-4 text-sm font-medium uppercase tracking-[0.18em] text-blue-400">
             FAQ
           </p>
 
-          <h2 className="text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">
+          <h2 className="text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
             Questions, answered.
           </h2>
 
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600">
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/50">
             Everything you need to know before starting a project with
             Mentroid.
           </p>
-        </div>
+        </motion.div>
 
         {/* FAQ */}
-        <div className="mt-14 divide-y divide-black/10 border-y border-black/10">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{
+            duration: 0.9,
+            delay: 0.15,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="mt-14 border-y border-white/10"
+        >
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index;
 
             return (
-              <div key={faq.question}>
-                <button
+              <motion.div
+                key={faq.question}
+                layout
+                className="border-b border-white/10 last:border-b-0"
+              >
+                <motion.button
                   type="button"
                   onClick={() =>
                     setOpenIndex(isOpen ? null : index)
                   }
-                  className="flex w-full items-center justify-between gap-6 py-6 text-left"
+                  whileHover={{ x: 4 }}
+                  transition={{ duration: 0.25 }}
+                  className="group flex w-full items-center justify-between gap-6 py-7 text-left"
                   aria-expanded={isOpen}
                 >
-                  <span className="text-base font-semibold text-slate-900 sm:text-lg">
+                  <span
+                    className={`text-base font-semibold transition-colors duration-300 sm:text-lg ${
+                      isOpen
+                        ? "text-white"
+                        : "text-white/75 group-hover:text-white"
+                    }`}
+                  >
                     {faq.question}
                   </span>
 
-                  <ChevronDown
-                    size={20}
-                    className={`shrink-0 text-slate-500 transition-transform duration-300 ${
-                      isOpen ? "rotate-180" : ""
+                  <motion.span
+                    animate={{
+                      rotate: isOpen ? 180 : 0,
+                      scale: isOpen ? 1.1 : 1,
+                    }}
+                    transition={{
+                      duration: 0.35,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors duration-300 ${
+                      isOpen
+                        ? "border-blue-400/50 bg-blue-400/10 text-blue-400"
+                        : "border-white/10 bg-white/[0.03] text-white/40 group-hover:border-white/20 group-hover:text-white"
                     }`}
-                  />
-                </button>
+                  >
+                    <ChevronDown size={18} />
+                  </motion.span>
+                </motion.button>
 
-                {isOpen && (
-                  <div className="pb-6 pr-10">
-                    <p className="text-sm leading-7 text-slate-600 sm:text-base">
-                      {faq.answer}
-                    </p>
-                  </div>
-                )}
-              </div>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{
+                        height: 0,
+                        opacity: 0,
+                      }}
+                      animate={{
+                        height: "auto",
+                        opacity: 1,
+                      }}
+                      exit={{
+                        height: 0,
+                        opacity: 0,
+                      }}
+                      transition={{
+                        height: {
+                          duration: 0.4,
+                          ease: [0.22, 1, 0.36, 1],
+                        },
+                        opacity: {
+                          duration: 0.25,
+                        },
+                      }}
+                      className="overflow-hidden"
+                    >
+                      <motion.p
+                        initial={{ y: -10 }}
+                        animate={{ y: 0 }}
+                        exit={{ y: -10 }}
+                        transition={{ duration: 0.3 }}
+                        className="max-w-3xl pb-7 pr-12 text-sm leading-7 text-white/50 sm:text-base"
+                      >
+                        {faq.answer}
+                      </motion.p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             );
           })}
-        </div>
-
+        </motion.div>
       </div>
     </section>
   );
 }
+
