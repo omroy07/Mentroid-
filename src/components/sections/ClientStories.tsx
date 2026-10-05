@@ -1,293 +1,504 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 import {
   ArrowLeft,
   ArrowRight,
-  ArrowUpRight,
-  Pause,
+  ExternalLink,
+  MoveUpRight,
   Play,
+  Quote,
+  X,
 } from "lucide-react";
-import Image from "next/image";
 
-type Story = {
-  number: string;
-  project: string;
-  category: string;
-  quote: string;
+gsap.registerPlugin(ScrollTrigger);
+
+type VideoType = "youtube" | "vimeo" | "local";
+
+interface Testimonial {
+  id: number;
   name: string;
   role: string;
   company: string;
-  initials: string;
-  avatar: string;
-   youtubeId: string;
-};
+  image: string;
+  text: string;
+  videoType: VideoType;
+  videoUrl: string;
+}
 
-const stories: Story[] = [
+/* ============================================================
+   TESTIMONIAL DATA
+   Exact client content from your previous component
+   ============================================================ */
+
+const testimonials: Testimonial[] = [
   {
-    number: "01",
-    project: "ECGenius",
-    category: "Healthcare AI",
-    quote:
-      "Mentroid helped us turn a complex workflow into something our team could actually use.",
-    name: "Rahul Sharma",
-    role: "Founder",
-    company: "ECGenius",
-    initials: "RS",
-    avatar: "/assets/clients/01.png",
-    youtubeId: "YOUR_YOUTUBE_VIDEO_ID_1",
+    id: 1,
+    name: "Sarah Johnson",
+    role: "Founder & CEO",
+    company: "Nexora",
+    image:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=800&auto=format&fit=crop",
+    text: "Working with this team completely transformed our digital experience. The attention to detail, creativity, and execution were exceptional.",
+    videoType: "youtube",
+    videoUrl: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID_1",
   },
 
   {
-    number: "02",
-    project: "LearnSphere",
-    category: "Education",
-    quote:
-      "The system gave us a completely different way to think about our learning platform.",
-    name: "Priya Patel",
+    id: 2,
+    name: "Michael Anderson",
+    role: "Creative Director",
+    company: "Vertex Studio",
+    image:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800&auto=format&fit=crop",
+    text: "They understood our vision from day one and turned it into something far beyond what we imagined. The final product feels premium and incredibly polished.",
+    videoType: "youtube",
+    videoUrl: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID_2",
+  },
+
+  {
+    id: 3,
+    name: "Emily Williams",
     role: "Product Lead",
-    company: "LearnSphere",
-    initials: "PP",
-    avatar: "/assets/clients/02.png",
-    youtubeId: "YOUR_YOUTUBE_VIDEO_ID_2",
+    company: "Orbit Labs",
+    image:
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop",
+    text: "The process was smooth, collaborative and extremely professional. Every interaction felt intentional and the results speak for themselves.",
+    videoType: "youtube",
+    videoUrl: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID_3",
   },
 
   {
-    number: "03",
-    project: "AgriTech",
-    category: "Agriculture AI",
-    quote:
-      "We were able to connect intelligence directly to the decisions happening on the ground.",
-    name: "Amit Verma",
-    role: "Co-founder",
-    company: "AgriTech",
-    initials: "AV",
-    avatar: "/assets/clients/03.png",
-    youtubeId: "YOUR_YOUTUBE_VIDEO_ID_3",
+    id: 4,
+    name: "Daniel Carter",
+    role: "CEO",
+    company: "Northstar",
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop",
+    text: "A rare combination of strong design thinking and flawless technical execution. Our new experience has completely changed how customers perceive our brand.",
+    videoType: "youtube",
+    videoUrl: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID_4",
   },
 ];
 
+/* ============================================================
+   HELPERS
+   ============================================================ */
 
-const AUTOPLAY_TIME = 4.5;
+function getYoutubeEmbedUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+
+    let videoId = "";
+
+    if (parsed.hostname.includes("youtu.be")) {
+      videoId = parsed.pathname.replace("/", "");
+    }
+
+    if (parsed.searchParams.get("v")) {
+      videoId = parsed.searchParams.get("v") || "";
+    }
+
+    if (parsed.pathname.includes("/embed/")) {
+      videoId = parsed.pathname.split("/embed/")[1];
+    }
+
+    if (!videoId) return url;
+
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+  } catch {
+    return url;
+  }
+}
+
+function getVimeoEmbedUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+
+    const parts = parsed.pathname.split("/").filter(Boolean);
+
+    const videoId = parts[parts.length - 1];
+
+    if (!videoId) return url;
+
+    return `https://player.vimeo.com/video/${videoId}?autoplay=1`;
+  } catch {
+    return url;
+  }
+}
+
+/* ============================================================
+   COMPONENT
+   ============================================================ */
 
 export default function ClientStories() {
   const sectionRef = useRef<HTMLElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
 
   const quoteRef = useRef<HTMLDivElement>(null);
-  const clientRef = useRef<HTMLDivElement>(null);
-  const categoryRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
 
-  const progressRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null);
 
-  const autoplayRef = useRef<gsap.core.Tween | null>(null);
-  const isAnimatingRef = useRef(false);
+  const [active, setActive] = useState(0);
+  const [videoOpen, setVideoOpen] = useState(false);
 
-const [activeIndex, setActiveIndex] = useState(0);
-const [isPaused, setIsPaused] = useState(false);
-const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const isAnimating = useRef(false);
 
-  /**
-   * -------------------------------------------------------
-   * CHANGE STORY
-   * -------------------------------------------------------
-   */
-  const changeStory = (nextIndex: number) => {
-    if (isAnimatingRef.current) return;
+  const current = testimonials[active];
 
-    const normalizedIndex =
-      (nextIndex + stories.length) % stories.length;
+  /* ==========================================================
+     SPLIT QUOTE INTO WORDS
+     ========================================================== */
 
-    if (normalizedIndex === activeIndex) return;
+  const quoteWords = useMemo(() => {
+    return current.text.split(" ");
+  }, [current.text]);
 
-    const quote = quoteRef.current;
-    const client = clientRef.current;
-    const category = categoryRef.current;
+  /* ==========================================================
+     QUOTE REVEAL
+     ========================================================== */
 
-    if (!quote || !client || !category) {
-      setActiveIndex(normalizedIndex);
-      return;
-    }
+  const revealQuote = useCallback(() => {
+    if (!quoteRef.current) return;
 
-    isAnimatingRef.current = true;
+    const words = quoteRef.current.querySelectorAll(
+      ".testimonial-word"
+    );
 
-    autoplayRef.current?.kill();
+    gsap.killTweensOf(words);
 
-    const direction =
-      normalizedIndex > activeIndex ||
-      (activeIndex === stories.length - 1 && normalizedIndex === 0)
-        ? 1
-        : -1;
+    gsap.fromTo(
+      words,
+      {
+        yPercent: 110,
+        opacity: 0,
+      },
+      {
+        yPercent: 0,
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.025,
+        ease: "power4.out",
+        clearProps: "transform",
+      }
+    );
+  }, []);
 
-    const nextStory = stories[normalizedIndex];
+  /* ==========================================================
+     INITIAL SCROLL ANIMATIONS
+     ========================================================== */
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from(".stories-eyebrow", {
+        y: 30,
+        opacity: 0,
+        duration: 1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 80%",
+        },
+      });
+
+      gsap.from(".stories-heading", {
+        y: 70,
+        opacity: 0,
+        duration: 1.2,
+        delay: 0.05,
+        ease: "power4.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 80%",
+        },
+      });
+
+      gsap.from(".stories-description", {
+        y: 30,
+        opacity: 0,
+        duration: 1,
+        delay: 0.15,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 75%",
+        },
+      });
+
+      gsap.from(".stories-stage", {
+        y: 80,
+        opacity: 0,
+        duration: 1.2,
+        delay: 0.15,
+        ease: "power4.out",
+        scrollTrigger: {
+          trigger: ".stories-stage",
+          start: "top 82%",
+        },
+      });
+
+      gsap.from(".stories-footer", {
+        y: 20,
+        opacity: 0,
+        duration: 1,
+        scrollTrigger: {
+          trigger: ".stories-footer",
+          start: "top 90%",
+        },
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  /* ==========================================================
+     REVEAL INITIAL QUOTE
+     ========================================================== */
+
+  useLayoutEffect(() => {
+    const timer = window.setTimeout(() => {
+      revealQuote();
+    }, 250);
+
+    return () => window.clearTimeout(timer);
+  }, [active, revealQuote]);
+
+  /* ==========================================================
+     TESTIMONIAL CHANGE
+     ========================================================== */
+
+  const changeTestimonial = (direction: 1 | -1) => {
+    if (isAnimating.current) return;
+
+    isAnimating.current = true;
+
+    const next =
+      (active + direction + testimonials.length) %
+      testimonials.length;
+
+    const quoteWordsCurrent = quoteRef.current?.querySelectorAll(
+      ".testimonial-word"
+    );
 
     const tl = gsap.timeline({
       onComplete: () => {
-        isAnimatingRef.current = false;
-        setActiveIndex(normalizedIndex);
+        setActive(next);
+        isAnimating.current = false;
       },
     });
 
-    /**
-     * OUT
-     */
+    /* Quote exits */
+
+    if (quoteWordsCurrent?.length) {
+      tl.to(quoteWordsCurrent, {
+        yPercent: direction === 1 ? -70 : 70,
+        opacity: 0,
+        duration: 0.3,
+        stagger: 0.012,
+        ease: "power2.in",
+      });
+    }
+
+    /* Card information exits */
+
     tl.to(
-      [quote, client, category],
+      ".testimonial-meta",
       {
-        y: direction > 0 ? -28 : 28,
+        y: direction === 1 ? -15 : 15,
+        opacity: 0,
+        duration: 0.3,
+        ease: "power2.in",
+      },
+      "<"
+    );
+
+    /* Image exits */
+
+    tl.to(
+      imageRef.current,
+      {
+        x: direction === 1 ? 35 : -35,
+        scale: 1.06,
         opacity: 0,
         duration: 0.35,
-        stagger: 0.025,
-        ease: "power3.in",
-      }
+        ease: "power2.in",
+      },
+      "<"
     );
 
-    /**
-     * CHANGE CONTENT
-     */
-    tl.call(() => {
-      const quoteText = quote.querySelector(
-        "[data-quote]"
-      );
+    /* Prepare */
 
-      const clientName = client.querySelector(
-        "[data-client-name]"
-      );
-
-      const clientRole = client.querySelector(
-        "[data-client-role]"
-      );
-
-     
-
-      if (quoteText) {
-        quoteText.textContent = `“${nextStory.quote}”`;
-      }
-
-      if (clientName) {
-        clientName.textContent = nextStory.name;
-      }
-
-      if (clientRole) {
-        clientRole.textContent = `${nextStory.role} · ${nextStory.company}`;
-      }
-
-     
-
-      category.textContent = nextStory.category;
-    });
-
-    /**
-     * RESET
-     */
-    tl.set([quote, client, category], {
-      y: direction > 0 ? 28 : -28,
-    });
-
-    /**
-     * IN
-     */
-    tl.to(
-      [quote, client, category],
+    tl.set(
+      ".testimonial-meta",
       {
-        y: 0,
-        opacity: 1,
-        duration: 0.55,
-        stagger: 0.045,
-        ease: "power3.out",
-      }
+        y: direction === 1 ? 15 : -15,
+      },
+      ">"
     );
 
-    startAutoplay(normalizedIndex);
-  };
-
-  /**
-   * -------------------------------------------------------
-   * AUTOPLAY
-   * -------------------------------------------------------
-   */
-  const startAutoplay = (currentIndex = activeIndex) => {
-    autoplayRef.current?.kill();
-
-    if (isPaused) return;
-
-    autoplayRef.current = gsap.delayedCall(
-      AUTOPLAY_TIME,
-      () => {
-        const next =
-          (currentIndex + 1) % stories.length;
-
-        changeStory(next);
-      }
-    );
-  };
-
-  /**
-   * -------------------------------------------------------
-   * INITIAL AUTOPLAY
-   * -------------------------------------------------------
-   */
-  useEffect(() => {
-    startAutoplay(0);
-
-    return () => {
-      autoplayRef.current?.kill();
-    };
-  }, []);
-
-  /**
-   * -------------------------------------------------------
-   * PAUSE / RESUME
-   * -------------------------------------------------------
-   */
-  useEffect(() => {
-    if (isPaused) {
-      autoplayRef.current?.kill();
-    } else {
-      startAutoplay(activeIndex);
-    }
-  }, [isPaused]);
-
-  /**
-   * -------------------------------------------------------
-   * PROGRESS BARS
-   * -------------------------------------------------------
-   */
-  useEffect(() => {
-    progressRefs.current.forEach((bar, index) => {
-      if (!bar) return;
-
-      gsap.killTweensOf(bar);
-
-      gsap.set(bar, {
-        scaleX: index === activeIndex ? 0 : index < activeIndex ? 1 : 0,
-        transformOrigin: "left center",
-      });
-
-      if (index === activeIndex && !isPaused) {
-        gsap.to(bar, {
-          scaleX: 1,
-          duration: AUTOPLAY_TIME,
-          ease: "none",
-        });
-      }
+    tl.set(imageRef.current, {
+      x: direction === 1 ? -35 : 35,
+      scale: 1.04,
     });
-  }, [activeIndex, isPaused]);
 
-  /**
-   * -------------------------------------------------------
-   * KEYBOARD CONTROLS
-   * -------------------------------------------------------
-   */
+    /* Bring back */
+
+    tl.to(".testimonial-meta", {
+      y: 0,
+      opacity: 1,
+      duration: 0.65,
+      ease: "power4.out",
+    });
+
+    tl.to(
+      imageRef.current,
+      {
+        x: 0,
+        scale: 1,
+        opacity: 1,
+        duration: 0.8,
+        ease: "power4.out",
+      },
+      "<"
+    );
+  };
+
+  /* ==========================================================
+     IMAGE PARALLAX
+     ========================================================== */
+
+  const handleMouseMove = (
+    e: React.MouseEvent<HTMLDivElement>
+  ) => {
+    if (!imageRef.current) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+
+    const x =
+      (e.clientX - rect.left) / rect.width - 0.5;
+
+    const y =
+      (e.clientY - rect.top) / rect.height - 0.5;
+
+    gsap.to(imageRef.current, {
+      x: x * 16,
+      y: y * 16,
+      duration: 0.7,
+      ease: "power3.out",
+    });
+  };
+
+  const handleMouseLeave = () => {
+    if (!imageRef.current) return;
+
+    gsap.to(imageRef.current, {
+      x: 0,
+      y: 0,
+      duration: 0.8,
+      ease: "power3.out",
+    });
+  };
+
+  /* ==========================================================
+     VIDEO MODAL OPEN
+     ========================================================== */
+
+  const openVideo = () => {
+    setVideoOpen(true);
+
+    document.body.style.overflow = "hidden";
+
+    requestAnimationFrame(() => {
+      if (!modalRef.current || !modalContentRef.current) return;
+
+      gsap.fromTo(
+        modalRef.current,
+        {
+          opacity: 0,
+        },
+        {
+          opacity: 1,
+          duration: 0.4,
+          ease: "power3.out",
+        }
+      );
+
+      gsap.fromTo(
+        modalContentRef.current,
+        {
+          y: 45,
+          scale: 0.96,
+          opacity: 0,
+        },
+        {
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          duration: 0.7,
+          ease: "power4.out",
+        }
+      );
+    });
+  };
+
+  /* ==========================================================
+     VIDEO MODAL CLOSE
+     ========================================================== */
+
+  const closeVideo = () => {
+    if (!modalRef.current || !modalContentRef.current) {
+      setVideoOpen(false);
+      document.body.style.overflow = "";
+      return;
+    }
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        setVideoOpen(false);
+        document.body.style.overflow = "";
+      },
+    });
+
+    tl.to(modalContentRef.current, {
+      y: 25,
+      scale: 0.97,
+      opacity: 0,
+      duration: 0.3,
+      ease: "power2.in",
+    }).to(
+      modalRef.current,
+      {
+        opacity: 0,
+        duration: 0.25,
+        ease: "power2.in",
+      },
+      "<"
+    );
+  };
+
+  /* ==========================================================
+     ESCAPE KEY
+     ========================================================== */
+
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight") {
-        changeStory(activeIndex + 1);
-      }
+    if (!videoOpen) return;
 
-      if (event.key === "ArrowLeft") {
-        changeStory(activeIndex - 1);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeVideo();
       }
     };
 
@@ -296,742 +507,376 @@ const [isVideoOpen, setIsVideoOpen] = useState(false);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [activeIndex]);
+  }, [videoOpen]);
 
-  const activeStory = stories[activeIndex];
+  /* ==========================================================
+     RESTORE BODY SCROLL
+     ========================================================== */
+
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
+  /* ==========================================================
+     VIDEO URL
+     ========================================================== */
+
+  const videoSrc =
+    current.videoType === "youtube"
+      ? getYoutubeEmbedUrl(current.videoUrl)
+      : current.videoType === "vimeo"
+        ? getVimeoEmbedUrl(current.videoUrl)
+        : current.videoUrl;
+
+  /* ==========================================================
+     RENDER
+     ========================================================== */
 
   return (
-    <section
-      ref={sectionRef}
-      id="client-stories"
-       data-navbar-theme="light"
-      className="
-        relative
-        w-full
-        min-h-782vh
-        overflow-hidden
-        bg-[#f3f4f1]
-        text-[#080808]
-      "
-    >
-      <div
-        ref={contentRef}
-        className="
-          relative
-          min-h-screen
-          px-6
-          py-20
-          md:px-10
-          md:py-24
-          lg:px-16
-          lg:py-20
-        "
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
+    <>
+      <section
+        ref={sectionRef}
+        data-navbar-theme="dark"
+        className="relative overflow-hidden bg-[#050505] px-5 py-28 text-white md:px-10 lg:px-16 xl:px-20 lg:py-40"
       >
-      
+        {/* ====================================================
+            TOP LINE
+            ==================================================== */}
 
-        {/* =====================================================
-            HEADER
-        ====================================================== */}
+        <div className="pointer-events-none absolute left-1/2 top-0 h-px w-[calc(100%-40px)] -translate-x-1/2 bg-white/10 md:w-[calc(100%-80px)]" />
 
-        <div
-          className="
-            mx-auto
-            grid
-            max-w-[1500px]
-            grid-cols-1
-            gap-10
-         
-           
-           
-            pt-10
+        {/* ====================================================
+            BACKGROUND NUMBER
+            ==================================================== */}
 
-            md:grid-cols-[1.4fr_0.6fr]
-            md:gap-16
-            md:pt-12
-
-          
-          "
-        >
-          <div>
-            
-            <h2
-              className="
-                max-w-[850px]
-                text-[clamp(4rem,8.5vw,6rem)]
-                font-medium
-                leading-[0.78]
-                tracking-[-0.09em]
-              "
-            >
-              Client
-            
-              <span className="text-black/30"> Stories.
-              </span>
-            </h2>
-          </div>
-
-          <div className="flex items-end">
-            <p
-              className="
-                max-w-[330px]
-                text-[13px]
-                leading-6
-                text-black/45
-                md:pb-1
-              "
-            >
-              Great work is built through
-              partnership. Here’s a look at the
-              people and teams building with
-              Mentroid.
-            </p>
-          </div>
+        <div className="pointer-events-none absolute right-[-5%] top-[12%] select-none text-[25vw] font-medium leading-none tracking-[-0.08em] text-white/[0.025]">
+          06
         </div>
 
-        {/* =====================================================
-            MAIN STORY
-        ====================================================== */}
+        <div className="relative mx-auto max-w-[1500px]">
+          {/* ==================================================
+              SECTION INTRO
+              ================================================== */}
 
-        <div
-          className="
-            mx-auto
-            grid
-            min-h-[580px]
-            max-w-[1500px]
-            grid-cols-1
-            gap-12
-            py-16
+          <div className="mb-20 grid grid-cols-1 gap-12 md:grid-cols-12 md:items-end">
+            <div className="md:col-span-8">
+              
 
-            md:grid-cols-[0.7fr_1.3fr]
-            md:gap-20
-            md:py-20
-
-            lg:min-h-[590px]
-            lg:grid-cols-[0.65fr_1.35fr]
-            lg:gap-24
-          "
-        >
-          {/* ===================================================
-              LEFT STORY INDEX
-          ==================================================== */}
-
-          <div
-            className="
-              flex
-              flex-col
-              justify-between
-            "
-          >
-            <div>
-              <div
-                className="
-                  mb-8
-                  text-[9px]
-                  uppercase
-                  tracking-[0.22em]
-                  text-black/30
-                "
-              >
-                Stories
-              </div>
-
-              <div className="space-y-1">
-                {stories.map((story, index) => {
-                  const active = index === activeIndex;
-
-                  return (
-                    <button
-                      key={story.number}
-                      type="button"
-                      onClick={() => changeStory(index)}
-                      className="
-                        group
-                        flex
-                        w-full
-                        max-w-[270px]
-                        items-center
-                        gap-4
-                        py-2
-                        text-left
-                      "
-                    >
-                      <span
-                        className={`
-                          w-6
-                          text-[8px]
-                          tracking-[0.16em]
-                          transition-colors
-                          duration-300
-                          ${
-                            active
-                              ? "text-black"
-                              : "text-black/25"
-                          }
-                        `}
-                      >
-                        {story.number}
-                      </span>
-
-                      <span
-                        className={`
-                          text-[12px]
-                          uppercase
-                          tracking-[0.12em]
-                          transition-all
-                          duration-300
-                          ${
-                            active
-                              ? "translate-x-1 text-black"
-                              : "text-black/25 group-hover:text-black/60"
-                          }
-                        `}
-                      >
-                        {story.project}
-                      </span>
-
-                      <span
-                        className={`
-                          ml-auto
-                          h-px
-                          transition-all
-                          duration-500
-                          ${
-                            active
-                              ? "w-8 bg-black/50"
-                              : "w-0 bg-black/20"
-                          }
-                        `}
-                      />
-                    </button>
-                  );
-                })}
-              </div>
+              <h2 className="stories-heading max-w-[900px] text-[15vw] font-medium leading-[0.82] tracking-[-0.065em] sm:text-7xl md:text-8xl lg:text-[108px]">
+                Client <span className="text-white/30"> Stories.
+                </span>
+              </h2>
             </div>
 
-            {/* NAVIGATION */}
-
-            <div
-              className="
-                mt-12
-                flex
-                items-center
-                gap-0
-              "
-            >
-              <button
-                type="button"
-                onClick={() =>
-                  changeStory(activeIndex - 1)
-                }
-                aria-label="Previous testimonial"
-                className="
-                  flex
-                  h-14
-                  w-14
-                  items-center
-                  justify-center
-                  border
-                  border-black/10
-                  text-black/50
-                  transition-all
-                  duration-300
-                  hover:bg-black
-                  hover:text-white
-                "
-              >
-                <ArrowLeft size={15} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  changeStory(activeIndex + 1)
-                }
-                aria-label="Next testimonial"
-                className="
-                  flex
-                  h-14
-                  w-14
-                  items-center
-                  justify-center
-                  border
-                  border-l-0
-                  border-black/10
-                  text-black/50
-                  transition-all
-                  duration-300
-                  hover:bg-black
-                  hover:text-white
-                "
-              >
-                <ArrowRight size={15} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setIsPaused((value) => !value)
-                }
-                aria-label={
-                  isPaused
-                    ? "Resume autoplay"
-                    : "Pause autoplay"
-                }
-                className="
-                  ml-5
-                  flex
-                  h-10
-                  w-10
-                  items-center
-                  justify-center
-                  rounded-full
-                  border
-                  border-black/10
-                  text-black/45
-                  transition-all
-                  duration-300
-                  hover:border-black/30
-                  hover:text-black
-                "
-              >
-                {isPaused ? (
-                  <Play size={12} />
-                ) : (
-                  <Pause size={12} />
-                )}
-              </button>
+            <div className="stories-description md:col-span-4 md:pb-2">
+              <p className="max-w-sm text-sm leading-6 text-white/50">
+                Great work is built through partnership. Here’s
+                a look at the people and teams building with
+                Mentroid.
+              </p>
             </div>
           </div>
 
-          {/* ===================================================
-              RIGHT TESTIMONIAL
-          ==================================================== */}
+          {/* ==================================================
+              STORY NAVIGATION
+              ================================================== */}
 
-          <div
-            className="
-              relative
-              flex
-              flex-col
-              justify-center
-              border-t
-              border-black/10
-              pt-12
+          {/* <div className="mb-8 flex flex-wrap items-center gap-x-7 gap-y-4 border-t border-white/10 pt-5">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-white/30">
+              Stories
+            </span>
 
-              md:border-t-0
-              md:border-l
-              md:border-black/10
-              md:pl-14
-              md:pt-0
-
-              lg:pl-20
-            "
-          >
-            {/* CATEGORY */}
-
-            <div
-              ref={categoryRef}
-              className="
-                mb-10
-                text-[9px]
-                uppercase
-                tracking-[0.24em]
-                text-black/35
-              "
-            >
-              {activeStory.category}
-            </div>
-
-            {/* QUOTE */}
-
-            <div
-              ref={quoteRef}
-              className="
-                max-w-[661px]
-                will-change-transform
-              "
-            >
-              <div
-                data-quote
-                className="
-                  text-[clamp(2.1rem,4.2vw,1.4rem)]
-                  font-medium
-                  leading-[0.98]
-                  tracking-[-0.065em]
-                  text-black/80
-                "
-              >
-                “{activeStory.quote}”
-              </div>
-            </div>
-
-            {/* CLIENT */}
-
-            <div
-              ref={clientRef}
-              className="
-                mt-14
-                flex
-                items-center
-                justify-between
-                gap-8
-                will-change-transform
-              "
-            >
-              <div className="flex items-center gap-4">
-               <div
-  data-avatar
-  className="
-    relative
-    h-14
-    w-14
-    shrink-0
-    rounded-full
-    overflow-hidden
-    rounded-[3px]
-    bg-[#dedfdb]
-  "
->
-  <Image
-    src={activeStory.avatar}
-    alt={activeStory.name}
-    fill
-    sizes="56px"
-    className="
-      object-cover
-      
-      opacity-90
-      transition-transform
-      duration-700
-      hover:scale-105
-    "
-  />
-</div>
-
-                <div>
-                  <div
-                    data-client-name
-                    className="
-                      text-[12px]
-                      font-medium
-                      text-black/75
-                    "
-                  >
-                    {activeStory.name}
-                  </div>
-
-                  <div
-                    data-client-role
-                    className="
-                      mt-1
-                      text-[10px]
-                      text-black/35
-                    "
-                  >
-                    {activeStory.role} ·{" "}
-                    {activeStory.company}
-                  </div>
-                </div>
-              </div>
-
-              {/* LISTEN / STORY */}
-
-             <button
-  type="button"
-  onClick={() => {
-    setIsVideoOpen(true);
-    setIsPaused(true);
-  }}
-  className="
-    hidden
-    items-center
-    gap-3
-    text-[8px]
-    uppercase
-    tracking-[0.2em]
-    text-black/40
-    transition-colors
-    hover:text-black
-    md:flex
-  "
->
-  <span
-    className="
-      flex
-      h-7
-      w-7
-      items-center
-      justify-center
-      rounded-full
-      border
-      border-black/15
-      transition-all
-      duration-300
-      group-hover:bg-black
-      group-hover:text-white
-    "
-  >
-    <Play size={9} fill="currentColor" />
-  </span>
-
-  Listen to story
-</button>
-            </div>
-
-            {/* PROGRESS */}
-
-            <div
-              className="
-                mt-16
-                flex
-                w-full
-                max-w-[760px]
-                gap-2
-              "
-            >
-              {stories.map((story, index) => (
+            <div className="flex flex-wrap gap-x-5 gap-y-3">
+              {testimonials.map((item, index) => (
                 <button
-                  key={story.number}
+                  key={item.id}
                   type="button"
-                  onClick={() => changeStory(index)}
-                  aria-label={`Go to ${story.project}`}
-                  className="
-                    relative
-                    h-[2px]
-                    flex-1
-                    overflow-hidden
-                    bg-black/10
-                  "
+                  disabled={isAnimating.current}
+                  onClick={() => {
+                    if (index === active || isAnimating.current)
+                      return;
+
+                    const direction =
+                      index > active ? 1 : -1;
+
+                    changeTestimonial(direction);
+                  }}
+                  className={`group flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] transition-colors duration-300 ${
+                    index === active
+                      ? "text-white"
+                      : "text-white/30 hover:text-white/70"
+                  }`}
                 >
-                  <div
-                    ref={(el) => {
-                      progressRefs.current[index] = el;
-                    }}
-                    className="
-                      absolute
-                      inset-y-0
-                      left-0
-                      w-full
-                      origin-left
-                      scale-x-0
-                      bg-black/65
-                    "
+                  <span
+                    className={`transition-all duration-500 ${
+                      index === active
+                        ? "h-px w-7 bg-white"
+                        : "h-px w-0 bg-white group-hover:w-4"
+                    }`}
                   />
+
+                  <span>
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+
+                  <span className="hidden sm:inline">
+                    {item.company}
+                  </span>
                 </button>
               ))}
             </div>
-          </div>
-        </div>
+          </div> */}
 
-        {/* =====================================================
-            FOOTER
-        ====================================================== */}
+          {/* ==================================================
+              STORY STAGE
+              ================================================== */}
 
-        {/* <div
-          className="
-            mx-auto
-            flex
-            max-w-[1500px]
-            flex-col
-            gap-6
-            border-t
-            border-black/10
-            pt-7
-
-            sm:flex-row
-            sm:items-end
-            sm:justify-between
-          "
-        >
-          <div>
-            <span
-              className="
-                text-[9px]
-                uppercase
-                tracking-[0.2em]
-                text-black/30
-              "
-            >
-              {String(activeIndex + 1).padStart(2, "0")}{" "}
-              /{" "}
-              {String(stories.length).padStart(2, "0")}
-            </span>
-          </div>
-
-          <button
-            type="button"
-            className="
-              group
-              flex
-              items-center
-              gap-4
-              self-start
-              text-[9px]
-              uppercase
-              tracking-[0.2em]
-              text-black/55
-              sm:self-auto
-            "
+          <div
+            className="stories-stage relative min-h-[680px] overflow-visible"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
           >
-            <span className="border-b border-black/30 pb-2">
-              Become a client
-            </span>
+            {/* Background index */}
 
-            <span
-              className="
-                flex
-                h-7
-                w-7
-                items-center
-                justify-center
-                rounded-full
-                border
-                border-black/15
-                transition-all
-                duration-300
-                group-hover:-translate-y-0.5
-                group-hover:translate-x-0.5
-              "
+            <div className="pointer-events-none absolute bottom-0 left-[-2%] select-none text-[28vw] font-medium leading-none tracking-[-0.09em] text-white/[0.035] md:text-[260px]">
+              {String(current.id).padStart(2, "0")}
+            </div>
+
+            {/* =================================================
+                CLIENT IMAGE
+                ================================================= */}
+
+            <div
+              ref={imageRef}
+              className="absolute bottom-16 left-0 z-20 hidden h-[350px] w-[260px] overflow-hidden rounded-[3px] md:block lg:h-[420px] lg:w-[320px]"
             >
-              <ArrowUpRight size={11} />
-            </span>
-          </button>
-        </div> */}
-      </div>
-      {isVideoOpen && (
+              <img
+                src={current.image}
+                alt={current.name}
+                className="h-full w-full object-cover grayscale transition-transform duration-700"
+              />
+
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
+              <div className="absolute bottom-5 left-5 flex items-center gap-2 text-[9px] uppercase tracking-[0.2em] text-white">
+                <span className="h-1 w-1 rounded-full bg-white" />
+                Client story
+              </div>
+            </div>
+
+            {/* =================================================
+                MAIN STORY CONTENT
+                ================================================= */}
+
+            <div className="relative z-10 ml-auto flex min-h-[600px] w-full max-w-[1080px] flex-col justify-between  py-10 md:pl-[100px] lg:pl-[140px]">
+              {/* Top metadata */}
+
+              <div className="testimonial-meta flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Quote
+                    size={17}
+                    strokeWidth={1.3}
+                    className="text-white/40"
+                  />
+
+                  <span className="text-[10px] uppercase tracking-[0.25em] text-white/35">
+                    Healthcare AI
+                  </span>
+                </div>
+
+                <span className="text-[10px] uppercase tracking-[0.2em] text-white/25">
+                  {String(current.id).padStart(2, "0")} /{" "}
+                  {String(testimonials.length).padStart(2, "0")}
+                </span>
+              </div>
+
+              {/* =================================================
+                  QUOTE
+                  ================================================= */}
+
+              <div
+                ref={quoteRef}
+                className="max-w-[1000px] py-16 md:py-20 lg:py-24"
+              >
+                <p className="text-[clamp(2.5rem,5.2vw,3.2rem)] font-normal leading-[0.98] tracking-[-0.055em] text-white">
+                  “{" "}
+                  {quoteWords.map((word, index) => (
+                    <span
+                      key={`${current.id}-${index}`}
+                      className="testimonial-word mr-[0.25em] inline-block opacity-0"
+                    >
+                      {word}
+                    </span>
+                  ))}{" "}
+                  ”
+                </p>
+              </div>
+
+              {/* =================================================
+                  CLIENT INFO + STORY CTA
+                  ================================================= */}
+
+              <div className="testimonial-meta flex flex-col justify-between gap-10 border-t border-white/10 pt-6 sm:flex-row sm:items-end">
+                <div>
+                  <p className="text-base font-medium tracking-[-0.02em] text-white">
+                    {current.name}
+                  </p>
+
+                  <p className="mt-1 text-sm text-white/40">
+                    {current.role} · {current.company}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4">
+                  {/* Listen */}
+
+                  <button
+                    type="button"
+                    onClick={openVideo}
+                    className="group flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] text-white transition-colors duration-300 hover:text-white/60"
+                  >
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 transition-all duration-300 group-hover:border-white group-hover:bg-white group-hover:text-black">
+                      <Play
+                        size={12}
+                        fill="currentColor"
+                        className="ml-[1px]"
+                      />
+                    </span>
+
+                    <span>Listen to story</span>
+
+                    <MoveUpRight
+                      size={13}
+                      className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                    />
+                  </button>
+
+                  {/* Arrows */}
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => changeTestimonial(-1)}
+                      className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/15 transition-all duration-300 hover:border-white hover:bg-white hover:text-black"
+                      aria-label="Previous testimonial"
+                    >
+                      <ArrowLeft
+                        size={15}
+                        className="transition-transform duration-300 group-hover:-translate-x-0.5"
+                      />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => changeTestimonial(1)}
+                      className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/15 transition-all duration-300 hover:border-white hover:bg-white hover:text-black"
+                      aria-label="Next testimonial"
+                    >
+                      <ArrowRight
+                        size={15}
+                        className="transition-transform duration-300 group-hover:translate-x-0.5"
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ======================================================
+          VIDEO MODAL
+          ====================================================== */}
+
+     {/* ======================================================
+    VIDEO MODAL
+    ====================================================== */}
+
+{videoOpen && (
   <div
-    className="
-      fixed
-      inset-0
-      z-[9999]
-      flex
-      items-center
-      justify-center
-      bg-black/80
-      p-5
-      backdrop-blur-sm
-      md:p-10
-    "
-    onClick={() => {
-      setIsVideoOpen(false);
-      setIsPaused(false);
+    ref={modalRef}
+    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 px-5 py-8 opacity-0 backdrop-blur-xl md:px-8"
+    onMouseDown={(event) => {
+      if (event.target === event.currentTarget) {
+        closeVideo();
+      }
     }}
   >
     <div
-      className="
-        relative
-        w-full
-        max-w-[1100px]
-        overflow-hidden
-        bg-black
-        shadow-2xl
-      "
-      onClick={(event) => event.stopPropagation()}
+      ref={modalContentRef}
+      className="relative w-full max-w-[900px] opacity-0"
     >
-      {/* CLOSE */}
-      <button
-        type="button"
-        onClick={() => {
-          setIsVideoOpen(false);
-          setIsPaused(false);
-        }}
-        aria-label="Close video"
-        className="
-          absolute
-          right-4
-          top-4
-          z-20
-          flex
-          h-10
-          w-10
-          items-center
-          justify-center
-          rounded-full
-          bg-white/10
-          text-white
-          backdrop-blur-md
-          transition-all
-          duration-300
-          hover:bg-white
-          hover:text-black
-        "
-      >
-        ×
-      </button>
+      {/* Modal header */}
 
-      {/* VIDEO */}
-      <div className="relative aspect-video w-full">
-        <iframe
-          key={activeStory.youtubeId}
-          src={`https://www.youtube.com/embed/${activeStory.youtubeId}?autoplay=1&rel=0&modestbranding=1`}
-          title={`${activeStory.project} — Client Story`}
-          className="
-            absolute
-            inset-0
-            h-full
-            w-full
-          "
-          allow="
-            autoplay;
-            encrypted-media;
-            picture-in-picture;
-            fullscreen
-          "
-          allowFullScreen
-        />
+      <div className="mb-4 flex items-center justify-between gap-5">
+        <div>
+          <p className="mb-1.5 text-[9px] uppercase tracking-[0.3em] text-white/35">
+            Client Story
+          </p>
+
+          <h3 className="text-lg font-medium tracking-[-0.035em] text-white md:text-xl">
+            {current.name}
+          </h3>
+
+          <p className="mt-1 text-xs text-white/35">
+            {current.role} · {current.company}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={closeVideo}
+          className="group flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 text-white transition-all duration-300 hover:bg-white hover:text-black"
+          aria-label="Close video"
+        >
+          <X
+            size={17}
+            className="transition-transform duration-300 group-hover:rotate-90"
+          />
+        </button>
       </div>
 
-      {/* VIDEO INFO */}
-      <div
-        className="
-          flex
-          items-center
-          justify-between
-          gap-6
-          bg-[#111]
-          px-5
-          py-4
-          text-white
-          md:px-7
-        "
-      >
-        <div>
-          <div
-            className="
-              text-[8px]
-              uppercase
-              tracking-[0.22em]
-              text-white/40
-            "
-          >
-            Client story
-          </div>
+      {/* Video */}
 
-          <div className="mt-1 text-sm font-medium">
-            {activeStory.project}
-          </div>
-        </div>
+      <div className="relative aspect-video overflow-hidden rounded-[6px] border border-white/10 bg-black shadow-2xl">
+        {current.videoType === "local" ? (
+          <video
+            src={videoSrc}
+            autoPlay
+            controls
+            playsInline
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <iframe
+            src={videoSrc}
+            title={`${current.name} client story`}
+            className="h-full w-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        )}
+      </div>
 
-        <div
-          className="
-            hidden
-            text-right
-            text-[9px]
-            uppercase
-            tracking-[0.18em]
-            text-white/40
-            sm:block
-          "
-        >
-          {activeStory.name}
-          <br />
-          {activeStory.company}
-        </div>
+      {/* Modal footer */}
+
+      <div className="mt-3 flex items-center justify-between">
+        <span className="text-[8px] uppercase tracking-[0.25em] text-white/25">
+          Mentroid / Client Stories
+        </span>
+
+        <span className="flex items-center gap-2 text-[8px] uppercase tracking-[0.2em] text-white/25">
+          Watch their experience
+          <ExternalLink size={9} />
+        </span>
       </div>
     </div>
   </div>
 )}
-    </section>
+    </>
   );
 }
