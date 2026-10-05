@@ -10,6 +10,7 @@ import Proof from "@/components/sections/Proof";
 import LetsBuild from "@/components/sections/LetsBuild";
 import ClientStories from "@/components/sections/ClientStories";
 import KeyFacts from "@/components/sections/KeyFacts";
+import Project from "@/components/sections/Project";
 
 
 export default function Home() {
@@ -20,9 +21,10 @@ export default function Home() {
       <Hero/>
       <IntelligenceSystem/>
       <WhatWeEngineer1/>
-      <Solutions/>
+    <Project/>
       <SelectedWork/>
       <ClientStories/>
+      <Solutions/>
       <Industries/>
       <KeyFacts/>
       <Proof/>

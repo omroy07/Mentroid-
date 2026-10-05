@@ -140,7 +140,7 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           }
 
           /* ----------------------------------------------------------------
-           * Viewport
+           * Viewportsrc/components/sections/ClientStories.tsx
            * ---------------------------------------------------------------- */
 
           gsap.set(viewport, {
