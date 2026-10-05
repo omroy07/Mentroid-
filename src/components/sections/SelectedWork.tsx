@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
@@ -61,14 +60,13 @@ const projects: Project[] = [
 ];
 
 /* -------------------------------------------------------------------------- */
-/* Reference geometry                                                         */
+/* DESKTOP GEOMETRY                                                           */
 /* -------------------------------------------------------------------------- */
 
 const DESKTOP = {
   width: 320,
   height: 384,
 
-  // Exact reference spacing
   stepX: 240,
   stepY: -84,
   stepZ: -288,
@@ -77,6 +75,10 @@ const DESKTOP = {
   perspective: 2000,
   translateY: 100,
 };
+
+/* -------------------------------------------------------------------------- */
+/* MOBILE GEOMETRY                                                            */
+/* -------------------------------------------------------------------------- */
 
 const MOBILE = {
   width: 220,
@@ -92,9 +94,8 @@ const MOBILE = {
 };
 
 /*
- * Mentroid uses 12 planes for the same diagonal depth effect
- * while keeping the DOM and scroll workload lighter than the
- * original 26-plane reference.
+ * 12 planes gives us the same continuous diagonal/depth effect
+ * without making the DOM unnecessarily heavy.
  */
 const PLANE_COUNT = 12;
 
@@ -103,7 +104,7 @@ export default function SelectedWork() {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const planesRef = useRef<HTMLDivElement | null>(null);
 
-const planeRefs = useRef<(HTMLElement | null)[]>([]);
+  const planeRefs = useRef<(HTMLElement | null)[]>([]);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -114,8 +115,9 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
       return;
     }
 
-    // Keep the section hidden until the first 3D frame is ready.
-    // This prevents the raw full-size image flash on refresh.
+    /*
+     * Prevent raw image flash before GSAP applies the 3D transforms.
+     */
     section.classList.remove("is-ready");
 
     const ctx = gsap.context(() => {
@@ -128,19 +130,18 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
         },
         (context) => {
           const isMobile = Boolean(context.conditions?.mobile);
-
           const config = isMobile ? MOBILE : DESKTOP;
 
           const planes = planeRefs.current.filter(
-  Boolean
-) as HTMLElement[];
+            Boolean
+          ) as HTMLElement[];
 
           if (!planes.length) {
             return;
           }
 
           /* ----------------------------------------------------------------
-           * Viewportsrc/components/sections/ClientStories.tsx
+           * VIEWPORT
            * ---------------------------------------------------------------- */
 
           gsap.set(viewport, {
@@ -149,7 +150,7 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           });
 
           /* ----------------------------------------------------------------
-           * Plane container
+           * PLANES CONTAINER
            * ---------------------------------------------------------------- */
 
           gsap.set(planesContainer, {
@@ -161,19 +162,7 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           });
 
           /* ----------------------------------------------------------------
-           * Initial positions
-           *
-           * Reference:
-           *
-           * plane 13 ≈ -63 / 22 / 75.6
-           * plane 14 ≈ 177 / -61.95 / -212.4
-           * plane 15 ≈ 417 / -145.95 / -500.4
-           *
-           * Which is exactly:
-           *
-           * x = index * 240
-           * y = index * -84
-           * z = index * -288
+           * INITIAL PLANE POSITIONS
            * ---------------------------------------------------------------- */
 
           const centerIndex = (PLANE_COUNT - 1) / 2;
@@ -199,62 +188,118 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           });
 
           /* ----------------------------------------------------------------
-           * Infinite plane renderer
+           * SCROLL STATE
            * ---------------------------------------------------------------- */
 
           const progress = {
             value: 0,
+            velocity: 0,
           };
 
-          // quickSetter avoids allocating new GSAP tweens/objects
-          // on every scroll frame.
+          let previousProgress = 0;
+
+          /* ----------------------------------------------------------------
+           * QUICK SETTERS
+           * ---------------------------------------------------------------- */
+
           const setX = planes.map((plane) =>
             gsap.quickSetter(plane, "x", "px")
           );
+
           const setY = planes.map((plane) =>
             gsap.quickSetter(plane, "y", "px")
           );
+
           const setZ = planes.map((plane) =>
             gsap.quickSetter(plane, "z", "px")
           );
+
           const setRotationY = planes.map((plane) =>
             gsap.quickSetter(plane, "rotationY", "deg")
           );
+
+          /* ----------------------------------------------------------------
+           * WAVY 3D RENDERER
+           *
+           * The original diagonal geometry remains intact.
+           * A very subtle sine wave is added to X/Y.
+           *
+           * Fast scrolling creates slightly more movement.
+           * Slow scrolling remains clean.
+           * ---------------------------------------------------------------- */
+
           const renderPlanes = () => {
             const movement = progress.value;
+
             const halfRange = PLANE_COUNT / 2;
+
+            /*
+             * Limit the wave intensity.
+             * This keeps the effect elegant instead of exaggerated.
+             */
+            const velocityInfluence = Math.min(
+              Math.abs(progress.velocity) * 4,
+              1
+            );
 
             planes.forEach((_, index) => {
               let position =
                 index - centerIndex + movement;
 
+              /*
+               * Infinite wrapping.
+               */
               position =
                 ((((position + halfRange) % PLANE_COUNT) +
                   PLANE_COUNT) %
                   PLANE_COUNT) -
                 halfRange;
 
-              setX[index](position * config.stepX);
-              setY[index](position * config.stepY);
-              setZ[index](position * config.stepZ);
+              /*
+               * Organic wave.
+               */
+              const wave =
+                Math.sin(
+                  position * 0.82 +
+                    movement * 1.65
+                ) *
+                velocityInfluence;
+
+              /*
+               * Secondary smaller wave.
+               */
+              const secondaryWave =
+                Math.sin(
+                  position * 0.45 +
+                    movement * 0.9
+                ) *
+                velocityInfluence;
+
+              const x =
+                position * config.stepX +
+                wave * (isMobile ? 8 : 18);
+
+              const y =
+                position * config.stepY +
+                secondaryWave * (isMobile ? 5 : 12);
+
+              const z =
+                position * config.stepZ;
+
+              setX[index](x);
+              setY[index](y);
+              setZ[index](z);
               setRotationY[index](config.rotateY);
             });
           };
 
           /*
-           * Render initial state.
+           * Initial state.
            */
           renderPlanes();
 
           /* ----------------------------------------------------------------
-           * ScrollTrigger
-           *
-           * IMPORTANT:
-           * There is only ONE ScrollTrigger.
-           *
-           * No ScrollTrigger.getVelocity()
-           * No extra ticker
-           * No second pin
+           * SCROLLTRIGGER
            * ---------------------------------------------------------------- */
 
           const trigger = ScrollTrigger.create({
@@ -262,10 +307,13 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
 
             start: "top top",
 
-           end: "bottom top",
+            end: "bottom top",
 
             pin: viewport,
 
+            /*
+             * Slightly softer than a hard 1:1 movement.
+             */
             scrub: 1.15,
 
             anticipatePin: 1,
@@ -273,32 +321,46 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
             invalidateOnRefresh: true,
 
             onUpdate: (self) => {
+              const nextProgress =
+                self.progress *
+                (PLANE_COUNT * 1.8);
+
               /*
-               * Move through the complete virtual plane sequence.
+               * Calculate our own progress velocity.
+               *
+               * IMPORTANT:
+               * We do NOT use ScrollTrigger.getVelocity().
                */
-              progress.value =
-                self.progress * (PLANE_COUNT * 1.8);
+              const delta =
+                nextProgress -
+                previousProgress;
+
+              progress.velocity = delta;
+
+              progress.value = nextProgress;
+
+              previousProgress = nextProgress;
 
               renderPlanes();
             },
           });
 
-          /*
-           * Refresh after the browser has calculated dimensions.
-           */
+          /* ----------------------------------------------------------------
+           * REFRESH
+           * ---------------------------------------------------------------- */
+
           requestAnimationFrame(() => {
             ScrollTrigger.refresh();
 
-            // Reveal only after GSAP + ScrollTrigger have the correct
-            // dimensions and the initial plane transforms are applied.
             requestAnimationFrame(() => {
               section.classList.add("is-ready");
             });
           });
 
-          /*
-           * Cleanup.
-           */
+          /* ----------------------------------------------------------------
+           * CLEANUP
+           * ---------------------------------------------------------------- */
+
           return () => {
             trigger.kill();
 
@@ -334,9 +396,7 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
         ref={viewportRef}
         className="selected-work-viewport"
       >
-        {/* ----------------------------------------------------------------
-            HEADER
-        ----------------------------------------------------------------- */}
+        {/* HEADER */}
 
         <header className="selected-work-header">
           <div className="selected-work-title">
@@ -351,17 +411,13 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           </div>
         </header>
 
-        {/* ----------------------------------------------------------------
-            SCROLL HINT
-        ----------------------------------------------------------------- */}
+        {/* SCROLL HINT */}
 
         <div className="selected-work-hint">
           SCROLL TO EXPLORE
         </div>
 
-        {/* ----------------------------------------------------------------
-            PLANES
-        ----------------------------------------------------------------- */}
+        {/* PLANES */}
 
         <div
           ref={planesRef}
@@ -377,14 +433,17 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
               <article
                 key={`${project.number}-${index}`}
                 ref={(element) => {
-                  planeRefs.current[index] = element;
+                  planeRefs.current[index] =
+                    element;
                 }}
                 className="selected-work-plane"
               >
-                {/* Clickable card */}
+                {/* CLICKABLE CARD */}
 
                 <a
                   href={project.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="selected-work-card"
                   aria-label={`View ${project.title}`}
                 >
@@ -394,7 +453,11 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
                       alt={`${project.title} — ${project.category}`}
                       className="selected-work-image"
                       draggable={false}
-                      loading={index < 6 ? "eager" : "lazy"}
+                      loading={
+                        index < 6
+                          ? "eager"
+                          : "lazy"
+                      }
                       decoding="async"
                     />
 
@@ -404,13 +467,13 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
                   </div>
                 </a>
 
-                {/* Plane number */}
+                {/* NUMBER */}
 
                 <div className="selected-work-index">
-                  {String(index).padStart(2, "0")}
+                  {project.number}
                 </div>
 
-                {/* Project label */}
+                {/* PROJECT LABEL */}
 
                 <div className="selected-work-label">
                   <span className="selected-work-label-line" />
@@ -432,24 +495,16 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
 
         .selected-work-section {
           position: relative;
-
           width: 100%;
-
           height: 550vh;
 
           overflow: clip;
 
           background: #000;
-
           color: #fff;
 
           isolation: isolate;
 
-          /*
-           * Critical refresh optimization:
-           * keep the raw <img> hidden until GSAP has applied
-           * the first 3D transform.
-           */
           visibility: hidden;
           opacity: 0;
 
@@ -469,20 +524,13 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           position: relative;
 
           width: 100%;
-
           height: 100vh;
 
           display: flex;
-
           align-items: center;
-
           justify-content: center;
 
-          /*
-           * Exact reference perspective.
-           */
           perspective: 2000px;
-
           perspective-origin: 10% 10%;
 
           overflow: hidden;
@@ -504,7 +552,6 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           z-index: 100;
 
           top: max(90px, 3vw);
-
           left: 3vw;
 
           pointer-events: none;
@@ -516,7 +563,6 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
             sans-serif;
 
           font-weight: 500;
-
           letter-spacing: -0.02em;
         }
 
@@ -525,7 +571,11 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
 
           margin-left: 4vw;
 
-          font-size: clamp(32px, 5vw, 64px);
+          font-size: clamp(
+            32px,
+            5vw,
+            64px
+          );
 
           line-height: 0.9;
 
@@ -547,7 +597,11 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
 
           margin-left: 4px;
 
-          font-size: clamp(10px, 0.4em, 0.4em);
+          font-size: clamp(
+            10px,
+            0.4em,
+            0.4em
+          );
 
           font-weight: 600;
 
@@ -570,7 +624,6 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           z-index: 100;
 
           right: 3vw;
-
           bottom: 3vw;
 
           color: #fff;
@@ -600,13 +653,10 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           position: relative;
 
           display: flex;
-
           align-items: center;
-
           justify-content: center;
 
           width: 0;
-
           height: 0;
 
           transform-style: preserve-3d;
@@ -622,13 +672,10 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           position: absolute;
 
           display: flex;
-
           align-items: center;
-
           justify-content: center;
 
           width: 320px;
-
           height: 384px;
 
           color: #fff;
@@ -640,18 +687,15 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           pointer-events: none;
 
           backface-visibility: visible;
-
-          box-shadow:
-            0 25px 50px -12px
-            rgba(0, 0, 0, 0.25);
         }
 
         /* ================================================================
-           CLICKABLE CARD + HOVER
+           CLICKABLE CARD
         ================================================================ */
 
         .selected-work-card {
           position: absolute;
+
           inset: 0;
 
           display: block;
@@ -659,33 +703,73 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           width: 100%;
           height: 100%;
 
-          overflow: hidden;
+          overflow: visible;
 
           color: inherit;
+
           text-decoration: none;
 
           pointer-events: auto;
 
           cursor: pointer;
 
-          transform: translateZ(0);
+          transform:
+            translate3d(0, 0, 0)
+            scale(1);
+
+          transform-style: preserve-3d;
+
+          transition:
+            transform 550ms
+              cubic-bezier(
+                0.22,
+                1,
+                0.36,
+                1
+              );
         }
+
+        /*
+         * Main hover lift.
+         *
+         * The card comes slightly upward
+         * AND slightly toward the viewer.
+         */
+
+        .selected-work-card:hover {
+          transform:
+            translate3d(
+              0,
+              -10px,
+              45px
+            )
+            scale(1.015);
+        }
+
+        /* ================================================================
+           CARD OVERLAY
+        ================================================================ */
 
         .selected-work-card::after {
           content: "";
+
           position: absolute;
+
           inset: 0;
+
+          z-index: 1;
 
           background:
             linear-gradient(
               180deg,
-              rgba(0, 0, 0, 0.04) 20%,
-              rgba(0, 0, 0, 0.55) 100%
+              rgba(0, 0, 0, 0.03) 20%,
+              rgba(0, 0, 0, 0.58) 100%
             );
 
           opacity: 0;
 
-          transition: opacity 320ms ease;
+          transition:
+            opacity 350ms ease;
 
           pointer-events: none;
         }
@@ -694,53 +778,8 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           opacity: 1;
         }
 
-        .selected-work-card:hover .selected-work-image {
-          transform: scale(1.045);
-          filter: brightness(0.78);
-        }
-
-        .selected-work-card-arrow {
-          position: absolute;
-
-          top: 16px;
-          right: 16px;
-
-          z-index: 2;
-
-          width: 36px;
-          height: 36px;
-
-          display: flex;
-          align-items: center;
-          justify-content: center;
-
-          border: 1px solid rgba(255, 255, 255, 0.55);
-          border-radius: 50%;
-
-          color: #fff;
-
-          font-family: Arial, sans-serif;
-          font-size: 18px;
-          line-height: 1;
-
-          opacity: 0;
-          transform: translateY(8px);
-
-          transition:
-            opacity 320ms ease,
-            transform 320ms ease,
-            background 320ms ease;
-        }
-
-        .selected-work-card:hover
-          .selected-work-card-arrow {
-          opacity: 1;
-          transform: translateY(0);
-          background: rgba(255, 255, 255, 0.08);
-        }
-
         /* ================================================================
-           IMAGE CONTAINER
+           IMAGE
         ================================================================ */
 
         .selected-work-plane-image {
@@ -749,7 +788,6 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           inset: 0;
 
           width: 100%;
-
           height: 100%;
 
           overflow: hidden;
@@ -757,11 +795,9 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           background: #111;
 
           transform-style: preserve-3d;
-        }
 
-        /* ================================================================
-           IMAGE
-        ================================================================ */
+          border-radius: 0;
+        }
 
         .selected-work-image {
           display: block;
@@ -777,13 +813,94 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
 
           pointer-events: none;
 
-          transform: scale(1);
+          transform:
+            scale(1)
+            translateZ(0);
 
           transition:
-            transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
-            filter 400ms ease;
+            transform 550ms
+              cubic-bezier(
+                0.22,
+                1,
+                0.36,
+                1
+              ),
+            filter 450ms ease;
 
           backface-visibility: hidden;
+        }
+
+        .selected-work-card:hover
+          .selected-work-image {
+          transform:
+            scale(1.045)
+            translateZ(0);
+
+          filter: brightness(0.78);
+        }
+
+        /* ================================================================
+           ARROW
+        ================================================================ */
+
+        .selected-work-card-arrow {
+          position: absolute;
+
+          top: 16px;
+          right: 16px;
+
+          z-index: 3;
+
+          width: 36px;
+          height: 36px;
+
+          display: flex;
+
+          align-items: center;
+          justify-content: center;
+
+          border:
+            1px solid
+            rgba(255, 255, 255, 0.55);
+
+          border-radius: 50%;
+
+          color: #fff;
+
+          font-family: Arial, sans-serif;
+
+          font-size: 18px;
+
+          line-height: 1;
+
+          opacity: 0;
+
+          transform:
+            translateY(8px)
+            scale(0.92);
+
+          transition:
+            opacity 320ms ease,
+            transform 320ms
+              cubic-bezier(
+                0.22,
+                1,
+                0.36,
+                1
+              ),
+            background 320ms ease;
+        }
+
+        .selected-work-card:hover
+          .selected-work-card-arrow {
+          opacity: 1;
+
+          transform:
+            translateY(0)
+            scale(1);
+
+          background:
+            rgba(255, 255, 255, 0.08);
         }
 
         /* ================================================================
@@ -794,7 +911,6 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           position: absolute;
 
           top: -24px;
-
           left: 0;
 
           color: #fff;
@@ -814,6 +930,8 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           letter-spacing: 0.05em;
 
           white-space: nowrap;
+
+          pointer-events: none;
         }
 
         /* ================================================================
@@ -824,7 +942,6 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           position: absolute;
 
           left: 100%;
-
           top: 50%;
 
           display: flex;
@@ -833,26 +950,97 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
 
           margin-left: 12px;
 
-          transform: translateY(-50%);
+          /*
+           * Hidden by default.
+           */
+          opacity: 0.18;
+
+          transform:
+            translate3d(
+              -18px,
+              -50%,
+              0
+            );
 
           pointer-events: none;
 
           white-space: nowrap;
+
+          transition:
+            opacity 450ms
+              cubic-bezier(
+                0.22,
+                1,
+                0.36,
+                1
+              ),
+            transform 450ms
+              cubic-bezier(
+                0.22,
+                1,
+                0.36,
+                1
+              );
         }
+
+        /*
+         * Hovering the plane activates its label.
+         */
+
+        .selected-work-plane:hover
+          .selected-work-label {
+          opacity: 1;
+
+          transform:
+            translate3d(
+              0,
+              -50%,
+              0
+            );
+        }
+
+        /* ================================================================
+           LABEL LINE
+        ================================================================ */
 
         .selected-work-label-line {
           display: block;
 
-          width: 120px;
+          width: 0;
 
           height: 1px;
 
-          flex: 0 0 120px;
+          flex: 0 0 0;
 
           background: #fff;
 
           transform-origin: left center;
+
+          opacity: 0;
+
+          transition:
+            width 500ms
+              cubic-bezier(
+                0.22,
+                1,
+                0.36,
+                1
+              ),
+            opacity 300ms ease;
         }
+
+        .selected-work-plane:hover
+          .selected-work-label-line {
+          width: 120px;
+
+          flex-basis: 120px;
+
+          opacity: 1;
+        }
+
+        /* ================================================================
+           LABEL TEXT
+        ================================================================ */
 
         .selected-work-label-text {
           display: block;
@@ -876,6 +1064,35 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           letter-spacing: 0.05em;
 
           text-transform: uppercase;
+
+          opacity: 0;
+
+          transform:
+            translateX(-8px);
+
+          transition:
+            opacity 400ms
+              cubic-bezier(
+                0.22,
+                1,
+                0.36,
+                1
+              ) 120ms,
+            transform 400ms
+              cubic-bezier(
+                0.22,
+                1,
+                0.36,
+                1
+              ) 120ms;
+        }
+
+        .selected-work-plane:hover
+          .selected-work-label-text {
+          opacity: 1;
+
+          transform:
+            translateX(0);
         }
 
         /* ================================================================
@@ -890,7 +1107,8 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
           .selected-work-viewport {
             perspective: 1300px;
 
-            perspective-origin: 10% 10%;
+            perspective-origin:
+              10% 10%;
           }
 
           .selected-work-header {
@@ -915,11 +1133,13 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
 
           .selected-work-plane {
             width: 220px;
+
             height: 264px;
           }
 
           .selected-work-card {
             width: 220px;
+
             height: 264px;
           }
 
@@ -933,17 +1153,14 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
             margin-left: 8px;
           }
 
-          .selected-work-card-arrow {
-            width: 30px;
-            height: 30px;
+          .selected-work-label-line {
+            width: 0;
 
-            top: 10px;
-            right: 10px;
-
-            font-size: 15px;
+            flex-basis: 0;
           }
 
-          .selected-work-label-line {
+          .selected-work-plane:hover
+            .selected-work-label-line {
             width: 70px;
 
             flex-basis: 70px;
@@ -955,12 +1172,38 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
             font-size: 9px;
           }
 
+          .selected-work-card-arrow {
+            width: 30px;
+
+            height: 30px;
+
+            top: 10px;
+
+            right: 10px;
+
+            font-size: 15px;
+          }
+
           .selected-work-hint {
             right: 24px;
 
             bottom: 24px;
 
             font-size: 9px;
+          }
+
+          /*
+           * Slightly smaller hover movement on touch-sized layouts.
+           */
+
+          .selected-work-card:hover {
+            transform:
+              translate3d(
+                0,
+                -7px,
+                28px
+              )
+              scale(1.01);
           }
         }
 
@@ -992,9 +1235,20 @@ const planeRefs = useRef<(HTMLElement | null)[]>([]);
            REDUCED MOTION
         ================================================================ */
 
-        @media (prefers-reduced-motion: reduce) {
+        @media (
+          prefers-reduced-motion: reduce
+        ) {
           .selected-work-section {
             height: 100vh;
+          }
+
+          .selected-work-card,
+          .selected-work-image,
+          .selected-work-label,
+          .selected-work-label-line,
+          .selected-work-label-text,
+          .selected-work-card-arrow {
+            transition: none !important;
           }
         }
       `}</style>
