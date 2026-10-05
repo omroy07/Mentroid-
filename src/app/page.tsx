@@ -1,6 +1,4 @@
-import Navbar from "@/components/navbar/Navbar";
 
-import Footer from "@/components/footer/Footer";
 import Hero from "@/components/hero/Hero";
 import IntelligenceSystem from "@/components/sections/IntelligenceSystem";
 import WhatWeEngineer1 from "@/components/sections/WhatWeEngineer1";
@@ -12,12 +10,13 @@ import Proof from "@/components/sections/Proof";
 import LetsBuild from "@/components/sections/LetsBuild";
 import ClientStories from "@/components/sections/ClientStories";
 import KeyFacts from "@/components/sections/KeyFacts";
-import NeuralCore from "@/components/3d/NeuralCore";
+
+
 export default function Home() {
   return (
-    <main className="min-h-screen ">
-      {/* <NeuralCore/> */}
-      <Navbar />
+    <main className="min-h-screen  ">
+  
+      
       <Hero/>
       <IntelligenceSystem/>
       <WhatWeEngineer1/>
@@ -28,7 +27,7 @@ export default function Home() {
       <KeyFacts/>
       <Proof/>
       <LetsBuild/>
-      <Footer />
+    
     </main>
   );
 }
