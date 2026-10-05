@@ -22,7 +22,7 @@ const scenes = [
   {
     id: "02",
     label: "DATA",
-    title: "The intelligence",
+    title: "Intelligence",
     accent: "starts with data.",
     description:
       "We connect your knowledge, documents, conversations and business systems into a foundation AI can actually use.",

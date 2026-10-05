@@ -548,7 +548,7 @@ export default function Solutions() {
 
             <h2
               className="
-                text-[clamp(4rem,9.5vw,9.5rem)]
+                text-[clamp(4.5rem,9.5vw,10rem)]
                 font-medium
                 leading-[0.76]
                 tracking-[-0.09em]

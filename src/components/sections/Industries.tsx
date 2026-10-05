@@ -576,7 +576,7 @@ gsap.set(imageInners[0], {
       className="
         relative
         h-[850vh]
-        -mt-[20vh]
+       
         w-full
         overflow-hidden
         bg-[#f4f4f1]
@@ -644,7 +644,7 @@ gsap.set(imageInners[0], {
 
             <h2
               className="
-                text-[clamp(4.5rem,10vw,10rem)]
+                text-[clamp(4.5rem,9.5vw,10rem)]
                 font-medium
                 leading-[0.76]
                 tracking-[-0.09em]

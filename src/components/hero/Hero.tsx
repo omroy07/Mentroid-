@@ -568,7 +568,7 @@ tl.to(
                     <div className="overflow-hidden">
                       <h1
                         className="
-                          text-[clamp(3.5rem,8vw,6.8rem)]
+                          text-[clamp(3.5rem,8vw,5.8rem)]
                           font-medium
                           leading-[0.88]
                           tracking-[-0.075em]
