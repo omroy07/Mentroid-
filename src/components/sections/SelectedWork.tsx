@@ -1,728 +1,321 @@
+
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
-import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowUpRight } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const projects = [
+type Project = {
+  number: string;
+  title: string;
+  category: string;
+  image: string;
+  href: string;
+};
+
+const projects: Project[] = [
   {
     number: "01",
-    name: "ECGenius",
+    title: "ECGenius",
     category: "Healthcare / AI",
-    description:
-      "Intelligent healthcare technology designed to turn complex information into actionable insight.",
     image: "/assets/selected-work/01.webp",
-    tags: ["AI", "Healthcare", "ML"],
+    href: "https://ecgenius.vercel.app/",
   },
   {
     number: "02",
-    name: "LearnSphere",
+    title: "LearnSphere",
     category: "Education / AI",
-    description:
-      "An intelligent learning experience built around personalized knowledge and engagement.",
     image: "/assets/selected-work/02.webp",
-    tags: ["AI", "Education", "SaaS"],
+    href: "https://learn-sphere-2.vercel.app/",
   },
   {
     number: "03",
-    name: "AgriTech",
+    title: "AgriTech",
     category: "Agriculture / ML",
-    description:
-      "Machine learning systems helping transform agricultural data into practical decisions.",
     image: "/assets/selected-work/03.webp",
-    tags: ["ML", "Agriculture", "Analytics"],
+    href: "https://agri-tech-6rs5.vercel.app/",
   },
   {
     number: "04",
-    name: "VisionSTRA",
+    title: "VisionSTRA",
     category: "Computer Vision",
-    description:
-      "Computer vision technology engineered to understand visual information at scale.",
     image: "/assets/selected-work/04.webp",
-    tags: ["Computer Vision", "AI", "ML"],
+    href: "https://visionstra.vercel.app/",
+  },
+  {
+    number: "05",
+    title: "AI Automation",
+    category: "Automation / AI",
+    image: "/assets/selected-work/05.webp",
+    href: "https://ai-money-mentor-nine.vercel.app/",
+  },
+  {
+    number: "06",
+    title: "AI Platform",
+    category: "Product Engineering",
+    image: "/assets/selected-work/06.webp",
+    href: "https://ai-platform.vercel.app/",
   },
 ];
 
+/* -------------------------------------------------------------------------- */
+/* Reference geometry                                                         */
+/* -------------------------------------------------------------------------- */
+
+const DESKTOP = {
+  width: 320,
+  height: 384,
+
+  // Exact reference spacing
+  stepX: 240,
+  stepY: -84,
+  stepZ: -288,
+
+  rotateY: -50,
+  perspective: 2000,
+  translateY: 100,
+};
+
+const MOBILE = {
+  width: 220,
+  height: 264,
+
+  stepX: 165,
+  stepY: -58,
+  stepZ: -198,
+
+  rotateY: -45,
+  perspective: 1300,
+  translateY: 55,
+};
+
+/*
+ * Mentroid uses 12 planes for the same diagonal depth effect
+ * while keeping the DOM and scroll workload lighter than the
+ * original 26-plane reference.
+ */
+const PLANE_COUNT = 12;
+
 export default function SelectedWork() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const planesRef = useRef<HTMLDivElement | null>(null);
 
-  const introRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
-  const footerRef = useRef<HTMLDivElement>(null);
-
-  const cardRefs = useRef<HTMLElement[]>([]);
-  const imageRefs = useRef<HTMLDivElement[]>([]);
-  const infoRefs = useRef<HTMLDivElement[]>([]);
+const planeRefs = useRef<(HTMLElement | null)[]>([]);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
-    const stage = stageRef.current;
-    const grid = gridRef.current;
+    const viewport = viewportRef.current;
+    const planesContainer = planesRef.current;
 
-    if (!section || !stage || !grid) return;
+    if (!section || !viewport || !planesContainer) {
+      return;
+    }
+
+    // Keep the section hidden until the first 3D frame is ready.
+    // This prevents the raw full-size image flash on refresh.
+    section.classList.remove("is-ready");
 
     const ctx = gsap.context(() => {
-      const cards = cardRefs.current;
-      const images = imageRefs.current;
-      const infos = infoRefs.current;
+      const media = gsap.matchMedia();
 
-      if (
-        cards.length !== projects.length ||
-        images.length !== projects.length ||
-        infos.length !== projects.length
-      ) {
-        return;
-      }
+      media.add(
+        {
+          desktop: "(min-width: 769px)",
+          mobile: "(max-width: 768px)",
+        },
+        (context) => {
+          const isMobile = Boolean(context.conditions?.mobile);
 
-      const mm = gsap.matchMedia();
+          const config = isMobile ? MOBILE : DESKTOP;
 
-      /*
-      ============================================================
-      DESKTOP
-      ============================================================
-      */
+          const planes = planeRefs.current.filter(
+  Boolean
+) as HTMLElement[];
 
-      mm.add("(min-width: 769px)", () => {
-        /*
-        ------------------------------------------------------------
-        INITIAL POSITIONS
-        ------------------------------------------------------------
-
-        01 → top-left from upper-left
-        02 → top-right from upper-right
-        03 → bottom-left from lower-left
-        04 → bottom-right from lower-right
-        ------------------------------------------------------------
-        */
-
-        gsap.set(cards[0], {
-          x: "-90vw",
-          y: "-75vh",
-          rotation: -7,
-          scale: 0.84,
-          opacity: 0,
-        });
-
-        gsap.set(cards[1], {
-          x: "90vw",
-          y: "-75vh",
-          rotation: 7,
-          scale: 0.84,
-          opacity: 0,
-        });
-
-        gsap.set(cards[2], {
-          x: "-90vw",
-          y: "75vh",
-          rotation: 7,
-          scale: 0.84,
-          opacity: 0,
-        });
-
-        gsap.set(cards[3], {
-          x: "90vw",
-          y: "75vh",
-          rotation: -7,
-          scale: 0.84,
-          opacity: 0,
-        });
-
-        gsap.set(images, {
-          scale: 1.13,
-        });
-
-        gsap.set(infos, {
-          opacity: 0,
-          y: 22,
-        });
-
-        /*
-        ============================================================
-        MASTER TIMELINE
-
-        Because this is scrubbed:
-        DOWN = forward
-        UP   = exact reverse
-        ============================================================
-        */
-
-        const timeline = gsap.timeline({
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: () => `+=${window.innerHeight * 6.2}`,
-            pin: stage,
-            scrub: 0.7,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        /*
-        ============================================================
-        01 — INTRO ENTER
-        ============================================================
-        */
-
-        timeline.fromTo(
-          introRef.current,
-          {
-            opacity: 0,
-            y: 70,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "power3.out",
+          if (!planes.length) {
+            return;
           }
-        );
 
-        /*
-        ------------------------------------------------------------
-        INTRO HOLD
-        ------------------------------------------------------------
-        */
+          /* ----------------------------------------------------------------
+           * Viewport
+           * ---------------------------------------------------------------- */
 
-        timeline.to({}, {
-          duration: 0.5,
-        });
-
-        /*
-        ============================================================
-        02 — INTRO EXIT
-        ============================================================
-        */
-
-        timeline.to(introRef.current, {
-          opacity: 0,
-          y: -60,
-          scale: 0.96,
-          duration: 0.55,
-          ease: "power3.inOut",
-        });
-
-        /*
-        ============================================================
-        03 — CARDS ASSEMBLE
-        ============================================================
-        */
-
-        timeline.to(
-          cards[0],
-          {
-            x: 0,
-            y: 0,
-            rotation: 0,
-            scale: 1,
-            opacity: 1,
-            duration: 1,
-            ease: "power4.out",
-          },
-          "<0.05"
-        );
-
-        timeline.to(
-          cards[1],
-          {
-            x: 0,
-            y: 0,
-            rotation: 0,
-            scale: 1,
-            opacity: 1,
-            duration: 1,
-            ease: "power4.out",
-          },
-          "<0.12"
-        );
-
-        timeline.to(
-          cards[2],
-          {
-            x: 0,
-            y: 0,
-            rotation: 0,
-            scale: 1,
-            opacity: 1,
-            duration: 1,
-            ease: "power4.out",
-          },
-          "<0.12"
-        );
-
-        timeline.to(
-          cards[3],
-          {
-            x: 0,
-            y: 0,
-            rotation: 0,
-            scale: 1,
-            opacity: 1,
-            duration: 1,
-            ease: "power4.out",
-          },
-          "<0.12"
-        );
-
-        /*
-        ============================================================
-        04 — IMAGE SETTLE
-        ============================================================
-        */
-
-        timeline.to(
-          images,
-          {
-            scale: 1,
-            duration: 0.75,
-            ease: "power3.out",
-          },
-          "<0.12"
-        );
-
-        /*
-        ============================================================
-        05 — PROJECT INFORMATION
-        ============================================================
-        */
-
-        timeline.to(
-          infos,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.55,
-            stagger: 0.08,
-            ease: "power3.out",
-          },
-          "<0.18"
-        );
-
-        /*
-        ============================================================
-        06 — HOLD THE COMPLETE GRID
-        ============================================================
-        */
-
-        timeline.to({}, {
-          duration: 1.15,
-        });
-
-        /*
-        ============================================================
-        07 — SMALL SETTLE
-        ============================================================
-        */
-
-        timeline.to(
-          cards,
-          {
-            scale: 0.985,
-            duration: 0.65,
-            ease: "power2.inOut",
-          }
-        );
-
-        timeline.to({}, {
-          duration: 0.35,
-        });
-
-        /*
-        ============================================================
-        08 — DISASSEMBLE
-
-        IMPORTANT:
-        Each card returns to the EXACT direction from which it
-        originally entered.
-
-        Therefore scrolling UP reverses this perfectly.
-        ============================================================
-        */
-
-        // 01 → upper-left
-        timeline.to(
-          cards[0],
-          {
-            x: "-90vw",
-            y: "-75vh",
-            rotation: -7,
-            scale: 0.84,
-            opacity: 0,
-            duration: 0.9,
-            ease: "power3.inOut",
-          }
-        );
-
-        // 02 → upper-right
-        timeline.to(
-          cards[1],
-          {
-            x: "90vw",
-            y: "-75vh",
-            rotation: 7,
-            scale: 0.84,
-            opacity: 0,
-            duration: 0.9,
-            ease: "power3.inOut",
-          },
-          "<0.08"
-        );
-
-        // 03 → lower-left
-        timeline.to(
-          cards[2],
-          {
-            x: "-90vw",
-            y: "75vh",
-            rotation: 7,
-            scale: 0.84,
-            opacity: 0,
-            duration: 0.9,
-            ease: "power3.inOut",
-          },
-          "<0.08"
-        );
-
-        // 04 → lower-right
-        timeline.to(
-          cards[3],
-          {
-            x: "90vw",
-            y: "75vh",
-            rotation: -7,
-            scale: 0.84,
-            opacity: 0,
-            duration: 0.9,
-            ease: "power3.inOut",
-          },
-          "<0.08"
-        );
-
-        /*
-        ------------------------------------------------------------
-        FOOTER EXITS WITH THE GRID
-        ------------------------------------------------------------
-        */
-
-        timeline.to(
-          footerRef.current,
-          {
-            opacity: 0,
-            y: -20,
-            duration: 0.35,
-            ease: "power2.inOut",
-          },
-          "<0.2"
-        );
-
-        /*
-        ------------------------------------------------------------
-        SMALL BREATHING SPACE BEFORE NEXT SECTION
-        ------------------------------------------------------------
-        */
-
-        timeline.to({}, {
-          duration: 0.3,
-        });
-      });
-
-      /*
-      ============================================================
-      MOBILE
-      ============================================================
-      */
-
-      mm.add("(max-width: 768px)", () => {
-        /*
-        ------------------------------------------------------------
-        MOBILE INITIAL POSITIONS
-        ------------------------------------------------------------
-        */
-
-        gsap.set(cards[0], {
-          x: "-35vw",
-          y: "-35vh",
-          rotation: -5,
-          scale: 0.9,
-          opacity: 0,
-        });
-
-        gsap.set(cards[1], {
-          x: "35vw",
-          y: "-25vh",
-          rotation: 5,
-          scale: 0.9,
-          opacity: 0,
-        });
-
-        gsap.set(cards[2], {
-          x: "-35vw",
-          y: "35vh",
-          rotation: 5,
-          scale: 0.9,
-          opacity: 0,
-        });
-
-        gsap.set(cards[3], {
-          x: "35vw",
-          y: "35vh",
-          rotation: -5,
-          scale: 0.9,
-          opacity: 0,
-        });
-
-        gsap.set(images, {
-          scale: 1.08,
-        });
-
-        gsap.set(infos, {
-          opacity: 0,
-          y: 20,
-        });
-
-        /*
-        ------------------------------------------------------------
-        MOBILE TIMELINE
-        ------------------------------------------------------------
-        */
-
-        const timeline = gsap.timeline({
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: () => `+=${window.innerHeight * 5.5}`,
-            pin: stage,
-            scrub: 0.7,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        /*
-        ------------------------------------------------------------
-        INTRO
-        ------------------------------------------------------------
-        */
-
-        timeline.fromTo(
-          introRef.current,
-          {
-            opacity: 0,
-            y: 45,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            ease: "power3.out",
-          }
-        );
-
-        timeline.to({}, {
-          duration: 0.35,
-        });
-
-        timeline.to(introRef.current, {
-          opacity: 0,
-          y: -40,
-          duration: 0.45,
-          ease: "power3.inOut",
-        });
-
-        /*
-        ------------------------------------------------------------
-        MOBILE CARD ASSEMBLY
-        ------------------------------------------------------------
-        */
-
-        timeline.to(
-          cards,
-          {
-            x: 0,
-            y: 0,
-            rotation: 0,
-            scale: 1,
-            opacity: 1,
-            duration: 0.85,
-            stagger: 0.1,
-            ease: "power4.out",
-          },
-          "<0.08"
-        );
-
-        /*
-        ------------------------------------------------------------
-        IMAGE SETTLE
-        ------------------------------------------------------------
-        */
-
-        timeline.to(
-          images,
-          {
-            scale: 1,
-            duration: 0.65,
-            ease: "power3.out",
-          },
-          "<0.12"
-        );
-
-        /*
-        ------------------------------------------------------------
-        CONTENT
-        ------------------------------------------------------------
-        */
-
-        timeline.to(
-          infos,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.45,
-            stagger: 0.07,
-            ease: "power3.out",
-          },
-          "<0.12"
-        );
-
-        /*
-        ------------------------------------------------------------
-        HOLD
-        ------------------------------------------------------------
-        */
-
-        timeline.to({}, {
-          duration: 0.9,
-        });
-
-        /*
-        ------------------------------------------------------------
-        MOBILE DISASSEMBLY
-        ------------------------------------------------------------
-
-        Same origin directions.
-        Reverse scroll naturally reverses this.
-        ------------------------------------------------------------
-        */
-
-        timeline.to(
-          cards[0],
-          {
-            x: "-35vw",
-            y: "-35vh",
-            rotation: -5,
-            scale: 0.9,
-            opacity: 0,
-            duration: 0.75,
-            ease: "power3.inOut",
-          }
-        );
-
-        timeline.to(
-          cards[1],
-          {
-            x: "35vw",
-            y: "-25vh",
-            rotation: 5,
-            scale: 0.9,
-            opacity: 0,
-            duration: 0.75,
-            ease: "power3.inOut",
-          },
-          "<0.08"
-        );
-
-        timeline.to(
-          cards[2],
-          {
-            x: "-35vw",
-            y: "35vh",
-            rotation: 5,
-            scale: 0.9,
-            opacity: 0,
-            duration: 0.75,
-            ease: "power3.inOut",
-          },
-          "<0.08"
-        );
-
-        timeline.to(
-          cards[3],
-          {
-            x: "35vw",
-            y: "35vh",
-            rotation: -5,
-            scale: 0.9,
-            opacity: 0,
-            duration: 0.75,
-            ease: "power3.inOut",
-          },
-          "<0.08"
-        );
-
-        timeline.to(
-          footerRef.current,
-          {
-            opacity: 0,
-            y: -20,
-            duration: 0.3,
-          },
-          "<0.15"
-        );
-      });
-
-      /*
-      ============================================================
-      HOVER
-
-      Do NOT animate card position here.
-      ScrollTrigger owns card position.
-      ============================================================
-      */
-
-      cards.forEach((card, index) => {
-        const image = images[index];
-
-        const handleEnter = () => {
-          gsap.to(image, {
-            scale: 1.045,
-            duration: 0.6,
-            ease: "power3.out",
-            overwrite: "auto",
+          gsap.set(viewport, {
+            perspective: config.perspective,
+            transformStyle: "preserve-3d",
           });
-        };
 
-        const handleLeave = () => {
-          gsap.to(image, {
-            scale: 1,
-            duration: 0.6,
-            ease: "power3.out",
-            overwrite: "auto",
+          /* ----------------------------------------------------------------
+           * Plane container
+           * ---------------------------------------------------------------- */
+
+          gsap.set(planesContainer, {
+            y: config.translateY,
+            x: 0,
+            rotationZ: 0,
+            transformStyle: "preserve-3d",
+            force3D: true,
           });
-        };
 
-        card.addEventListener("mouseenter", handleEnter);
-        card.addEventListener("mouseleave", handleLeave);
+          /* ----------------------------------------------------------------
+           * Initial positions
+           *
+           * Reference:
+           *
+           * plane 13 ≈ -63 / 22 / 75.6
+           * plane 14 ≈ 177 / -61.95 / -212.4
+           * plane 15 ≈ 417 / -145.95 / -500.4
+           *
+           * Which is exactly:
+           *
+           * x = index * 240
+           * y = index * -84
+           * z = index * -288
+           * ---------------------------------------------------------------- */
 
-        return () => {
-          card.removeEventListener("mouseenter", handleEnter);
-          card.removeEventListener("mouseleave", handleLeave);
-        };
-      });
+          const centerIndex = (PLANE_COUNT - 1) / 2;
 
-      /*
-      ============================================================
-      REFRESH
-      ============================================================
-      */
+          planes.forEach((plane, index) => {
+            const position = index - centerIndex;
 
-      requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
-      });
+            gsap.set(plane, {
+              width: config.width,
+              height: config.height,
+
+              x: position * config.stepX,
+              y: position * config.stepY,
+              z: position * config.stepZ,
+
+              rotationY: config.rotateY,
+
+              transformStyle: "preserve-3d",
+              force3D: true,
+
+              filter: "brightness(1)",
+            });
+          });
+
+          /* ----------------------------------------------------------------
+           * Infinite plane renderer
+           * ---------------------------------------------------------------- */
+
+          const progress = {
+            value: 0,
+          };
+
+          // quickSetter avoids allocating new GSAP tweens/objects
+          // on every scroll frame.
+          const setX = planes.map((plane) =>
+            gsap.quickSetter(plane, "x", "px")
+          );
+          const setY = planes.map((plane) =>
+            gsap.quickSetter(plane, "y", "px")
+          );
+          const setZ = planes.map((plane) =>
+            gsap.quickSetter(plane, "z", "px")
+          );
+          const setRotationY = planes.map((plane) =>
+            gsap.quickSetter(plane, "rotationY", "deg")
+          );
+          const renderPlanes = () => {
+            const movement = progress.value;
+            const halfRange = PLANE_COUNT / 2;
+
+            planes.forEach((_, index) => {
+              let position =
+                index - centerIndex + movement;
+
+              position =
+                ((((position + halfRange) % PLANE_COUNT) +
+                  PLANE_COUNT) %
+                  PLANE_COUNT) -
+                halfRange;
+
+              setX[index](position * config.stepX);
+              setY[index](position * config.stepY);
+              setZ[index](position * config.stepZ);
+              setRotationY[index](config.rotateY);
+            });
+          };
+
+          /*
+           * Render initial state.
+           */
+          renderPlanes();
+
+          /* ----------------------------------------------------------------
+           * ScrollTrigger
+           *
+           * IMPORTANT:
+           * There is only ONE ScrollTrigger.
+           *
+           * No ScrollTrigger.getVelocity()
+           * No extra ticker
+           * No second pin
+           * ---------------------------------------------------------------- */
+
+          const trigger = ScrollTrigger.create({
+            trigger: section,
+
+            start: "top top",
+
+           end: "bottom top",
+
+            pin: viewport,
+
+            scrub: 1.15,
+
+            anticipatePin: 1,
+
+            invalidateOnRefresh: true,
+
+            onUpdate: (self) => {
+              /*
+               * Move through the complete virtual plane sequence.
+               */
+              progress.value =
+                self.progress * (PLANE_COUNT * 1.8);
+
+              renderPlanes();
+            },
+          });
+
+          /*
+           * Refresh after the browser has calculated dimensions.
+           */
+          requestAnimationFrame(() => {
+            ScrollTrigger.refresh();
+
+            // Reveal only after GSAP + ScrollTrigger have the correct
+            // dimensions and the initial plane transforms are applied.
+            requestAnimationFrame(() => {
+              section.classList.add("is-ready");
+            });
+          });
+
+          /*
+           * Cleanup.
+           */
+          return () => {
+            trigger.kill();
+
+            gsap.set(planes, {
+              clearProps: "all",
+            });
+
+            gsap.set(planesContainer, {
+              clearProps: "all",
+            });
+          };
+        }
+      );
+
+      return () => {
+        media.revert();
+      };
     }, section);
 
     return () => {
@@ -733,409 +326,678 @@ export default function SelectedWork() {
   return (
     <section
       ref={sectionRef}
-      id="selected-work"
-       data-navbar-theme="light"
-      className="
-        relative
-        h-[700vh]
-        w-full
-        overflow-hidden
-        bg-[#f3f4f1]
-        text-[#080808]
-      "
+      data-navbar-theme="dark"
+      className="selected-work-section"
+      aria-label="Selected work"
     >
       <div
-        ref={stageRef}
-        className="
-          relative
-          h-screen
-          w-full
-          overflow-hidden
-          bg-[#f3f4f1]
-        "
+        ref={viewportRef}
+        className="selected-work-viewport"
       >
-        {/* ========================================================
-            TOP META
-        ======================================================== */}
+        {/* ----------------------------------------------------------------
+            HEADER
+        ----------------------------------------------------------------- */}
 
-        <div
-          className="
-            absolute
-            left-6
-            right-6
-            top-7
-            z-[100]
-            flex
-            items-center
-            justify-between
-            md:left-10
-            md:right-10
-            lg:left-16
-            lg:right-16
-          "
-        >
-          <div
-            className="
-              flex
-              items-center
-              gap-3
-              text-[9px]
-              uppercase
-              tracking-[0.24em]
-              text-black/45
-            "
-          >
-            
+        <header className="selected-work-header">
+          <div className="selected-work-title">
+            SELECTED WORK
           </div>
 
-          <span
-            className="
-              hidden
-              text-[9px]
-              uppercase
-              tracking-[0.24em]
-              text-black/30
-              md:block
-            "
-          >
-       
-          </span>
-        </div>
-
-        {/* ========================================================
-            INTRO
-        ======================================================== */}
-
-        <div
-          ref={introRef}
-          className="
-            absolute
-            inset-0
-            z-[90]
-            flex
-            items-center
-            px-6
-            md:px-10
-            lg:px-16
-          "
-        >
-          <div className="max-w-[950px]">
-            <div
-              className="
-                mb-8
-                flex
-                items-center
-                gap-3
-              "
-            >
-             
-            </div>
-
-            <h2
-              className="
-                text-[clamp(4.2rem,9.5vw,9.5rem)]
-                font-medium
-                leading-[0.76]
-                tracking-[-0.09em]
-              "
-            >
-              Built for
-              <br />
-              <span className="text-black/30">
-                problems
-              </span>
-              <br />
-              worth solving.
-            </h2>
-
-            <p
-              className="
-                mt-9
-                max-w-[430px]
-                text-[14px]
-                leading-7
-                text-black/40
-              "
-            >
-              A selection of intelligent products and
-              systems built around real-world problems.
-            </p>
+          <div className="selected-work-title selected-work-collection">
+            PROJECTS
+            <sup className="selected-work-count">
+              ({String(projects.length).padStart(2, "0")})
+            </sup>
           </div>
+        </header>
+
+        {/* ----------------------------------------------------------------
+            SCROLL HINT
+        ----------------------------------------------------------------- */}
+
+        <div className="selected-work-hint">
+          SCROLL TO EXPLORE
         </div>
 
-        {/* ========================================================
-            PROJECT GRID
-        ======================================================== */}
+        {/* ----------------------------------------------------------------
+            PLANES
+        ----------------------------------------------------------------- */}
 
         <div
-          ref={gridRef}
-          className="
-            absolute
-            left-[9vw]
-            right-[9vw]
-            top-[15vh]
-            bottom-[12vh]
-            z-20
-            grid
-            grid-cols-2
-            grid-rows-2
-            gap-[1.1vw]
-
-            max-md:left-5
-            max-md:right-5
-            max-md:top-[19vh]
-            max-md:bottom-[11vh]
-            max-md:grid-cols-1
-            max-md:grid-rows-4
-            max-md:gap-3
-          "
+          ref={planesRef}
+          className="selected-work-planes"
         >
-          {projects.map((project, index) => (
-            <article
-              key={project.number}
-              ref={(el) => {
-                if (el) {
-                  cardRefs.current[index] = el;
-                }
-              }}
-              className="
-                group
-                relative
-                min-h-0
-                cursor-pointer
-                overflow-hidden
-                bg-[#dedfdb]
-                will-change-transform
-              "
-            >
-              {/* ==================================================
-                  IMAGE
-              ================================================== */}
+          {Array.from({
+            length: PLANE_COUNT,
+          }).map((_, index) => {
+            const project =
+              projects[index % projects.length];
 
-              <div
-                ref={(el) => {
-                  if (el) {
-                    imageRefs.current[index] = el;
-                  }
+            return (
+              <article
+                key={`${project.number}-${index}`}
+                ref={(element) => {
+                  planeRefs.current[index] = element;
                 }}
-                className="
-                  absolute
-                  inset-0
-                  overflow-hidden
-                  will-change-transform
-                "
+                className="selected-work-plane"
               >
-                <Image
-                  src={project.image}
-                  alt={`${project.name} — ${project.category}`}
-                  fill
-                  priority={index === 0}
-                  sizes="(max-width: 768px) calc(100vw - 40px), 40vw"
-                  className="
-                    object-cover
-                    transition-[filter]
-                    duration-500
-                    group-hover:brightness-[0.82]
-                  "
-                />
+                {/* Clickable card */}
 
-                <div
-                  className="
-                    pointer-events-none
-                    absolute
-                    inset-0
-                    bg-black/[0.04]
-                    transition-colors
-                    duration-500
-                    group-hover:bg-black/[0.14]
-                  "
-                />
-              </div>
-
-              {/* ==================================================
-                  TOP META
-              ================================================== */}
-
-              <div
-                className="
-                  absolute
-                  left-5
-                  right-5
-                  top-5
-                  z-20
-                  flex
-                  items-center
-                  justify-between
-                "
-              >
-                <span
-                  className="
-                    text-[8px]
-                    uppercase
-                    tracking-[0.22em]
-                    text-white/75
-                  "
+                <a
+                  href={project.href}
+                  className="selected-work-card"
+                  aria-label={`View ${project.title}`}
                 >
-                  MENTROID / {project.number}
-                </span>
+                  <div className="selected-work-plane-image">
+                    <img
+                      src={project.image}
+                      alt={`${project.title} — ${project.category}`}
+                      className="selected-work-image"
+                      draggable={false}
+                      loading={index < 6 ? "eager" : "lazy"}
+                      decoding="async"
+                    />
 
-                <span
-                  className="
-                    flex
-                    h-7
-                    w-7
-                    items-center
-                    justify-center
-                    rounded-full
-                    border
-                    border-white/25
-                    bg-black/10
-                    text-white/80
-                    opacity-0
-                    transition-all
-                    duration-500
-                    group-hover:opacity-100
-                  "
-                >
-                  <ArrowUpRight size={12} />
-                </span>
-              </div>
+                    <span className="selected-work-card-arrow">
+                      ↗
+                    </span>
+                  </div>
+                </a>
 
-              {/* ==================================================
-                  PROJECT INFORMATION
-              ================================================== */}
+                {/* Plane number */}
 
-              <div
-                ref={(el) => {
-                  if (el) {
-                    infoRefs.current[index] = el;
-                  }
-                }}
-                className="
-                  absolute
-                  bottom-5
-                  left-5
-                  right-5
-                  z-20
-                "
-              >
-                <div
-                  className="
-                    mb-2
-                    text-[8px]
-                    uppercase
-                    tracking-[0.2em]
-                    text-white/65
-                  "
-                >
-                  {project.category}
+                <div className="selected-work-index">
+                  {String(index).padStart(2, "0")}
                 </div>
 
-                <div className="flex items-end justify-between gap-4">
-                  <h3
-                    className="
-                      text-[clamp(1.8rem,3vw,3.2rem)]
-                      font-medium
-                      leading-[0.85]
-                      tracking-[-0.07em]
-                      text-white
-                    "
-                  >
-                    {project.name}
-                  </h3>
+                {/* Project label */}
 
-                  <span
-                    className="
-                      hidden
-                      text-[8px]
-                      uppercase
-                      tracking-[0.18em]
-                      text-white/55
-                      md:block
-                    "
-                  >
-                    Case study
+                <div className="selected-work-label">
+                  <span className="selected-work-label-line" />
+
+                  <span className="selected-work-label-text">
+                    {project.title}
                   </span>
                 </div>
-
-                {/* Tags */}
-
-                <div
-                  className="
-                    mt-3
-                    flex
-                    flex-wrap
-                    gap-1.5
-                    translate-y-2
-                    opacity-0
-                    transition-all
-                    duration-500
-                    group-hover:translate-y-0
-                    group-hover:opacity-100
-                  "
-                >
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="
-                        border
-                        border-white/20
-                        px-2.5
-                        py-1
-                        text-[7px]
-                        uppercase
-                        tracking-[0.14em]
-                        text-white/65
-                      "
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        {/* ========================================================
-            FOOTER
-        ======================================================== */}
-
-        <div
-          ref={footerRef}
-          className="
-            absolute
-            bottom-7
-            left-6
-            right-6
-            z-50
-            flex
-            items-end
-            justify-between
-            md:left-10
-            md:right-10
-            lg:left-16
-            lg:right-16
-          "
-        >
-        
-          <div
-            className="
-              flex
-              items-center
-              gap-3
-              text-[9px]
-              uppercase
-              tracking-[0.2em]
-              text-black/45
-            "
-          >
-            <span>Explore work</span>
-
-            <ArrowUpRight size={13} />
-          </div>
+              </article>
+            );
+          })}
         </div>
       </div>
+
+      <style jsx>{`
+        /* ================================================================
+           SECTION
+        ================================================================ */
+
+        .selected-work-section {
+          position: relative;
+
+          width: 100%;
+
+          height: 550vh;
+
+          overflow: clip;
+
+          background: #000;
+
+          color: #fff;
+
+          isolation: isolate;
+
+          /*
+           * Critical refresh optimization:
+           * keep the raw <img> hidden until GSAP has applied
+           * the first 3D transform.
+           */
+          visibility: hidden;
+          opacity: 0;
+
+          transition: opacity 180ms ease;
+        }
+
+        .selected-work-section.is-ready {
+          visibility: visible;
+          opacity: 1;
+        }
+
+        /* ================================================================
+           VIEWPORT
+        ================================================================ */
+
+        .selected-work-viewport {
+          position: relative;
+
+          width: 100%;
+
+          height: 100vh;
+
+          display: flex;
+
+          align-items: center;
+
+          justify-content: center;
+
+          /*
+           * Exact reference perspective.
+           */
+          perspective: 2000px;
+
+          perspective-origin: 10% 10%;
+
+          overflow: hidden;
+
+          background: #000;
+
+          touch-action: pan-y;
+
+          transform-style: preserve-3d;
+        }
+
+        /* ================================================================
+           HEADER
+        ================================================================ */
+
+        .selected-work-header {
+          position: absolute;
+
+          z-index: 100;
+
+          top: max(90px, 3vw);
+
+          left: 3vw;
+
+          pointer-events: none;
+
+          font-family:
+            "Geist",
+            "Inter",
+            Arial,
+            sans-serif;
+
+          font-weight: 500;
+
+          letter-spacing: -0.02em;
+        }
+
+        .selected-work-title {
+          color: #fff;
+
+          margin-left: 4vw;
+
+          font-size: clamp(32px, 5vw, 64px);
+
+          line-height: 0.9;
+
+          font-weight: 400;
+
+          letter-spacing: -0.02em;
+
+          white-space: nowrap;
+        }
+
+        .selected-work-collection {
+          margin-left: 0;
+        }
+
+        .selected-work-count {
+          position: relative;
+
+          top: 0.65em;
+
+          margin-left: 4px;
+
+          font-size: clamp(10px, 0.4em, 0.4em);
+
+          font-weight: 600;
+
+          letter-spacing: normal;
+
+          font-variant-numeric: tabular-nums;
+
+          line-height: 0;
+
+          vertical-align: top;
+        }
+
+        /* ================================================================
+           HINT
+        ================================================================ */
+
+        .selected-work-hint {
+          position: absolute;
+
+          z-index: 100;
+
+          right: 3vw;
+
+          bottom: 3vw;
+
+          color: #fff;
+
+          font-family:
+            "Geist Mono",
+            "SFMono-Regular",
+            Consolas,
+            monospace;
+
+          font-size: 10px;
+
+          font-weight: 400;
+
+          letter-spacing: 0.05em;
+
+          text-transform: uppercase;
+
+          pointer-events: none;
+        }
+
+        /* ================================================================
+           PLANES CONTAINER
+        ================================================================ */
+
+        .selected-work-planes {
+          position: relative;
+
+          display: flex;
+
+          align-items: center;
+
+          justify-content: center;
+
+          width: 0;
+
+          height: 0;
+
+          transform-style: preserve-3d;
+
+          will-change: transform;
+        }
+
+        /* ================================================================
+           PLANE
+        ================================================================ */
+
+        .selected-work-plane {
+          position: absolute;
+
+          display: flex;
+
+          align-items: center;
+
+          justify-content: center;
+
+          width: 320px;
+
+          height: 384px;
+
+          color: #fff;
+
+          transform-style: preserve-3d;
+
+          will-change: transform;
+
+          pointer-events: none;
+
+          backface-visibility: visible;
+
+          box-shadow:
+            0 25px 50px -12px
+            rgba(0, 0, 0, 0.25);
+        }
+
+        /* ================================================================
+           CLICKABLE CARD + HOVER
+        ================================================================ */
+
+        .selected-work-card {
+          position: absolute;
+          inset: 0;
+
+          display: block;
+
+          width: 100%;
+          height: 100%;
+
+          overflow: hidden;
+
+          color: inherit;
+          text-decoration: none;
+
+          pointer-events: auto;
+
+          cursor: pointer;
+
+          transform: translateZ(0);
+        }
+
+        .selected-work-card::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+
+          background:
+            linear-gradient(
+              180deg,
+              rgba(0, 0, 0, 0.04) 20%,
+              rgba(0, 0, 0, 0.55) 100%
+            );
+
+          opacity: 0;
+
+          transition: opacity 320ms ease;
+
+          pointer-events: none;
+        }
+
+        .selected-work-card:hover::after {
+          opacity: 1;
+        }
+
+        .selected-work-card:hover .selected-work-image {
+          transform: scale(1.045);
+          filter: brightness(0.78);
+        }
+
+        .selected-work-card-arrow {
+          position: absolute;
+
+          top: 16px;
+          right: 16px;
+
+          z-index: 2;
+
+          width: 36px;
+          height: 36px;
+
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          border: 1px solid rgba(255, 255, 255, 0.55);
+          border-radius: 50%;
+
+          color: #fff;
+
+          font-family: Arial, sans-serif;
+          font-size: 18px;
+          line-height: 1;
+
+          opacity: 0;
+          transform: translateY(8px);
+
+          transition:
+            opacity 320ms ease,
+            transform 320ms ease,
+            background 320ms ease;
+        }
+
+        .selected-work-card:hover
+          .selected-work-card-arrow {
+          opacity: 1;
+          transform: translateY(0);
+          background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* ================================================================
+           IMAGE CONTAINER
+        ================================================================ */
+
+        .selected-work-plane-image {
+          position: absolute;
+
+          inset: 0;
+
+          width: 100%;
+
+          height: 100%;
+
+          overflow: hidden;
+
+          background: #111;
+
+          transform-style: preserve-3d;
+        }
+
+        /* ================================================================
+           IMAGE
+        ================================================================ */
+
+        .selected-work-image {
+          display: block;
+
+          width: 100%;
+          height: 100%;
+
+          object-fit: cover;
+
+          user-select: none;
+
+          -webkit-user-drag: none;
+
+          pointer-events: none;
+
+          transform: scale(1);
+
+          transition:
+            transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
+            filter 400ms ease;
+
+          backface-visibility: hidden;
+        }
+
+        /* ================================================================
+           INDEX
+        ================================================================ */
+
+        .selected-work-index {
+          position: absolute;
+
+          top: -24px;
+
+          left: 0;
+
+          color: #fff;
+
+          font-family:
+            "Geist Mono",
+            "SFMono-Regular",
+            Consolas,
+            monospace;
+
+          font-size: 10px;
+
+          font-weight: 400;
+
+          line-height: 1;
+
+          letter-spacing: 0.05em;
+
+          white-space: nowrap;
+        }
+
+        /* ================================================================
+           LABEL
+        ================================================================ */
+
+        .selected-work-label {
+          position: absolute;
+
+          left: 100%;
+
+          top: 50%;
+
+          display: flex;
+
+          align-items: center;
+
+          margin-left: 12px;
+
+          transform: translateY(-50%);
+
+          pointer-events: none;
+
+          white-space: nowrap;
+        }
+
+        .selected-work-label-line {
+          display: block;
+
+          width: 120px;
+
+          height: 1px;
+
+          flex: 0 0 120px;
+
+          background: #fff;
+
+          transform-origin: left center;
+        }
+
+        .selected-work-label-text {
+          display: block;
+
+          padding: 4px 8px;
+
+          color: #fff;
+
+          font-family:
+            "Geist Mono",
+            "SFMono-Regular",
+            Consolas,
+            monospace;
+
+          font-size: 10px;
+
+          font-weight: 400;
+
+          line-height: 1;
+
+          letter-spacing: 0.05em;
+
+          text-transform: uppercase;
+        }
+
+        /* ================================================================
+           TABLET / MOBILE
+        ================================================================ */
+
+        @media (max-width: 768px) {
+          .selected-work-section {
+            height: 350vh;
+          }
+
+          .selected-work-viewport {
+            perspective: 1300px;
+
+            perspective-origin: 10% 10%;
+          }
+
+          .selected-work-header {
+            top: 72px;
+
+            left: 24px;
+          }
+
+          .selected-work-title {
+            margin-left: 20px;
+
+            font-size: clamp(
+              30px,
+              11vw,
+              46px
+            );
+          }
+
+          .selected-work-collection {
+            margin-left: 0;
+          }
+
+          .selected-work-plane {
+            width: 220px;
+            height: 264px;
+          }
+
+          .selected-work-card {
+            width: 220px;
+            height: 264px;
+          }
+
+          .selected-work-index {
+            top: -20px;
+
+            font-size: 9px;
+          }
+
+          .selected-work-label {
+            margin-left: 8px;
+          }
+
+          .selected-work-card-arrow {
+            width: 30px;
+            height: 30px;
+
+            top: 10px;
+            right: 10px;
+
+            font-size: 15px;
+          }
+
+          .selected-work-label-line {
+            width: 70px;
+
+            flex-basis: 70px;
+          }
+
+          .selected-work-label-text {
+            padding: 4px 6px;
+
+            font-size: 9px;
+          }
+
+          .selected-work-hint {
+            right: 24px;
+
+            bottom: 24px;
+
+            font-size: 9px;
+          }
+        }
+
+        /* ================================================================
+           SMALL MOBILE
+        ================================================================ */
+
+        @media (max-width: 480px) {
+          .selected-work-header {
+            top: 64px;
+
+            left: 18px;
+          }
+
+          .selected-work-title {
+            margin-left: 16px;
+
+            font-size: 32px;
+          }
+
+          .selected-work-hint {
+            right: 18px;
+
+            bottom: 18px;
+          }
+        }
+
+        /* ================================================================
+           REDUCED MOTION
+        ================================================================ */
+
+        @media (prefers-reduced-motion: reduce) {
+          .selected-work-section {
+            height: 100vh;
+          }
+        }
+      `}</style>
     </section>
   );
 }
