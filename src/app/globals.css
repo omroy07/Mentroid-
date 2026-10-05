@@ -62,3 +62,34 @@ a {
     display: none;
   }
 }
+
+.motion-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.motion-bg-right,
+.motion-bg-left {
+  position: absolute;
+  top: 50%;
+  white-space: nowrap;
+  font-size: clamp(8rem, 22vw, 24rem);
+  font-weight: 700;
+  line-height: 0.8;
+  letter-spacing: -0.08em;
+  color: rgba(255, 255, 255, 0.035);
+  will-change: transform;
+}
+
+.motion-bg-right {
+  right: -10%;
+  transform: translateY(-50%);
+}
+
+.motion-bg-left {
+  left: -10%;
+  transform: translateY(-50%);
+}

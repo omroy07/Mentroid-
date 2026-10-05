@@ -13,12 +13,14 @@ import LetsBuild from "@/components/sections/LetsBuild";
 import ClientStories from "@/components/sections/ClientStories";
 import KeyFacts from "@/components/sections/KeyFacts";
 import NeuralCore from "@/components/3d/NeuralCore";
+import Projects from "../components/sections/Projects"
 export default function Home() {
   return (
     <main className="min-h-screen ">
       {/* <NeuralCore/> */}
       <Navbar />
       <Hero/>
+      <Projects/>
       <IntelligenceSystem/>
       <WhatWeEngineer1/>
       <Solutions/>
