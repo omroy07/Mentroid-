@@ -41,7 +41,7 @@ const industries = [
       "AI-powered systems for analysis, automation, customer experience and operational intelligence.",
     image: "/assets/industries/04.webp",
   },
-   {
+  {
     number: "05",
     name: "SMEs",
     statement: "Enterprise intelligence without enterprise complexity.",
@@ -57,7 +57,7 @@ const industries = [
       "AI-native product experiences and scalable systems designed to move quickly from idea to production.",
     image: "/assets/industries/06.webp",
   },
-   {
+  {
     number: "07",
     name: "Retail & E-commerce",
     statement: "Every interaction becomes intelligent.",
@@ -73,7 +73,6 @@ const industries = [
       "Intelligent workflows that help professional teams work faster without losing the human layer.",
     image: "/assets/industries/08.webp",
   },
-
 ];
 
 export default function Industries() {
@@ -102,12 +101,6 @@ export default function Industries() {
       const imageInners = imageInnerRefs.current;
       const numbers = numberRefs.current;
 
-      /*
-      ============================================================
-      SAFETY CHECK
-      ============================================================
-      */
-
       if (
         items.length !== industries.length ||
         images.length !== industries.length ||
@@ -117,450 +110,480 @@ export default function Industries() {
         return;
       }
 
-      /*
-      ============================================================
-      IMPORTANT:
-      Calculate the movement from the REAL item position.
-      This prevents the last SMEs item from ending too low.
-      ============================================================
-      */
+      const mm = gsap.matchMedia();
 
-    const getIndustryOffset = (index: number) => {
-  const item = items[index];
+      mm.add(
+        {
+          mobile: "(max-width: 767px)",
+          tablet: "(min-width: 768px) and (max-width: 1023px)",
+          desktop: "(min-width: 1024px)",
+        },
+        (context) => {
+          const { mobile, tablet } = context.conditions as {
+            mobile: boolean;
+            tablet: boolean;
+            desktop: boolean;
+          };
 
-  if (!item) return 0;
+          /*
+          ============================================================
+          RESPONSIVE SETTINGS
+          ============================================================
+          */
 
-  /*
-   * Position the active industry around 40% of
-   * the viewport.
-   *
-   * No artificial clamp here.
-   * The previous clamp was preventing the final
-   * SMEs item from reaching the focal position.
-   */
-const targetY = window.innerHeight * 0.36;
-  return targetY - item.offsetTop;
-};
+          const targetRatio = mobile
+            ? 0.27
+            : tablet
+              ? 0.34
+              : 0.36;
 
-      /*
-      ============================================================
-      INITIAL STATE
-      ============================================================
-      */
+          /*
+          ============================================================
+          CALCULATE ACTIVE INDUSTRY POSITION
+          ============================================================
+          */
 
-      // Intro starts invisible.
-      gsap.set(intro, {
-        autoAlpha: 0,
-        y: 70,
-        scale: 1,
-      });
+          const getIndustryOffset = (index: number) => {
+            const item = items[index];
 
-      // Industry list completely hidden.
-      gsap.set(list, {
-        autoAlpha: 0,
-        y: 0,
-      });
+            if (!item) return 0;
 
-      // All industry items hidden.
-      gsap.set(items, {
-        autoAlpha: 0,
-        scale: 0.97,
-      });
+            const targetY = window.innerHeight * targetRatio;
 
-    // All images hidden initially.
-gsap.set(images, {
-  autoAlpha: 0,
-  clipPath: "inset(10% 0% 10% 0%)",
-});
+            return targetY - item.offsetTop;
+          };
 
-// The first industry image is already visible
-// during the intro.
-gsap.set(images[0], {
+          /*
+          ============================================================
+          INITIAL STATE
+          ============================================================
+          */
+
+          gsap.set(intro, {
+            autoAlpha: 0,
+            y: mobile ? 45 : 70,
+            scale: 1,
+          });
+
+          gsap.set(list, {
+            autoAlpha: 0,
+            y: 0,
+          });
+
+          gsap.set(items, {
+            autoAlpha: 0,
+            scale: 0.97,
+          });
+
+          gsap.set(images, {
+            autoAlpha: 0,
+            clipPath: "inset(10% 0% 10% 0%)",
+          });
+
+          /*
+          ------------------------------------------------------------
+          FIRST IMAGE
+
+          Desktop/tablet:
+          visible subtly during intro.
+
+          Mobile:
+          hidden until intro finishes.
+          ------------------------------------------------------------
+          */
+
+         gsap.set(images[0], {
   autoAlpha: 1,
   clipPath: "inset(0% 0% 0% 0%)",
 });
 
-gsap.set(imageInners, {
-  scale: 1.1,
-});
-
-// First image has a subtle camera position
-// during the intro.
-gsap.set(imageInners[0], {
-  scale: 1.06,
-});
-
-      // Counters hidden.
-      gsap.set(numbers, {
-        autoAlpha: 0,
-      });
-
-      /*
-      ============================================================
-      MASTER TIMELINE
-      ============================================================
-      */
-
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-
           /*
-          IMPORTANT:
-          We use the complete section height as the scroll range.
-          This prevents unused blank scroll space after SMEs.
+          ------------------------------------------------------------
+          IMAGE CAMERA
+          ------------------------------------------------------------
           */
 
-          end: "bottom bottom",
+          gsap.set(imageInners, {
+            scale: 1.08,
+          });
 
-          pin: stage,
-          scrub: 0.8,
+          gsap.set(imageInners[0], {
+            scale: 1.05,
+          });
 
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
+          /*
+          ------------------------------------------------------------
+          NUMBERS
+          ------------------------------------------------------------
+          */
 
-         
-        },
-      });
+          gsap.set(numbers, {
+            autoAlpha: 0,
+          });
 
-      /*
-      ============================================================
-      01 — INTRO ENTER
-      ============================================================
-      */
+          /*
+          ============================================================
+          MASTER SCROLL TIMELINE
+          ============================================================
+          */
 
-      timeline.to(intro, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.7,
-        ease: "power3.out",
-      });
+          const timeline = gsap.timeline({
+            scrollTrigger: {
+              trigger: section,
+              start: "top top",
+              end: "bottom bottom",
+              pin: stage,
+              scrub: 0.8,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+            },
+          });
 
-      /*
-      ============================================================
-      INTRO HOLD
-      ============================================================
-      */
+          /*
+          ============================================================
+          01 — INTRO ENTER
+          ============================================================
+          */
 
-      timeline.to({}, {
-        duration: 0.45,
-      });
-
-      /*
-      ============================================================
-      02 — INTRO EXIT
-      ============================================================
-      */
-
-      timeline.to(intro, {
-        autoAlpha: 0,
-        y: -70,
-        scale: 0.96,
-        duration: 0.55,
-        ease: "power3.inOut",
-      });
-
-      /*
-      ============================================================
-      03 — SHOW INDUSTRY LIST
-      ============================================================
-      */
-
-      timeline.set(list, {
-        autoAlpha: 1,
-      });
-
-      /*
-      ============================================================
-      04 — FIRST INDUSTRY
-      ============================================================
-      */
-
-      timeline.to(items[0], {
-        autoAlpha: 1,
-        scale: 1,
-        duration: 0.45,
-        ease: "power3.out",
-      });
-
-      /*
-      Position first item properly.
-      */
-
-      timeline.to(
-        list,
-        {
-          y: () => getIndustryOffset(0),
-          duration: 0.45,
-          ease: "power3.out",
-        },
-        "<"
-      );
-
-      /*
-      First image.
-      */
-
-     timeline.fromTo(
-  imageInners[0],
-  {
-    scale: 1.06,
-  },
-  {
-    scale: 1,
-    duration: 0.75,
-    ease: "power2.out",
-  },
-  "<"
-);
-      /*
-      First image camera movement.
-      */
-
-      timeline.fromTo(
-        imageInners[0],
-        {
-          scale: 1.1,
-        },
-        {
-          scale: 1,
-          duration: 0.75,
-          ease: "power2.out",
-        },
-        "<"
-      );
-
-      /*
-      First number.
-      */
-
-      timeline.to(
-        numbers[0],
-        {
-          autoAlpha: 1,
-          duration: 0.15,
-        },
-        "<0.15"
-      );
-
-      /*
-      ============================================================
-      05 — INDUSTRY TRANSITIONS
-      ============================================================
-      */
-
-      industries.forEach((_, index) => {
-        if (index === 0) return;
-
-        const previousItem = items[index - 1];
-        const currentItem = items[index];
-
-        const previousImage = images[index - 1];
-        const currentImage = images[index];
-
-        const previousInner = imageInners[index - 1];
-        const currentInner = imageInners[index];
-
-        const previousNumber = numbers[index - 1];
-        const currentNumber = numbers[index];
-
-        /*
-        ------------------------------------------------------------
-        HOLD CURRENT SCENE
-        ------------------------------------------------------------
-        */
-
-        timeline.to({}, {
-          duration: 0.35,
-        });
-
-        /*
-        ------------------------------------------------------------
-        MOVE LIST TO REAL POSITION
-        ------------------------------------------------------------
-        */
-
-        timeline.to(
-          list,
-          {
-            y: () => getIndustryOffset(index),
+          timeline.to(intro, {
+            autoAlpha: 1,
+            y: 0,
             duration: 0.7,
+            ease: "power3.out",
+          });
+
+          /*
+          ============================================================
+          INTRO HOLD
+          ============================================================
+          */
+
+          timeline.to({}, {
+            duration: mobile ? 0.4 : 0.45,
+          });
+
+          /*
+          ============================================================
+          INTRO EXIT
+          ============================================================
+          */
+
+          timeline.to(intro, {
+            autoAlpha: 0,
+            y: mobile ? -55 : -70,
+            scale: mobile ? 0.98 : 0.96,
+            duration: 0.55,
             ease: "power3.inOut",
-          }
-        );
+          });
 
-        /*
-        ------------------------------------------------------------
-        PREVIOUS INDUSTRY DIM
-        ------------------------------------------------------------
-        */
+          /*
+          ============================================================
+          02 — SHOW INDUSTRY LIST
+          ============================================================
+          */
 
-        timeline.to(
-          previousItem,
-          {
-            autoAlpha: 0.18,
-            scale: 0.97,
-            duration: 0.35,
-            ease: "power2.out",
-          },
-          "<0.08"
-        );
+          timeline.set(list, {
+            autoAlpha: 1,
+          });
 
-        /*
-        ------------------------------------------------------------
-        CURRENT INDUSTRY ACTIVE
-        ------------------------------------------------------------
-        */
+          /*
+          ============================================================
+          03 — FIRST INDUSTRY
+          ============================================================
+          */
 
-        timeline.to(
-          currentItem,
-          {
+          timeline.to(items[0], {
             autoAlpha: 1,
             scale: 1,
             duration: 0.45,
             ease: "power3.out",
-          },
-          "<0.12"
-        );
+          });
 
-        /*
-        ------------------------------------------------------------
-        PREVIOUS IMAGE EXIT
-        ------------------------------------------------------------
-        */
+          /*
+          ------------------------------------------------------------
+          POSITION FIRST INDUSTRY
+          ------------------------------------------------------------
+          */
 
-        timeline.to(
-          previousImage,
-          {
-            autoAlpha: 0,
-            clipPath: "inset(8% 0% 8% 0%)",
-            duration: 0.42,
-            ease: "power2.inOut",
-          },
-          "<0.02"
-        );
+          timeline.to(
+            list,
+            {
+              y: () => getIndustryOffset(0),
+              duration: 0.45,
+              ease: "power3.out",
+            },
+            "<"
+          );
 
-        /*
-        ------------------------------------------------------------
-        CURRENT IMAGE ENTER
-        ------------------------------------------------------------
-        */
+          /*
+          ------------------------------------------------------------
+          FIRST IMAGE REVEAL
+          ------------------------------------------------------------
+          */
 
-        timeline.fromTo(
-          currentImage,
-          {
-            autoAlpha: 0,
-            clipPath: "inset(12% 0% 12% 0%)",
-          },
-          {
-            autoAlpha: 1,
-            clipPath: "inset(0% 0% 0% 0%)",
-            duration: 0.65,
-            ease: "power3.inOut",
-          },
-          "<0.12"
-        );
+      timeline.fromTo(
+  images[0],
+  {
+    autoAlpha: 1,
+    clipPath: "inset(0% 0% 0% 0%)",
+  },
+  {
+    autoAlpha: 1,
+    clipPath: "inset(0% 0% 0% 0%)",
+    duration: 0.65,
+    ease: "power3.inOut",
+  },
+  "<0.05"
+);
 
-        /*
-        ------------------------------------------------------------
-        IMAGE CAMERA ZOOM
-        ------------------------------------------------------------
-        */
+          /*
+          ------------------------------------------------------------
+          FIRST IMAGE CAMERA
+          ------------------------------------------------------------
+          */
 
-        timeline.fromTo(
-          currentInner,
-          {
-            scale: 1.1,
-          },
-          {
-            scale: 1,
-            duration: 0.75,
-            ease: "power2.out",
-          },
-          "<"
-        );
+          timeline.fromTo(
+            imageInners[0],
+            {
+              scale: 1.05,
+            },
+            {
+              scale: 1,
+              duration: 0.75,
+              ease: "power2.out",
+            },
+            "<"
+          );
 
-        /*
-        ------------------------------------------------------------
-        COUNTER
-        ------------------------------------------------------------
-        */
+          /*
+          ------------------------------------------------------------
+          FIRST NUMBER
+          ------------------------------------------------------------
+          */
 
-        timeline.to(
-          previousNumber,
-          {
-            autoAlpha: 0,
-            duration: 0.12,
-          },
-          "<0.05"
-        );
+          timeline.to(
+            numbers[0],
+            {
+              autoAlpha: 1,
+              duration: 0.15,
+            },
+            "<0.15"
+          );
 
-        timeline.to(
-          currentNumber,
-          {
-            autoAlpha: 1,
-            duration: 0.12,
-          },
-          "<0.08"
-        );
-      });
+          /*
+          ============================================================
+          04 — INDUSTRY TRANSITIONS
+          ============================================================
+          */
 
-      /*
-      ============================================================
-      06 — FINAL SMEs POSITION
-      ============================================================
-      */
+          industries.forEach((_, index) => {
+            if (index === 0) return;
 
-      const lastIndex = industries.length - 1;
+            const previousItem = items[index - 1];
+            const currentItem = items[index];
 
-      /*
-      Force the final item to its exact focal position.
-      */
+            const previousImage = images[index - 1];
+            const currentImage = images[index];
 
-      timeline.to(
-        list,
-        {
-          y: () => getIndustryOffset(lastIndex),
-          duration: 0.45,
-          ease: "power3.out",
+            const currentInner = imageInners[index];
+
+            const previousNumber = numbers[index - 1];
+            const currentNumber = numbers[index];
+
+            /*
+            ----------------------------------------------------------
+            HOLD
+            ----------------------------------------------------------
+            */
+
+            timeline.to({}, {
+              duration: mobile ? 0.3 : 0.35,
+            });
+
+            /*
+            ----------------------------------------------------------
+            MOVE LIST
+            ----------------------------------------------------------
+            */
+
+            timeline.to(list, {
+              y: () => getIndustryOffset(index),
+              duration: mobile ? 0.6 : 0.7,
+              ease: "power3.inOut",
+            });
+
+            /*
+            ----------------------------------------------------------
+            PREVIOUS ITEM DIM
+            ----------------------------------------------------------
+            */
+
+            timeline.to(
+              previousItem,
+              {
+                autoAlpha: 0.18,
+                scale: 0.97,
+                duration: 0.35,
+                ease: "power2.out",
+              },
+              "<0.08"
+            );
+
+            /*
+            ----------------------------------------------------------
+            CURRENT ITEM ACTIVE
+            ----------------------------------------------------------
+            */
+
+            timeline.to(
+              currentItem,
+              {
+                autoAlpha: 1,
+                scale: 1,
+                duration: 0.45,
+                ease: "power3.out",
+              },
+              "<0.12"
+            );
+
+            /*
+            ----------------------------------------------------------
+            PREVIOUS IMAGE EXIT
+            ----------------------------------------------------------
+            */
+
+            timeline.to(
+              previousImage,
+              {
+                autoAlpha: 0,
+                clipPath: "inset(8% 0% 8% 0%)",
+                duration: 0.42,
+                ease: "power2.inOut",
+              },
+              "<0.02"
+            );
+
+            /*
+            ----------------------------------------------------------
+            CURRENT IMAGE ENTER
+            ----------------------------------------------------------
+            */
+
+            timeline.fromTo(
+              currentImage,
+              {
+                autoAlpha: 0,
+                clipPath: "inset(12% 0% 12% 0%)",
+              },
+              {
+                autoAlpha: 1,
+                clipPath: "inset(0% 0% 0% 0%)",
+                duration: 0.65,
+                ease: "power3.inOut",
+              },
+              "<0.12"
+            );
+
+            /*
+            ----------------------------------------------------------
+            IMAGE CAMERA
+            ----------------------------------------------------------
+            */
+
+            timeline.fromTo(
+              currentInner,
+              {
+                scale: 1.08,
+              },
+              {
+                scale: 1,
+                duration: 0.75,
+                ease: "power2.out",
+              },
+              "<"
+            );
+
+            /*
+            ----------------------------------------------------------
+            PREVIOUS NUMBER
+            ----------------------------------------------------------
+            */
+
+            timeline.to(
+              previousNumber,
+              {
+                autoAlpha: 0,
+                duration: 0.12,
+              },
+              "<0.05"
+            );
+
+            /*
+            ----------------------------------------------------------
+            CURRENT NUMBER
+            ----------------------------------------------------------
+            */
+
+            timeline.to(
+              currentNumber,
+              {
+                autoAlpha: 1,
+                duration: 0.12,
+              },
+              "<0.08"
+            );
+          });
+
+          /*
+          ============================================================
+          05 — FINAL INDUSTRY
+          ============================================================
+          */
+
+          const lastIndex = industries.length - 1;
+
+          timeline.to(list, {
+            y: () => getIndustryOffset(lastIndex),
+            duration: 0.45,
+            ease: "power3.out",
+          });
+
+          timeline.to(
+            items[lastIndex],
+            {
+              autoAlpha: 1,
+              scale: 1,
+              duration: 0.2,
+              ease: "power2.out",
+            },
+            "<"
+          );
+
+          /*
+          ============================================================
+          FINAL HOLD
+          ============================================================
+          */
+
+          timeline.to({}, {
+            duration: mobile ? 0.25 : 0.28,
+          });
+
+          /*
+          ============================================================
+          REFRESH
+          ============================================================
+          */
+
+          requestAnimationFrame(() => {
+            ScrollTrigger.refresh();
+          });
         }
       );
 
-      /*
-      Final active state.
-      */
-
-      timeline.to(
-        items[lastIndex],
-        {
-          autoAlpha: 1,
-          scale: 1,
-          duration: 0.2,
-          ease: "power2.out",
-        },
-        "<"
-      );
-
-      /*
-      Short final breathing room.
-      */
-
-      timeline.to({}, {
-        duration: 0.28,
-      });
-
-      /*
-      IMPORTANT:
-      There is NO stage fade-out here.
-
-      The final frame remains visible until the section
-      naturally ends and the next section enters.
-      */
-
-      requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
-      });
+      return () => {
+        mm.revert();
+      };
     }, section);
 
     return () => {
@@ -575,31 +598,32 @@ gsap.set(imageInners[0], {
       data-navbar-theme="light"
       className="
         relative
-        h-[850vh]
-       
+        h-[900vh]
         w-full
         overflow-hidden
         bg-[#f4f4f1]
         text-[#080808]
+
+        md:h-[950vh]
+
+        lg:h-[1000vh]
       "
     >
       <div
         ref={stageRef}
         className="
           relative
-          h-screen
+          h-[100svh]
           w-full
           overflow-hidden
           bg-[#f4f4f1]
+
+          md:h-screen
         "
       >
-       
-
-    
-
-        {/* ======================================================
+        {/* ==========================================================
             INTRO
-        ======================================================= */}
+        ========================================================== */}
 
         <div
           ref={introRef}
@@ -609,45 +633,72 @@ gsap.set(imageInners[0], {
             z-[100]
             flex
             items-center
-            px-6
+            px-5
+
+            sm:px-7
 
             md:px-10
 
             lg:px-16
           "
         >
-          <div className="max-w-[1050px]">
+          <div
+            className="
+              w-full
+              max-w-[1050px]
+
+}
+            "
+          >
             {/* Label */}
 
             <div
               className="
-                mb-8
+                mb-6
                 flex
                 items-center
                 gap-3
+
+                sm:mb-8
               "
             >
-
-              {/* <span
+              <span
                 className="
-                  text-[9px]
+                  h-1.5
+                  w-1.5
+                  shrink-0
+                  rounded-full
+                  bg-black/35
+                "
+              />
+
+              <span
+                className="
+                  text-[8px]
                   uppercase
                   tracking-[0.24em]
                   text-black/40
+
+                  sm:text-[9px]
                 "
               >
                 Industries
-              </span> */}
+              </span>
             </div>
 
             {/* Heading */}
 
             <h2
               className="
-                text-[clamp(4.5rem,9.5vw,10rem)]
+                max-w-[900px]
+                text-[clamp(3.6rem,14vw,5.8rem)]
                 font-medium
-                leading-[0.76]
+                leading-[0.78]
                 tracking-[-0.09em]
+
+                sm:text-[clamp(4.5rem,11vw,7rem)]
+
+                md:text-[clamp(5.5rem,9.5vw,10rem)]
               "
             >
               Intelligence
@@ -663,11 +714,16 @@ gsap.set(imageInners[0], {
 
             <p
               className="
-                mt-10
-                max-w-[430px]
-                text-[14px]
-                leading-7
+                mt-7
+                max-w-[330px]
+                text-[12px]
+                leading-6
                 text-black/40
+
+                sm:mt-9
+                sm:max-w-[430px]
+                sm:text-[14px]
+                sm:leading-7
 
                 md:text-[15px]
               "
@@ -679,26 +735,33 @@ gsap.set(imageInners[0], {
           </div>
         </div>
 
-        {/* ======================================================
-            INDUSTRY LIST
-        ======================================================= */}
+        {/* ==========================================================
+            MOBILE INDUSTRY LIST
+        ========================================================== */}
 
-       <div
-  ref={listRef}
-  className="
-    absolute
-    left-[6vw]
-    top-[34vh]
-    z-30
-    w-[52vw]
-    will-change-transform
-    opacity-0
+        <div
+          ref={listRef}
+          className="
+            absolute
+            left-5
+            top-[20vh]
+            z-30
+            w-[calc(100%-40px)]
+            will-change-transform
+            opacity-0
 
-    max-md:left-6
-    max-md:top-[26vh]
-    max-md:w-[calc(100vw-48px)]
-  "
->
+            sm:left-7
+            sm:top-[20vh]
+            sm:w-[calc(100%-56px)]
+
+            md:left-[6vw]
+            md:top-[34vh]
+            md:w-[52vw]
+
+            lg:left-[6vw]
+            lg:w-[52vw]
+          "
+        >
           {industries.map((industry, index) => (
             <div
               key={industry.number}
@@ -710,16 +773,19 @@ gsap.set(imageInners[0], {
               className="
                 group
                 flex
-                min-h-[7.5vw]
+                min-h-[62px]
                 items-baseline
-                gap-5
+                gap-3
                 border-b
                 border-black/[0.08]
                 py-3
                 will-change-transform
 
-                max-md:min-h-[15vw]
-                max-md:py-3
+                sm:min-h-[68px]
+                sm:gap-4
+
+                md:min-h-[7.5vw]
+                md:gap-5
               "
             >
               {/* Number */}
@@ -731,26 +797,34 @@ gsap.set(imageInners[0], {
                   }
                 }}
                 className="
-                  w-7
+                  w-6
                   shrink-0
-                  text-[9px]
+                  text-[8px]
                   uppercase
                   tracking-[0.18em]
                   text-black/35
+
+                  sm:w-7
+                  sm:text-[9px]
                 "
               >
                 {industry.number}
               </span>
 
-              {/* Industry content */}
+              {/* Industry */}
 
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <h3
                   className="
-                    text-[clamp(2.6rem,6.3vw,4.8rem)]
+                    max-w-full
+                    text-[clamp(2rem,9vw,3.4rem)]
                     font-medium
                     leading-[0.82]
                     tracking-[-0.075em]
+
+                    sm:text-[clamp(2.2rem,7vw,3.8rem)]
+
+                    md:text-[clamp(2.6rem,6.3vw,4.8rem)]
                   "
                 >
                   {industry.name}
@@ -758,12 +832,16 @@ gsap.set(imageInners[0], {
 
                 <p
                   className="
-                    mt-3
-                    max-w-[390px]
-                    text-[11px]
+                    mt-2
+                    max-w-[300px]
+                    text-[9px]
                     leading-5
                     text-black/35
 
+                    sm:mt-3
+                    sm:text-[10px]
+
+                    md:max-w-[390px]
                     md:text-[12px]
                   "
                 >
@@ -774,33 +852,39 @@ gsap.set(imageInners[0], {
           ))}
         </div>
 
-        {/* ======================================================
+        {/* ==========================================================
             IMAGE WINDOW
-        ======================================================= */}
+        ========================================================== */}
 
-        <div
-          className="
-            absolute
-            right-[5vw]
-            top-1/2
-            z-20
-            h-[58vh]
-            w-[38vw]
-            max-w-[650px]
-            -translate-y-1/2
-            overflow-hidden
-            bg-black
+   <div
+  className="
+    absolute
+    left-5
+    right-5
+    bottom-[2vh]
+    z-20
+    h-[27vh]
+    overflow-hidden
+    bg-black
 
-            max-md:left-6
-            max-md:right-6
-            max-md:top-auto
-            max-md:bottom-[8vh]
-            max-md:h-[30vh]
-            max-md:w-auto
-            max-md:max-w-none
-            max-md:translate-y-0
-          "
-        >
+    sm:left-7
+    sm:right-7
+    sm:bottom-[3vh]
+    sm:h-[27vh]
+
+    md:left-auto
+    md:right-[5vw]
+    md:top-1/2
+    md:bottom-auto
+    md:h-[58vh]
+    md:w-[38vw]
+    md:-translate-y-1/2
+
+    lg:right-[5vw]
+    lg:h-[58vh]
+    lg:w-[38vw]
+  "
+>
           {industries.map((industry, index) => (
             <div
               key={industry.number}
@@ -817,7 +901,7 @@ gsap.set(imageInners[0], {
                 will-change-transform
               "
             >
-              {/* Image inner */}
+              {/* Image */}
 
               <div
                 ref={(el) => {
@@ -835,8 +919,12 @@ gsap.set(imageInners[0], {
                   src={industry.image}
                   alt={industry.name}
                   fill
-                  priority={index === 0}
-                  sizes="(max-width: 768px) calc(100vw - 48px), 38vw"
+                  loading={index === 0 ? "eager" : "lazy"}
+                  sizes="
+                    (max-width: 767px) 100vw,
+                    (max-width: 1023px) 100vw,
+                    38vw
+                  "
                   className="
                     object-cover
                     grayscale
@@ -844,7 +932,7 @@ gsap.set(imageInners[0], {
                 />
               </div>
 
-              {/* Image overlay */}
+              {/* Overlay */}
 
               <div
                 className="
@@ -855,35 +943,45 @@ gsap.set(imageInners[0], {
                 "
               />
 
-              {/* Image top label */}
+              {/* Top label */}
 
               <div
                 className="
                   absolute
-                  left-5
-                  top-5
+                  left-4
+                  top-4
                   z-10
-                  text-[8px]
+                  text-[7px]
                   uppercase
                   tracking-[0.2em]
                   text-white/60
+
+                  sm:left-5
+                  sm:top-5
+                  sm:text-[8px]
                 "
               >
                 MENTROID / {industry.number}
               </div>
 
-              {/* Image bottom label */}
+              {/* Bottom label */}
 
               <div
                 className="
                   absolute
-                  bottom-5
-                  right-5
+                  bottom-4
+                  right-4
                   z-10
-                  text-[8px]
+                  max-w-[70%]
+                  text-right
+                  text-[7px]
                   uppercase
                   tracking-[0.2em]
                   text-white/60
+
+                  sm:bottom-5
+                  sm:right-5
+                  sm:text-[8px]
                 "
               >
                 {industry.name}
@@ -892,9 +990,9 @@ gsap.set(imageInners[0], {
           ))}
         </div>
 
-        {/* ======================================================
-            SIDE DESCRIPTION
-        ======================================================= */}
+        {/* ==========================================================
+            SIDE DESCRIPTION — DESKTOP ONLY
+        ========================================================== */}
 
         <div
           className="
@@ -902,13 +1000,12 @@ gsap.set(imageInners[0], {
             bottom-[8vh]
             right-[22vw]
             z-40
+            hidden
             max-w-[320px]
 
-            max-md:hidden
+            lg:block
           "
         >
-          {/* <div className="mb-4 h-px w-10 bg-black/25" /> */}
-
           <p
             className="
               text-[14px]
@@ -937,9 +1034,6 @@ gsap.set(imageInners[0], {
             <ArrowUpRight size={12} />
           </div>
         </div>
-
-     
-    
       </div>
     </section>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -93,6 +94,23 @@ const MOBILE = {
   translateY: 55,
 };
 
+/* -------------------------------------------------------------------------- */
+/* TABLET GEOMETRY                                                            */
+/* -------------------------------------------------------------------------- */
+
+const TABLET = {
+  width: 280,
+  height: 336,
+
+  stepX: 205,
+  stepY: -70,
+  stepZ: -235,
+
+  rotateY: -48,
+  perspective: 1600,
+  translateY: 75,
+};
+
 /*
  * 12 planes gives us the same continuous diagonal/depth effect
  * without making the DOM unnecessarily heavy.
@@ -125,12 +143,18 @@ export default function SelectedWork() {
 
       media.add(
         {
-          desktop: "(min-width: 769px)",
+          desktop: "(min-width: 1201px)",
+          tablet: "(min-width: 769px) and (max-width: 1200px)",
           mobile: "(max-width: 768px)",
         },
         (context) => {
           const isMobile = Boolean(context.conditions?.mobile);
-          const config = isMobile ? MOBILE : DESKTOP;
+          const isTablet = Boolean(context.conditions?.tablet);
+          const config = isMobile
+            ? MOBILE
+            : isTablet
+              ? TABLET
+              : DESKTOP;
 
           const planes = planeRefs.current.filter(
             Boolean
@@ -448,17 +472,14 @@ export default function SelectedWork() {
                   aria-label={`View ${project.title}`}
                 >
                   <div className="selected-work-plane-image">
-                    <img
+                    <Image
                       src={project.image}
                       alt={`${project.title} — ${project.category}`}
-                      className="selected-work-image"
+                      fill
+                      sizes="(max-width: 480px) 190px, (max-width: 768px) 220px, (max-width: 1200px) 280px, 320px"
+                      priority={index < 2}
                       draggable={false}
-                      loading={
-                        index < 6
-                          ? "eager"
-                          : "lazy"
-                      }
-                      decoding="async"
+                      className="selected-work-image"
                     />
 
                     <span className="selected-work-card-arrow">
@@ -752,6 +773,96 @@ export default function SelectedWork() {
 
         .selected-work-card::after {
           content: "";
+
+          position: absolute;
+
+          inset: 0;
+
+          z-index: 1;
+
+          background:
+            linear-gradient(
+              180deg,
+              rgba(0, 0, 0, 0.03) 20%,
+              rgba(0, 0, 0, 0.58) 100%
+            );
+
+          opacity: 0;
+
+          transition:
+            opacity 350ms ease;
+
+          pointer-events: none;
+        }
+
+        .selected-work-card:hover::after {
+          opacity: 1;
+        }
+
+        /* ================================================================
+           IMAGE
+        ================================================================ */
+
+        .selected-work-plane-image {
+          position: absolute;
+
+          inset: 0;
+
+          width: 100%;
+          height: 100%;
+
+          overflow: hidden;
+
+          background: #111;
+
+          transform-style: preserve-3d;
+
+          border-radius: 0;
+        }
+
+        .selected-work-image {
+          display: block;
+
+          width: 100%;
+          height: 100%;
+
+          object-fit: cover;
+
+          user-select: none;
+
+          -webkit-user-drag: none;
+
+          pointer-events: none;
+
+          transform:
+            scale(1)
+            translateZ(0);
+
+          transition:
+            transform 550ms
+              cubic-bezier(
+                0.22,
+                1,
+                0.36,
+                1
+              ),
+            filter 450ms ease;
+
+          backface-visibility: hidden;
+        }
+
+        .selected-work-card:hover
+          .selected-work-image {
+          transform:
+            scale(1.045)
+            translateZ(0);
+
+          filter: brightness(0.78);
+        }
+
+        /* ================================================================
+           ARROW
+        ================================== "";
 
           position: absolute;
 

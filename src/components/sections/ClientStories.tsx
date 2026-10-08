@@ -37,11 +37,6 @@ interface Testimonial {
   videoUrl: string;
 }
 
-/* ============================================================
-   TESTIMONIAL DATA
-   Exact client content from your previous component
-   ============================================================ */
-
 const testimonials: Testimonial[] = [
   {
     id: 1,
@@ -54,7 +49,6 @@ const testimonials: Testimonial[] = [
     videoType: "youtube",
     videoUrl: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID_1",
   },
-
   {
     id: 2,
     name: "Michael Anderson",
@@ -66,7 +60,6 @@ const testimonials: Testimonial[] = [
     videoType: "youtube",
     videoUrl: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID_2",
   },
-
   {
     id: 3,
     name: "Emily Williams",
@@ -78,7 +71,6 @@ const testimonials: Testimonial[] = [
     videoType: "youtube",
     videoUrl: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID_3",
   },
-
   {
     id: 4,
     name: "Daniel Carter",
@@ -93,7 +85,7 @@ const testimonials: Testimonial[] = [
 ];
 
 /* ============================================================
-   HELPERS
+   VIDEO HELPERS
    ============================================================ */
 
 function getYoutubeEmbedUrl(url: string) {
@@ -144,9 +136,7 @@ function getVimeoEmbedUrl(url: string) {
 
 export default function ClientStories() {
   const sectionRef = useRef<HTMLElement>(null);
-
   const quoteRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
 
   const modalRef = useRef<HTMLDivElement>(null);
@@ -159,17 +149,17 @@ export default function ClientStories() {
 
   const current = testimonials[active];
 
-  /* ==========================================================
-     SPLIT QUOTE INTO WORDS
-     ========================================================== */
+  /* ============================================================
+     QUOTE WORDS
+     ============================================================ */
 
   const quoteWords = useMemo(() => {
     return current.text.split(" ");
   }, [current.text]);
 
-  /* ==========================================================
+  /* ============================================================
      QUOTE REVEAL
-     ========================================================== */
+     ============================================================ */
 
   const revealQuote = useCallback(() => {
     if (!quoteRef.current) return;
@@ -197,193 +187,179 @@ export default function ClientStories() {
     );
   }, []);
 
-  /* ==========================================================
-     INITIAL SCROLL ANIMATIONS
-     ========================================================== */
+  /* ============================================================
+     SECTION REVEAL
+     ============================================================ */
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".stories-eyebrow", {
-        y: 30,
+      const reveal = (
+        selector: string,
+        vars: gsap.TweenVars,
+        trigger: string | Element = sectionRef.current!
+      ) => {
+        gsap.from(selector, {
+          ...vars,
+          scrollTrigger: {
+            trigger,
+            start: "top 82%",
+            once: true,
+          },
+        });
+      };
+
+      reveal(".stories-eyebrow", {
+        y: 25,
         opacity: 0,
-        duration: 1,
+        duration: 0.9,
         ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%",
-        },
       });
 
-      gsap.from(".stories-heading", {
-        y: 70,
+      reveal(".stories-heading", {
+        y: 55,
         opacity: 0,
-        duration: 1.2,
+        duration: 1.1,
         delay: 0.05,
         ease: "power4.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%",
-        },
       });
 
-      gsap.from(".stories-description", {
-        y: 30,
+      reveal(".stories-description", {
+        y: 25,
         opacity: 0,
-        duration: 1,
-        delay: 0.15,
+        duration: 0.9,
+        delay: 0.1,
         ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 75%",
-        },
       });
 
-      gsap.from(".stories-stage", {
-        y: 80,
+      reveal(".stories-stage", {
+        y: 55,
         opacity: 0,
-        duration: 1.2,
-        delay: 0.15,
+        duration: 1.1,
+        delay: 0.1,
         ease: "power4.out",
-        scrollTrigger: {
-          trigger: ".stories-stage",
-          start: "top 82%",
-        },
-      });
-
-      gsap.from(".stories-footer", {
-        y: 20,
-        opacity: 0,
-        duration: 1,
-        scrollTrigger: {
-          trigger: ".stories-footer",
-          start: "top 90%",
-        },
       });
     }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
-  /* ==========================================================
-     REVEAL INITIAL QUOTE
-     ========================================================== */
+  /* ============================================================
+     INITIAL QUOTE
+     ============================================================ */
 
   useLayoutEffect(() => {
     const timer = window.setTimeout(() => {
       revealQuote();
-    }, 250);
+    }, 200);
 
     return () => window.clearTimeout(timer);
   }, [active, revealQuote]);
 
-  /* ==========================================================
-     TESTIMONIAL CHANGE
-     ========================================================== */
+  /* ============================================================
+     CHANGE TESTIMONIAL
+     ============================================================ */
 
-  const changeTestimonial = (direction: 1 | -1) => {
-    if (isAnimating.current) return;
+  const changeTestimonial = useCallback(
+    (direction: 1 | -1) => {
+      if (isAnimating.current) return;
 
-    isAnimating.current = true;
+      isAnimating.current = true;
 
-    const next =
-      (active + direction + testimonials.length) %
-      testimonials.length;
+      const next =
+        (active + direction + testimonials.length) %
+        testimonials.length;
 
-    const quoteWordsCurrent = quoteRef.current?.querySelectorAll(
-      ".testimonial-word"
-    );
+      const quoteWordsCurrent =
+        quoteRef.current?.querySelectorAll(
+          ".testimonial-word"
+        );
 
-    const tl = gsap.timeline({
-      onComplete: () => {
-        setActive(next);
-        isAnimating.current = false;
-      },
-    });
-
-    /* Quote exits */
-
-    if (quoteWordsCurrent?.length) {
-      tl.to(quoteWordsCurrent, {
-        yPercent: direction === 1 ? -70 : 70,
-        opacity: 0,
-        duration: 0.3,
-        stagger: 0.012,
-        ease: "power2.in",
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setActive(next);
+          isAnimating.current = false;
+        },
       });
-    }
 
-    /* Card information exits */
+      if (quoteWordsCurrent?.length) {
+        tl.to(quoteWordsCurrent, {
+          yPercent: direction === 1 ? -70 : 70,
+          opacity: 0,
+          duration: 0.3,
+          stagger: 0.012,
+          ease: "power2.in",
+        });
+      }
 
-    tl.to(
-      ".testimonial-meta",
-      {
-        y: direction === 1 ? -15 : 15,
-        opacity: 0,
-        duration: 0.3,
-        ease: "power2.in",
-      },
-      "<"
-    );
+      tl.to(
+        ".testimonial-meta",
+        {
+          y: direction === 1 ? -15 : 15,
+          opacity: 0,
+          duration: 0.3,
+          ease: "power2.in",
+        },
+        "<"
+      );
 
-    /* Image exits */
+      if (imageRef.current) {
+        tl.to(
+          imageRef.current,
+          {
+            x: direction === 1 ? 30 : -30,
+            scale: 1.04,
+            opacity: 0,
+            duration: 0.35,
+            ease: "power2.in",
+          },
+          "<"
+        );
 
-    tl.to(
-      imageRef.current,
-      {
-        x: direction === 1 ? 35 : -35,
-        scale: 1.06,
-        opacity: 0,
-        duration: 0.35,
-        ease: "power2.in",
-      },
-      "<"
-    );
+        tl.set(imageRef.current, {
+          x: direction === 1 ? -30 : 30,
+          scale: 1.02,
+        });
 
-    /* Prepare */
+        tl.to(
+          imageRef.current,
+          {
+            x: 0,
+            scale: 1,
+            opacity: 1,
+            duration: 0.7,
+            ease: "power4.out",
+          },
+          ">"
+        );
+      }
 
-    tl.set(
-      ".testimonial-meta",
-      {
-        y: direction === 1 ? 15 : -15,
-      },
-      ">"
-    );
+      tl.to(
+        ".testimonial-meta",
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          ease: "power4.out",
+        },
+        "<"
+      );
+    },
+    [active]
+  );
 
-    tl.set(imageRef.current, {
-      x: direction === 1 ? -35 : 35,
-      scale: 1.04,
-    });
-
-    /* Bring back */
-
-    tl.to(".testimonial-meta", {
-      y: 0,
-      opacity: 1,
-      duration: 0.65,
-      ease: "power4.out",
-    });
-
-    tl.to(
-      imageRef.current,
-      {
-        x: 0,
-        scale: 1,
-        opacity: 1,
-        duration: 0.8,
-        ease: "power4.out",
-      },
-      "<"
-    );
-  };
-
-  /* ==========================================================
+  /* ============================================================
      IMAGE PARALLAX
-     ========================================================== */
+     ============================================================ */
 
   const handleMouseMove = (
     e: React.MouseEvent<HTMLDivElement>
   ) => {
     if (!imageRef.current) return;
+
+    /*
+     * Disable the effect on touch devices.
+     */
+    if (window.matchMedia("(hover: none)").matches) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
 
@@ -394,10 +370,11 @@ export default function ClientStories() {
       (e.clientY - rect.top) / rect.height - 0.5;
 
     gsap.to(imageRef.current, {
-      x: x * 16,
-      y: y * 16,
-      duration: 0.7,
+      x: x * 12,
+      y: y * 12,
+      duration: 0.6,
       ease: "power3.out",
+      overwrite: true,
     });
   };
 
@@ -407,14 +384,15 @@ export default function ClientStories() {
     gsap.to(imageRef.current, {
       x: 0,
       y: 0,
-      duration: 0.8,
+      duration: 0.7,
       ease: "power3.out",
+      overwrite: true,
     });
   };
 
-  /* ==========================================================
-     VIDEO MODAL OPEN
-     ========================================================== */
+  /* ============================================================
+     VIDEO MODAL
+     ============================================================ */
 
   const openVideo = () => {
     setVideoOpen(true);
@@ -422,7 +400,9 @@ export default function ClientStories() {
     document.body.style.overflow = "hidden";
 
     requestAnimationFrame(() => {
-      if (!modalRef.current || !modalContentRef.current) return;
+      if (!modalRef.current || !modalContentRef.current) {
+        return;
+      }
 
       gsap.fromTo(
         modalRef.current,
@@ -431,7 +411,7 @@ export default function ClientStories() {
         },
         {
           opacity: 1,
-          duration: 0.4,
+          duration: 0.35,
           ease: "power3.out",
         }
       );
@@ -439,26 +419,26 @@ export default function ClientStories() {
       gsap.fromTo(
         modalContentRef.current,
         {
-          y: 45,
-          scale: 0.96,
+          y: 30,
+          scale: 0.97,
           opacity: 0,
         },
         {
           y: 0,
           scale: 1,
           opacity: 1,
-          duration: 0.7,
+          duration: 0.6,
           ease: "power4.out",
         }
       );
     });
   };
 
-  /* ==========================================================
-     VIDEO MODAL CLOSE
-     ========================================================== */
+  /* ============================================================
+     CLOSE VIDEO
+     ============================================================ */
 
-  const closeVideo = () => {
+  const closeVideo = useCallback(() => {
     if (!modalRef.current || !modalContentRef.current) {
       setVideoOpen(false);
       document.body.style.overflow = "";
@@ -473,25 +453,25 @@ export default function ClientStories() {
     });
 
     tl.to(modalContentRef.current, {
-      y: 25,
+      y: 20,
       scale: 0.97,
       opacity: 0,
-      duration: 0.3,
+      duration: 0.25,
       ease: "power2.in",
     }).to(
       modalRef.current,
       {
         opacity: 0,
-        duration: 0.25,
+        duration: 0.2,
         ease: "power2.in",
       },
       "<"
     );
-  };
+  }, []);
 
-  /* ==========================================================
-     ESCAPE KEY
-     ========================================================== */
+  /* ============================================================
+     ESCAPE
+     ============================================================ */
 
   useEffect(() => {
     if (!videoOpen) return;
@@ -507,11 +487,11 @@ export default function ClientStories() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [videoOpen]);
+  }, [videoOpen, closeVideo]);
 
-  /* ==========================================================
-     RESTORE BODY SCROLL
-     ========================================================== */
+  /* ============================================================
+     RESTORE SCROLL
+     ============================================================ */
 
   useEffect(() => {
     return () => {
@@ -519,9 +499,9 @@ export default function ClientStories() {
     };
   }, []);
 
-  /* ==========================================================
+  /* ============================================================
      VIDEO URL
-     ========================================================== */
+     ============================================================ */
 
   const videoSrc =
     current.videoType === "youtube"
@@ -530,216 +510,498 @@ export default function ClientStories() {
         ? getVimeoEmbedUrl(current.videoUrl)
         : current.videoUrl;
 
-  /* ==========================================================
+  /* ============================================================
      RENDER
-     ========================================================== */
+     ============================================================ */
 
   return (
     <>
       <section
         ref={sectionRef}
         data-navbar-theme="dark"
-        className="relative overflow-hidden bg-[#050505] px-5 py-28 text-white md:px-10 lg:px-16 xl:px-20 lg:py-40"
+        className="
+          relative
+          overflow-hidden
+          bg-[#050505]
+       
+          px-5
+          py-24
+          text-white
+
+         sm:px-6
+    sm:py-24
+
+    md:px-10
+    md:py-28
+
+    lg:px-16
+    lg:py-24
+
+    xl:px-20
+    xl:py-28
+        "
       >
-        {/* ====================================================
-            TOP LINE
-            ==================================================== */}
+        {/* TOP LINE */}
 
-        <div className="pointer-events-none absolute left-1/2 top-0 h-px w-[calc(100%-40px)] -translate-x-1/2 bg-white/10 md:w-[calc(100%-80px)]" />
+        <div
+          className="
+            pointer-events-none
+            absolute
+            left-1/2
+            top-0
+            h-px
+            w-[calc(100%-40px)]
+            -translate-x-1/2
+            bg-white/10
 
-        {/* ====================================================
-            BACKGROUND NUMBER
-            ==================================================== */}
+            sm:w-[calc(100%-48px)]
 
-        <div className="pointer-events-none absolute right-[-5%] top-[12%] select-none text-[25vw] font-medium leading-none tracking-[-0.08em] text-white/[0.025]">
+            md:w-[calc(100%-80px)]
+          "
+        />
+
+        {/* BACKGROUND NUMBER */}
+
+        <div
+          className="
+            pointer-events-none
+            absolute
+            right-[-8%]
+            top-[10%]
+            select-none
+            text-[42vw]
+            font-medium
+            leading-none
+            tracking-[-0.08em]
+            text-white/[0.025]
+
+            sm:text-[35vw]
+
+            md:text-[30vw]
+
+            lg:text-[25vw]
+          "
+        >
           06
         </div>
 
         <div className="relative mx-auto max-w-[1500px]">
           {/* ==================================================
-              SECTION INTRO
-              ================================================== */}
+              INTRO
+          ================================================== */}
 
-          <div className="mb-20 grid grid-cols-1 gap-12 md:grid-cols-12 md:items-end">
+          <div
+            className="
+              mb-14
+              grid
+              grid-cols-1
+              gap-8
+
+              sm:mb-16
+              sm:gap-10
+
+              md:mb-20
+              md:grid-cols-12
+              md:items-end
+              md:gap-12
+            "
+          >
             <div className="md:col-span-8">
-              
+              <div
+                className="
+                  stories-eyebrow
+                  mb-5
+                  flex
+                  items-center
+                  gap-3
 
-              <h2 className="stories-heading max-w-[900px] text-[15vw] font-medium leading-[0.82] tracking-[-0.065em] sm:text-7xl md:text-8xl lg:text-[108px]">
-                Client <span className="text-white/30"> Stories.
+                  sm:mb-6
+                "
+              >
+               
+               
+              </div>
+
+              <h2
+                className="
+                  stories-heading
+                  max-w-[900px]
+                  text-[clamp(3.5rem,16vw,5.8rem)]
+                  font-medium
+                  leading-[0.82]
+                  tracking-[-0.075em]
+
+                  sm:text-[clamp(4.5rem,11vw,7rem)]
+
+                  md:text-8xl
+
+                  lg:text-[108px]
+                "
+              >
+                Client{" "}
+                <span className="text-white/30">
+                  Stories.
                 </span>
               </h2>
             </div>
 
-            <div className="stories-description md:col-span-4 md:pb-2">
-              <p className="max-w-sm text-sm leading-6 text-white/50">
-                Great work is built through partnership. Here’s
-                a look at the people and teams building with
-                Mentroid.
+            <div
+              className="
+                stories-description
+                md:col-span-4
+                md:pb-2
+              "
+            >
+              <p
+                className="
+                  max-w-sm
+                  text-[12px]
+                  leading-6
+                  text-white/50
+
+                  sm:text-[13px]
+                  sm:leading-7
+
+                  md:text-sm
+                  md:leading-6
+                "
+              >
+                Great work is built through partnership.
+                Here’s a look at the people and teams
+                building with Mentroid.
               </p>
             </div>
           </div>
 
           {/* ==================================================
-              STORY NAVIGATION
-              ================================================== */}
-
-          {/* <div className="mb-8 flex flex-wrap items-center gap-x-7 gap-y-4 border-t border-white/10 pt-5">
-            <span className="text-[10px] uppercase tracking-[0.25em] text-white/30">
-              Stories
-            </span>
-
-            <div className="flex flex-wrap gap-x-5 gap-y-3">
-              {testimonials.map((item, index) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  disabled={isAnimating.current}
-                  onClick={() => {
-                    if (index === active || isAnimating.current)
-                      return;
-
-                    const direction =
-                      index > active ? 1 : -1;
-
-                    changeTestimonial(direction);
-                  }}
-                  className={`group flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] transition-colors duration-300 ${
-                    index === active
-                      ? "text-white"
-                      : "text-white/30 hover:text-white/70"
-                  }`}
-                >
-                  <span
-                    className={`transition-all duration-500 ${
-                      index === active
-                        ? "h-px w-7 bg-white"
-                        : "h-px w-0 bg-white group-hover:w-4"
-                    }`}
-                  />
-
-                  <span>
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-
-                  <span className="hidden sm:inline">
-                    {item.company}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div> */}
-
-          {/* ==================================================
               STORY STAGE
-              ================================================== */}
+          ================================================== */}
 
           <div
-            className="stories-stage relative min-h-[680px] overflow-visible"
+            className="
+              stories-stage
+              relative
+              overflow-visible
+
+              min-h-0
+
+               md:min-h-[450px]
+    lg:min-h-[450px]
+    xl:min-h-[620px]
+            "
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
           >
-            {/* Background index */}
+            {/* BACKGROUND INDEX */}
 
-            <div className="pointer-events-none absolute bottom-0 left-[-2%] select-none text-[28vw] font-medium leading-none tracking-[-0.09em] text-white/[0.035] md:text-[260px]">
+            <div
+              className="
+                pointer-events-none
+                absolute
+                bottom-[20%]
+                left-[-3%]
+                select-none
+                text-[45vw]
+                font-medium
+                leading-none
+                tracking-[-0.09em]
+                text-white/[0.035]
+
+                sm:text-[38vw]
+
+                md:text-[28vw]
+
+                lg:text-[260px]
+              "
+            >
               {String(current.id).padStart(2, "0")}
             </div>
 
-            {/* =================================================
-                CLIENT IMAGE
-                ================================================= */}
+            {/* ==================================================
+                MOBILE / TABLET IMAGE
+            ================================================== */}
 
             <div
               ref={imageRef}
-              className="absolute bottom-16 left-0 z-20 hidden h-[350px] w-[260px] overflow-hidden rounded-[3px] md:block lg:h-[420px] lg:w-[320px]"
+              className="
+                relative
+                z-20
+                mb-8
+                h-[56vw]
+                min-h-[230px]
+                max-h-[360px]
+                w-full
+                overflow-hidden
+                rounded-[3px]
+
+                sm:h-[48vw]
+                sm:max-h-[380px]
+
+                md:absolute
+                md:bottom-10
+                md:left-0
+                md:mb-[150px]
+                md:h-[350px]
+                md:w-[260px]
+
+                lg:h-[420px]
+                lg:w-[320px]
+              "
             >
               <img
                 src={current.image}
                 alt={current.name}
-                className="h-full w-full object-cover grayscale transition-transform duration-700"
+                loading="lazy"
+                decoding="async"
+                className="
+                  h-full
+                  w-full
+                  object-cover
+                  grayscale
+                  transition-transform
+                  duration-700
+                  will-change-transform
+                "
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+              <div
+                className="
+                  absolute
+                  inset-0
+                  bg-gradient-to-t
+                  from-black/55
+                  via-transparent
+                  to-transparent
+                "
+              />
 
-              <div className="absolute bottom-5 left-5 flex items-center gap-2 text-[9px] uppercase tracking-[0.2em] text-white">
-                <span className="h-1 w-1 rounded-full bg-white" />
-                Client story
-              </div>
+             
             </div>
 
-            {/* =================================================
+            {/* ==================================================
                 MAIN STORY CONTENT
-                ================================================= */}
+            ================================================== */}
 
-            <div className="relative z-10 ml-auto flex min-h-[600px] w-full max-w-[1080px] flex-col justify-between  py-10 md:pl-[100px] lg:pl-[140px]">
-              {/* Top metadata */}
+            <div
+              className="
+                relative
+                z-10
+                ml-auto
+                flex
+                w-full
+                max-w-[1080px]
+                flex-col
 
-              <div className="testimonial-meta flex items-center justify-between">
-                <div className="flex items-center gap-3">
+                md:min-h-[600px]
+                md:justify-between
+                md:pl-[100px]
+
+                lg:min-h-[450px]
+                lg:pl-[140px]
+              "
+            >
+              {/* TOP META */}
+
+              <div
+                className="
+                  testimonial-meta
+                  flex
+                  items-center
+                  justify-between
+                  gap-4
+                "
+              >
+                <div className="flex min-w-0 items-center gap-3">
                   <Quote
-                    size={17}
+                    size={16}
                     strokeWidth={1.3}
-                    className="text-white/40"
+                    className="shrink-0 text-white/40"
                   />
 
-                  <span className="text-[10px] uppercase tracking-[0.25em] text-white/35">
+                  <span
+                    className="
+                      truncate
+                      text-[8px]
+                      uppercase
+                      tracking-[0.2em]
+                      text-white/35
+
+                      sm:text-[9px]
+                      sm:tracking-[0.23em]
+                    "
+                  >
                     Healthcare AI
                   </span>
                 </div>
 
-                <span className="text-[10px] uppercase tracking-[0.2em] text-white/25">
+                <span
+                  className="
+                    shrink-0
+                    text-[8px]
+                    uppercase
+                    tracking-[0.18em]
+                    text-white/25
+
+                    sm:text-[9px]
+                    sm:tracking-[0.2em]
+                  "
+                >
                   {String(current.id).padStart(2, "0")} /{" "}
                   {String(testimonials.length).padStart(2, "0")}
                 </span>
               </div>
 
-              {/* =================================================
+              {/* ==================================================
                   QUOTE
-                  ================================================= */}
+              ================================================== */}
+<div
+  ref={quoteRef}
+  className="max-w-[1000px] my-6 sm:my-8 md:my-10"
+>
+  <p
+    className="
+      text-[clamp(1.6rem,8.5vw,3rem)]
+      font-normal
+      leading-[0.98]
+      tracking-[-0.055em]
+      text-white
+
+      sm:text-[clamp(1.3rem,7vw,3.2rem)]
+
+      md:text-[clamp(2.6rem,5.2vw,3.2rem)]
+    "
+  >
+    <span className="testimonial-word inline-block opacity-0">
+      “
+    </span>{" "}
+
+    {quoteWords.map((word, index) => (
+      <span
+        key={`${current.id}-${index}`}
+        className="
+          testimonial-word
+          mr-[0.2em]
+          inline-block
+          opacity-0
+        "
+      >
+        {word}
+      </span>
+    ))}
+
+    {" "}
+    <span className="testimonial-word inline-block opacity-0">
+      ”
+    </span>
+  </p>
+</div>
+              {/* ==================================================
+                  CLIENT INFO + ACTIONS
+              ================================================== */}
 
               <div
-                ref={quoteRef}
-                className="max-w-[1000px] py-16 md:py-20 lg:py-24"
+                className="
+                  testimonial-meta
+                  flex
+                  flex-col
+                  gap-7
+                  border-t
+                  border-white/10
+                  pt-5
+
+                  sm:gap-8
+                  sm:pt-6
+
+                  md:flex-row
+                  md:items-end
+                  md:justify-between
+                "
               >
-                <p className="text-[clamp(2.5rem,5.2vw,3.2rem)] font-normal leading-[0.98] tracking-[-0.055em] text-white">
-                  “{" "}
-                  {quoteWords.map((word, index) => (
-                    <span
-                      key={`${current.id}-${index}`}
-                      className="testimonial-word mr-[0.25em] inline-block opacity-0"
-                    >
-                      {word}
-                    </span>
-                  ))}{" "}
-                  ”
-                </p>
-              </div>
-
-              {/* =================================================
-                  CLIENT INFO + STORY CTA
-                  ================================================= */}
-
-              <div className="testimonial-meta flex flex-col justify-between gap-10 border-t border-white/10 pt-6 sm:flex-row sm:items-end">
                 <div>
-                  <p className="text-base font-medium tracking-[-0.02em] text-white">
+                  <p
+                    className="
+                      text-[15px]
+                      font-medium
+                      tracking-[-0.02em]
+                      text-white
+
+                      sm:text-base
+                    "
+                  >
                     {current.name}
                   </p>
 
-                  <p className="mt-1 text-sm text-white/40">
+                  <p
+                    className="
+                      mt-1
+                      text-[12px]
+                      text-white/40
+
+                      sm:text-sm
+                    "
+                  >
                     {current.role} · {current.company}
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4">
-                  {/* Listen */}
+                <div
+                  className="
+                    flex
+                    flex-wrap
+                    items-center
+                    gap-4
+
+                    sm:gap-5
+                  "
+                >
+                  {/* LISTEN */}
 
                   <button
                     type="button"
                     onClick={openVideo}
-                    className="group flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] text-white transition-colors duration-300 hover:text-white/60"
+                    className="
+                      group
+                      flex
+                      min-h-10
+                      items-center
+                      gap-2.5
+                      text-[8px]
+                      uppercase
+                      tracking-[0.16em]
+                      text-white
+                      transition-colors
+                      duration-300
+                      hover:text-white/60
+
+                      sm:gap-3
+                      sm:text-[10px]
+                      sm:tracking-[0.2em]
+                    "
                   >
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 transition-all duration-300 group-hover:border-white group-hover:bg-white group-hover:text-black">
+                    <span
+                      className="
+                        flex
+                        h-9
+                        w-9
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-full
+                        border
+                        border-white/20
+                        transition-all
+                        duration-300
+
+                        sm:h-10
+                        sm:w-10
+
+                        group-hover:border-white
+                        group-hover:bg-white
+                        group-hover:text-black
+                      "
+                    >
                       <Play
-                        size={12}
+                        size={11}
                         fill="currentColor"
                         className="ml-[1px]"
                       />
@@ -748,35 +1010,90 @@ export default function ClientStories() {
                     <span>Listen to story</span>
 
                     <MoveUpRight
-                      size={13}
-                      className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                      size={12}
+                      className="
+                        transition-transform
+                        duration-300
+                        group-hover:-translate-y-0.5
+                        group-hover:translate-x-0.5
+                      "
                     />
                   </button>
 
-                  {/* Arrows */}
+                  {/* ARROWS */}
 
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => changeTestimonial(-1)}
-                      className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/15 transition-all duration-300 hover:border-white hover:bg-white hover:text-black"
+                      onClick={() =>
+                        changeTestimonial(-1)
+                      }
+                      className="
+                        group
+                        flex
+                        h-9
+                        w-9
+                        items-center
+                        justify-center
+                        rounded-full
+                        border
+                        border-white/15
+                        transition-all
+                        duration-300
+
+                        sm:h-10
+                        sm:w-10
+
+                        hover:border-white
+                        hover:bg-white
+                        hover:text-black
+                      "
                       aria-label="Previous testimonial"
                     >
                       <ArrowLeft
-                        size={15}
-                        className="transition-transform duration-300 group-hover:-translate-x-0.5"
+                        size={14}
+                        className="
+                          transition-transform
+                          duration-300
+                          group-hover:-translate-x-0.5
+                        "
                       />
                     </button>
 
                     <button
                       type="button"
-                      onClick={() => changeTestimonial(1)}
-                      className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/15 transition-all duration-300 hover:border-white hover:bg-white hover:text-black"
+                      onClick={() =>
+                        changeTestimonial(1)
+                      }
+                      className="
+                        group
+                        flex
+                        h-9
+                        w-9
+                        items-center
+                        justify-center
+                        rounded-full
+                        border
+                        border-white/15
+                        transition-all
+                        duration-300
+
+                        sm:h-10
+                        sm:w-10
+
+                        hover:border-white
+                        hover:bg-white
+                        hover:text-black
+                      "
                       aria-label="Next testimonial"
                     >
                       <ArrowRight
-                        size={15}
-                        className="transition-transform duration-300 group-hover:translate-x-0.5"
+                        size={14}
+                        className="
+                          transition-transform
+                          duration-300
+                          group-hover:translate-x-0.5
+                        "
                       />
                     </button>
                   </div>
@@ -784,99 +1101,230 @@ export default function ClientStories() {
               </div>
             </div>
           </div>
-
         </div>
       </section>
 
-      {/* ======================================================
+      {/* ========================================================
           VIDEO MODAL
-          ====================================================== */}
+      ======================================================== */}
 
-     {/* ======================================================
-    VIDEO MODAL
-    ====================================================== */}
+      {videoOpen && (
+        <div
+          ref={modalRef}
+          className="
+            fixed
+            inset-0
+            z-[9999]
+            flex
+            items-center
+            justify-center
+            overflow-y-auto
+            bg-black/90
+            px-4
+            py-6
+            opacity-0
+            backdrop-blur-xl
 
-{videoOpen && (
-  <div
-    ref={modalRef}
-    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 px-5 py-8 opacity-0 backdrop-blur-xl md:px-8"
-    onMouseDown={(event) => {
-      if (event.target === event.currentTarget) {
-        closeVideo();
-      }
-    }}
-  >
-    <div
-      ref={modalContentRef}
-      className="relative w-full max-w-[900px] opacity-0"
-    >
-      {/* Modal header */}
+            sm:px-6
+            sm:py-8
 
-      <div className="mb-4 flex items-center justify-between gap-5">
-        <div>
-          <p className="mb-1.5 text-[9px] uppercase tracking-[0.3em] text-white/35">
-            Client Story
-          </p>
-
-          <h3 className="text-lg font-medium tracking-[-0.035em] text-white md:text-xl">
-            {current.name}
-          </h3>
-
-          <p className="mt-1 text-xs text-white/35">
-            {current.role} · {current.company}
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={closeVideo}
-          className="group flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 text-white transition-all duration-300 hover:bg-white hover:text-black"
-          aria-label="Close video"
+            md:px-8
+          "
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              closeVideo();
+            }
+          }}
         >
-          <X
-            size={17}
-            className="transition-transform duration-300 group-hover:rotate-90"
-          />
-        </button>
-      </div>
+          <div
+            ref={modalContentRef}
+            className="
+              relative
+              w-full
+              max-w-[900px]
+              opacity-0
+            "
+          >
+            {/* MODAL HEADER */}
 
-      {/* Video */}
+            <div
+              className="
+                mb-3
+                flex
+                items-start
+                justify-between
+                gap-4
 
-      <div className="relative aspect-video overflow-hidden rounded-[6px] border border-white/10 bg-black shadow-2xl">
-        {current.videoType === "local" ? (
-          <video
-            src={videoSrc}
-            autoPlay
-            controls
-            playsInline
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <iframe
-            src={videoSrc}
-            title={`${current.name} client story`}
-            className="h-full w-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-        )}
-      </div>
+                sm:mb-4
+                sm:gap-5
+              "
+            >
+              <div className="min-w-0">
+                <p
+                  className="
+                    mb-1
+                    text-[8px]
+                    uppercase
+                    tracking-[0.25em]
+                    text-white/35
 
-      {/* Modal footer */}
+                    sm:text-[9px]
+                    sm:tracking-[0.3em]
+                  "
+                >
+                  Client Story
+                </p>
 
-      <div className="mt-3 flex items-center justify-between">
-        <span className="text-[8px] uppercase tracking-[0.25em] text-white/25">
-          Mentroid / Client Stories
-        </span>
+                <h3
+                  className="
+                    truncate
+                    text-base
+                    font-medium
+                    tracking-[-0.035em]
+                    text-white
 
-        <span className="flex items-center gap-2 text-[8px] uppercase tracking-[0.2em] text-white/25">
-          Watch their experience
-          <ExternalLink size={9} />
-        </span>
-      </div>
-    </div>
-  </div>
-)}
+                    sm:text-lg
+
+                    md:text-xl
+                  "
+                >
+                  {current.name}
+                </h3>
+
+                <p
+                  className="
+                    mt-1
+                    truncate
+                    text-[11px]
+                    text-white/35
+
+                    sm:text-xs
+                  "
+                >
+                  {current.role} · {current.company}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={closeVideo}
+                className="
+                  group
+                  flex
+                  h-9
+                  w-9
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-white/15
+                  text-white
+                  transition-all
+                  duration-300
+
+                  sm:h-10
+                  sm:w-10
+
+                  hover:bg-white
+                  hover:text-black
+                "
+                aria-label="Close video"
+              >
+                <X
+                  size={16}
+                  className="
+                    transition-transform
+                    duration-300
+                    group-hover:rotate-90
+                  "
+                />
+              </button>
+            </div>
+
+            {/* VIDEO */}
+
+            <div
+              className="
+                relative
+                aspect-video
+                w-full
+                overflow-hidden
+                rounded-[5px]
+                border
+                border-white/10
+                bg-black
+                shadow-2xl
+              "
+            >
+              {current.videoType === "local" ? (
+                <video
+                  src={videoSrc}
+                  autoPlay
+                  controls
+                  playsInline
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <iframe
+                  src={videoSrc}
+                  title={`${current.name} client story`}
+                  className="h-full w-full"
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              )}
+            </div>
+
+            {/* MODAL FOOTER */}
+
+            <div
+              className="
+                mt-3
+                flex
+                items-center
+                justify-between
+                gap-4
+              "
+            >
+              <span
+                className="
+                  text-[7px]
+                  uppercase
+                  tracking-[0.2em]
+                  text-white/25
+
+                  sm:text-[8px]
+                  sm:tracking-[0.25em]
+                "
+              >
+                Mentroid / Client Stories
+              </span>
+
+              <span
+                className="
+                  hidden
+                  items-center
+                  gap-2
+                  text-[7px]
+                  uppercase
+                  tracking-[0.18em]
+                  text-white/25
+
+                  sm:flex
+                  sm:text-[8px]
+                  sm:tracking-[0.2em]
+                "
+              >
+                Watch their experience
+
+                <ExternalLink size={9} />
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -47,17 +47,11 @@ const scenes: Scene[] = [
 ];
 
 export default function Hero() {
-  const sectionRef =
-    useRef<HTMLElement | null>(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const pinRef = useRef<HTMLDivElement | null>(null);
 
-  const pinRef =
-    useRef<HTMLDivElement | null>(null);
-
-  const mediaRefs =
-    useRef<(HTMLDivElement | null)[]>([]);
-
-  const contentRefs =
-    useRef<(HTMLDivElement | null)[]>([]);
+  const mediaRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -66,15 +60,13 @@ export default function Hero() {
     if (!section || !pin) return;
 
     const ctx = gsap.context(() => {
-      const media =
-        mediaRefs.current.filter(
-          Boolean
-        ) as HTMLDivElement[];
+      const media = mediaRefs.current.filter(
+        Boolean
+      ) as HTMLDivElement[];
 
-      const content =
-        contentRefs.current.filter(
-          Boolean
-        ) as HTMLDivElement[];
+      const content = contentRefs.current.filter(
+        Boolean
+      ) as HTMLDivElement[];
 
       if (!media.length || !content.length) {
         return;
@@ -82,10 +74,7 @@ export default function Hero() {
 
       /*
        * ========================================================
-       * IMPORTANT:
-       * Hide all scenes immediately.
-       *
-       * This prevents the refresh "text stacking" flash.
+       * CONTENT INITIAL STATE
        * ========================================================
        */
 
@@ -125,17 +114,17 @@ export default function Hero() {
        * ========================================================
        */
 
-     const tl = gsap.timeline({
-  scrollTrigger: {
-    trigger: section,
-    start: "top top",
-    end: "bottom bottom",
-    scrub: 1,
-    pin: pin,
-    anticipatePin: 1,
-    invalidateOnRefresh: true,
-  },
-});
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1,
+          pin: pin,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      });
 
       /*
        * ========================================================
@@ -271,50 +260,24 @@ export default function Hero() {
        * ========================================================
        */
 
-  /*
- * ========================================================
- * FINAL HERO → INTELLIGENCE SYSTEM TRANSITION
- * ========================================================
- */
+      tl.to(media[2], {
+        scale: 1.08,
+        xPercent: -2,
+        yPercent: -2,
+        duration: 0.5,
+        ease: "none",
+      });
 
-/*
- * 1. Let the final Hero scene breathe.
- */
-tl.to(
-  media[2],
-  {
-    scale: 1.08,
-    xPercent: -2,
-    yPercent: -2,
-    duration: 0.5,
-    ease: "none",
-  }
-);
+      /*
+       * Remove final scene typography.
+       */
 
-// Remove final scene typography.
-tl.to(
-  content[2],
-  {
-    autoAlpha: 0,
-    y: -60,
-    duration: 0.25,
-    ease: "none",
-  }
-);
-
-// THE IMPORTANT PART:
-// Directly scrub the final visual from 1.08 → 2.6.
-// tl.to(
-//   media[2],
-//   {
-//     scale: 2.6,
-//     xPercent: -3,
-//     yPercent: -3,
-//     duration: 1.8,
-//     ease: "none",
-//   }
-// );
-
+      tl.to(content[2], {
+        autoAlpha: 0,
+        y: -60,
+        duration: 0.25,
+        ease: "none",
+      });
 
       /*
        * ========================================================
@@ -323,9 +286,7 @@ tl.to(
        */
 
       const parallaxElements =
-        section.querySelectorAll(
-          ".hero-parallax"
-        );
+        section.querySelectorAll(".hero-parallax");
 
       gsap.to(parallaxElements, {
         yPercent: -12,
@@ -360,7 +321,7 @@ tl.to(
     <section
       ref={sectionRef}
       id="hero"
-      data-navbar-theme="dark" 
+      data-navbar-theme="dark"
       className="
         relative
         h-[400vh]
@@ -378,7 +339,8 @@ tl.to(
         ref={pinRef}
         className="
           relative
-          h-screen
+          h-[100svh]
+          min-h-[520px]
           w-full
           max-w-full
           overflow-hidden
@@ -399,61 +361,63 @@ tl.to(
             overflow-hidden
           "
         >
-          {scenes.map(
-            (scene, index) => (
-              <div
-                key={scene.media}
-                ref={(element) => {
-                  mediaRefs.current[index] =
-                    element;
-                }}
-               className={`
-  absolute
-  inset-0
-  h-full
-  w-full
-  max-w-full
-  overflow-hidden
-  ${index === 0 ? "visible opacity-100" : "invisible opacity-0"}
-`}
-              >
-                {scene.type ===
-                "video" ? (
-                  <video
-                    className="
-                      hero-parallax
-                      absolute
-                      inset-0
-                      h-full
-                      w-full
-                      max-w-full
-                      object-cover
-                    "
-                    src={scene.media}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="auto"
-                  />
-                ) : (
-                  <img
-                    className="
-                      hero-parallax
-                      absolute
-                      inset-0
-                      h-full
-                      w-full
-                      max-w-full
-                      object-cover
-                    "
-                    src={scene.media}
-                    alt=""
-                  />
-                )}
-              </div>
-            )
-          )}
+          {scenes.map((scene, index) => (
+            <div
+              key={scene.media}
+              ref={(element) => {
+                mediaRefs.current[index] = element;
+              }}
+              className={`
+                absolute
+                inset-0
+                h-full
+                w-full
+                max-w-full
+                overflow-hidden
+                ${
+                  index === 0
+                    ? "visible opacity-100"
+                    : "invisible opacity-0"
+                }
+              `}
+            >
+              {scene.type === "video" ? (
+                <video
+                  className="
+                    hero-parallax
+                    absolute
+                    inset-0
+                    h-full
+                    w-full
+                    max-w-full
+                    object-cover
+                  "
+                  src={scene.media}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload={index < 2 ? "auto" : "metadata"}
+                />
+              ) : (
+                <img
+                  className="
+                    hero-parallax
+                    absolute
+                    inset-0
+                    h-full
+                    w-full
+                    max-w-full
+                    object-cover
+                  "
+                  src={scene.media}
+                  alt=""
+                  loading={index === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                />
+              )}
+            </div>
+          ))}
         </div>
 
         {/* ====================================================
@@ -466,7 +430,6 @@ tl.to(
             absolute
             inset-0
             z-[2]
-            
             bg-black/25
           "
         />
@@ -513,141 +476,170 @@ tl.to(
             className="
               w-full
               max-w-full
-              px-6
+              px-5
+              sm:px-6
               md:px-10
               lg:px-14
+              xl:px-16
             "
           >
             <div
               className="
                 relative
-                min-h-[520px]
+                min-h-[420px]
                 w-full
                 max-w-full
+                sm:min-h-[460px]
+                md:min-h-[500px]
+                lg:min-h-[520px]
               "
             >
-              {scenes.map(
-                (
-                  scene,
-                  index
-                ) => (
-                  <div
-                    key={
-                      scene.title
+              {scenes.map((scene, index) => (
+                <div
+                  key={scene.title}
+                  ref={(element) => {
+                    contentRefs.current[index] = element;
+                  }}
+                  className={`
+                    absolute
+                    left-0
+                    top-1/2
+                    w-full
+                    max-w-[850px]
+                    -translate-y-1/2
+                    ${
+                      index === 0
+                        ? "visible opacity-100"
+                        : "invisible opacity-0"
                     }
-                    ref={(
-                      element
-                    ) => {
-                      contentRefs.current[
-                        index
-                      ] =
-                        element;
-                    }}
-                   className={`
-  absolute
-  left-0
-  top-1/2
-  w-full
-  max-w-[850px]
-  -translate-y-1/2
-  ${index === 0 ? "visible opacity-100" : "invisible opacity-0"}
-`}
+                  `}
+                >
+                  {/* EYEBROW */}
+
+                  <div
+                    className="
+                      mb-5
+                      flex
+                      items-center
+                      gap-3
+                      sm:mb-6
+                      md:mb-7
+                    "
                   >
-                    {/* EYEBROW */}
-
-                    <div className="mb-7 flex items-center gap-3">
-                      <span className="text-[10px] font-medium uppercase tracking-[0.25em] text-white/70">
-                        {
-                          scene.eyebrow
-                        }
-                      </span>
-                    </div>
-
-                    {/* HEADING */}
-
-                    <div className="overflow-hidden">
-                      <h1
-                        className="
-                          text-[clamp(3.5rem,8vw,5.8rem)]
-                          font-medium
-                          leading-[0.88]
-                          tracking-[-0.075em]
-                          text-white
-                        "
-                      >
-                        <span className="block">
-                          {
-                            scene.title
-                          }
-                        </span>
-
-                        <span className="block text-white/60">
-                          {
-                            scene.accent
-                          }
-                        </span>
-                      </h1>
-                    </div>
-
-                    {/* DESCRIPTION */}
-
-                    <p
+                    <span
                       className="
-                        mt-8
-                        max-w-[480px]
-                        text-sm
-                        leading-7
-                        text-white/65
-                        md:text-base
-                        md:leading-8
+                        text-[9px]
+                        font-medium
+                        uppercase
+                        tracking-[0.2em]
+                        text-white/70
+                        sm:text-[10px]
+                        sm:tracking-[0.25em]
                       "
                     >
-                      {
-                        scene.description
-                      }
-                    </p>
-
-                    {/* CTA */}
-
-                    {index ===
-                      0 && (
-                      <div className="mt-9 flex items-center gap-3">
-                        <a
-                          href="#services"
-                          className="
-                            group
-                            inline-flex
-                            items-center
-                            gap-3
-                            rounded-full
-                            bg-white
-                            px-6
-                            py-3.5
-                            text-sm
-                            font-medium
-                            text-black
-                            transition
-                            hover:scale-[1.02]
-                          "
-                        >
-                          Explore Mentroid
-
-                          <ArrowUpRight
-                            size={
-                              16
-                            }
-                            className="
-                              transition-transform
-                              group-hover:translate-x-0.5
-                              group-hover:-translate-y-0.5
-                            "
-                          />
-                        </a>
-                      </div>
-                    )}
+                      {scene.eyebrow}
+                    </span>
                   </div>
-                )
-              )}
+
+                  {/* HEADING */}
+
+                  <div className="overflow-hidden">
+                    <h1
+                      className="
+                        max-w-[950px]
+                        text-[clamp(2.8rem,10vw,5.8rem)]
+                        font-medium
+                        leading-[0.9]
+                        tracking-[-0.065em]
+                        text-white
+                        sm:text-[clamp(3.2rem,8vw,5.8rem)]
+                        sm:tracking-[-0.075em]
+                      "
+                    >
+                      <span className="block">
+                        {scene.title}
+                      </span>
+
+                      <span className="block text-white/60">
+                        {scene.accent}
+                      </span>
+                    </h1>
+                  </div>
+
+                  {/* DESCRIPTION */}
+
+                  <p
+                    className="
+                      mt-6
+                      max-w-[390px]
+                      text-[13px]
+                      leading-6
+                      text-white/65
+                      sm:mt-7
+                      sm:max-w-[440px]
+                      sm:text-sm
+                      sm:leading-7
+                      md:mt-8
+                      md:max-w-[480px]
+                      md:text-base
+                      md:leading-8
+                    "
+                  >
+                    {scene.description}
+                  </p>
+
+                  {/* CTA */}
+
+                  {index === 0 && (
+                    <div
+                      className="
+                        mt-7
+                        flex
+                        items-center
+                        gap-3
+                        sm:mt-8
+                        md:mt-9
+                      "
+                    >
+                      <a
+                        href="#services"
+                        className="
+                          group
+                          inline-flex
+                          items-center
+                          gap-2.5
+                          rounded-full
+                          bg-white
+                          px-5
+                          py-3
+                          text-xs
+                          font-medium
+                          text-black
+                          transition-transform
+                          duration-300
+                          hover:scale-[1.02]
+                          sm:gap-3
+                          sm:px-6
+                          sm:py-3.5
+                          sm:text-sm
+                        "
+                      >
+                        Explore Mentroid
+
+                        <ArrowUpRight
+                          size={16}
+                          className="
+                            transition-transform
+                            duration-300
+                            group-hover:translate-x-0.5
+                            group-hover:-translate-y-0.5
+                          "
+                        />
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -658,34 +650,44 @@ tl.to(
 
         <div
           className="
+            pointer-events-none
             absolute
-            bottom-7
-            left-6
-            right-6
+            bottom-5
+            left-5
+            right-5
             z-20
             flex
             items-end
             justify-between
+            sm:bottom-6
+            sm:left-6
+            sm:right-6
+            md:bottom-7
             md:left-10
             md:right-10
             lg:left-14
             lg:right-14
+            xl:left-16
+            xl:right-16
           "
         >
           <div
             className="
               flex
               items-center
-              gap-3
-              text-[9px]
+              gap-2.5
+              text-[8px]
               uppercase
-              tracking-[0.2em]
+              tracking-[0.17em]
               text-white/50
+              sm:gap-3
+              sm:text-[9px]
+              sm:tracking-[0.2em]
             "
           >
             <ArrowDown size={13} />
 
-            Scroll to explore
+            <span>Scroll to explore</span>
           </div>
         </div>
       </div>

@@ -65,16 +65,19 @@ export default function IntelligenceSystem() {
         Boolean
       ) as HTMLDivElement[];
 
-      if (!sceneElements.length || !visuals.length) return;
+      if (!sceneElements.length || !visuals.length) {
+        return;
+      }
 
       /*
-      ============================================================
-      INITIAL STATE
-      ============================================================
-      */
+       * ============================================================
+       * INITIAL STATE
+       * ============================================================
+       */
 
       gsap.set(sceneElements, {
         autoAlpha: 0,
+        force3D: true,
       });
 
       gsap.set(sceneElements[0], {
@@ -95,10 +98,10 @@ export default function IntelligenceSystem() {
       });
 
       /*
-      ============================================================
-      MAIN CINEMATIC TIMELINE
-      ============================================================
-      */
+       * ============================================================
+       * MAIN CINEMATIC TIMELINE
+       * ============================================================
+       */
 
       const timeline = gsap.timeline({
         scrollTrigger: {
@@ -106,17 +109,17 @@ export default function IntelligenceSystem() {
           start: "top top",
           end: "bottom bottom",
           scrub: 1,
-          pin: pin,
+          pin,
           anticipatePin: 1,
           invalidateOnRefresh: true,
         },
       });
 
       /*
-      ============================================================
-      SCENE 01
-      ============================================================
-      */
+       * ============================================================
+       * SCENE 01
+       * ============================================================
+       */
 
       timeline.to(
         visuals[0],
@@ -129,10 +132,10 @@ export default function IntelligenceSystem() {
       );
 
       /*
-      ============================================================
-      SCENE 01 → 02
-      ============================================================
-      */
+       * ============================================================
+       * SCENE 01 → 02
+       * ============================================================
+       */
 
       timeline.to(
         sceneElements[0],
@@ -176,7 +179,7 @@ export default function IntelligenceSystem() {
         visuals[1],
         {
           opacity: 0,
-          scale: 0.90,
+          scale: 0.9,
           xPercent: 5,
         },
         {
@@ -190,10 +193,10 @@ export default function IntelligenceSystem() {
       );
 
       /*
-      ============================================================
-      SCENE 02 CAMERA MOVEMENT
-      ============================================================
-      */
+       * ============================================================
+       * SCENE 02 CAMERA
+       * ============================================================
+       */
 
       timeline.to(
         visuals[1],
@@ -207,10 +210,10 @@ export default function IntelligenceSystem() {
       );
 
       /*
-      ============================================================
-      SCENE 02 → 03
-      ============================================================
-      */
+       * ============================================================
+       * SCENE 02 → 03
+       * ============================================================
+       */
 
       timeline.to(
         sceneElements[1],
@@ -254,7 +257,7 @@ export default function IntelligenceSystem() {
         visuals[2],
         {
           opacity: 0,
-          scale: 0.90,
+          scale: 0.9,
           xPercent: -5,
         },
         {
@@ -268,10 +271,10 @@ export default function IntelligenceSystem() {
       );
 
       /*
-      ============================================================
-      SCENE 03 FINAL CAMERA
-      ============================================================
-      */
+       * ============================================================
+       * SCENE 03 FINAL CAMERA
+       * ============================================================
+       */
 
       timeline.to(
         visuals[2],
@@ -285,10 +288,10 @@ export default function IntelligenceSystem() {
       );
 
       /*
-      ============================================================
-      FINAL TEXT EXIT
-      ============================================================
-      */
+       * ============================================================
+       * FINAL TEXT EXIT
+       * ============================================================
+       */
 
       timeline.to(
         sceneElements[2],
@@ -302,10 +305,10 @@ export default function IntelligenceSystem() {
       );
 
       /*
-      ============================================================
-      REFRESH
-      ============================================================
-      */
+       * ============================================================
+       * REFRESH
+       * ============================================================
+       */
 
       requestAnimationFrame(() => {
         ScrollTrigger.refresh();
@@ -321,16 +324,24 @@ export default function IntelligenceSystem() {
     <section
       ref={sectionRef}
       id="intelligence-system"
-       data-navbar-theme="dark"
+      data-navbar-theme="dark"
       className="
         relative
         z-20
-        -mt-[250px]
-        h-[360vh]
+        -mt-[120px]
+        h-[300vh]
         w-full
         overflow-x-clip
-        bg-[#000000]
+        bg-black
         text-white
+
+        sm:-mt-[150px]
+
+        md:-mt-[180px]
+
+        lg:-mt-[220px]
+
+        xl:-mt-[250px]
       "
     >
       {/* ========================================================
@@ -341,32 +352,19 @@ export default function IntelligenceSystem() {
         ref={pinRef}
         className="
           relative
-          h-screen
+          h-[100svh]
+          min-h-[620px]
           w-full
           overflow-hidden
-          bg-[#00000]
+          bg-black
+
+          sm:min-h-[650px]
+
+          md:min-h-[680px]
+
+          lg:min-h-[700px]
         "
       >
-        {/* ======================================================
-            TOP LABEL
-        ====================================================== */}
-
-        <div
-          className="
-            absolute
-            left-6
-            right-6
-            top-24
-            z-50
-            md:left-10
-            md:right-10
-            lg:left-14
-            lg:right-14
-          "
-        >
-         
-        </div>
-
         {/* ======================================================
             SCENES
         ====================================================== */}
@@ -381,9 +379,9 @@ export default function IntelligenceSystem() {
                 sceneRefs.current[index] = element;
               }}
               className="
+                invisible
                 absolute
                 inset-0
-                invisible
               "
             >
               {/* ==================================================
@@ -393,48 +391,71 @@ export default function IntelligenceSystem() {
               <div
                 className={`
                   absolute
-                  top-1/2
                   z-30
-                  w-[calc(100%-48px)]
+                  w-[calc(100%-40px)]
                   max-w-[520px]
+
                   -translate-y-1/2
+
+                  left-5
+                  top-[30%]
+
+                  sm:left-6
+                  sm:w-[calc(100%-48px)]
+                  sm:top-[30%]
+
+                  md:top-1/2
+                  md:w-[min(42vw,520px)]
+
+                  lg:w-[min(40vw,520px)]
+
+                  xl:w-[min(38vw,520px)]
 
                   ${
                     textLeft
-                      ? "left-6 md:left-10 lg:left-14"
-                      : "right-6 md:right-10 lg:right-14"
+                      ? `
+                        md:left-[5vw]
+                        md:right-auto
+                      `
+                      : `
+                        md:right-[5vw]
+                        md:left-auto
+                      `
                   }
-
-                  max-md:!left-6
-                  max-md:!right-6
-                  max-md:!top-[34%]
-                  max-md:!translate-y-0
                 `}
               >
                 {/* LABEL */}
 
                 <div
                   className="
-                    mb-6
+                    mb-5
                     flex
                     items-center
                     gap-3
+
+                    sm:mb-6
+
+                    md:mb-6
                   "
                 >
                   <span
                     className="
                       h-1.5
                       w-1.5
+                      shrink-0
                       bg-white
                     "
                   />
 
                   <span
                     className="
-                      text-[9px]
+                      text-[8px]
                       uppercase
-                      tracking-[0.2em]
+                      tracking-[0.18em]
                       text-white/45
+
+                      sm:text-[9px]
+                      sm:tracking-[0.2em]
                     "
                   >
                     {scene.label}
@@ -445,10 +466,18 @@ export default function IntelligenceSystem() {
 
                 <h2
                   className="
-                    text-[clamp(3rem,6vw,6.8rem)]
+                    text-[clamp(2.65rem,10vw,4.5rem)]
                     font-medium
-                    leading-[0.88]
-                    tracking-[-0.07em]
+                    leading-[0.9]
+                    tracking-[-0.065em]
+
+                    sm:text-[clamp(3rem,8vw,5.2rem)]
+
+                    md:text-[clamp(3.4rem,5.5vw,6rem)]
+
+                    lg:text-[clamp(4rem,5.3vw,6.8rem)]
+
+                    xl:text-[clamp(4.5rem,5vw,6.8rem)]
                   "
                 >
                   {scene.title}
@@ -464,11 +493,18 @@ export default function IntelligenceSystem() {
 
                 <p
                   className="
-                    mt-7
-                    max-w-[400px]
-                    text-[14px]
-                    leading-7
+                    mt-5
+                    max-w-[360px]
+                    text-[12px]
+                    leading-6
                     text-white/45
+
+                    sm:mt-6
+                    sm:max-w-[400px]
+                    sm:text-[13px]
+                    sm:leading-7
+
+                    md:mt-7
                     md:text-[15px]
                     md:leading-8
                   "
@@ -480,14 +516,20 @@ export default function IntelligenceSystem() {
 
                 <div
                   className="
-                    mt-8
+                    mt-6
                     flex
                     items-center
                     gap-3
-                    text-[9px]
+                    text-[8px]
                     uppercase
-                    tracking-[0.18em]
+                    tracking-[0.16em]
                     text-white/30
+
+                    sm:mt-7
+                    sm:text-[9px]
+                    sm:tracking-[0.18em]
+
+                    md:mt-8
                   "
                 >
                   <span>{scene.tag}</span>
@@ -503,26 +545,44 @@ export default function IntelligenceSystem() {
               <div
                 className={`
                   absolute
-                  top-1/2
                   z-20
-                  h-[52vh]
-                  w-[min(52vw,820px)]
-                  min-h-[300px]
-                  min-w-[300px]
+
+                  left-5
+                  right-5
+                  top-[69%]
+
+                  h-[28vh]
+                  min-h-[190px]
+
                   -translate-y-1/2
+
+                  sm:left-6
+                  sm:right-6
+                  sm:top-[69%]
+                  sm:h-[30vh]
+                  sm:min-h-[210px]
+
+                  md:top-1/2
+                  md:h-[48vh]
+                  md:w-[min(48vw,650px)]
+                  md:min-h-[300px]
+
+                  lg:h-[52vh]
+                  lg:w-[min(50vw,760px)]
+
+                  xl:w-[min(52vw,820px)]
 
                   ${
                     textLeft
-                      ? "right-[4vw]"
-                      : "left-[4vw]"
+                      ? `
+                        md:right-[4vw]
+                        md:left-auto
+                      `
+                      : `
+                        md:left-[4vw]
+                        md:right-auto
+                      `
                   }
-
-                  max-md:!left-6
-                  max-md:!right-6
-                  max-md:!top-[65%]
-                  max-md:!h-[34vh]
-                  max-md:!w-[calc(100%-48px)]
-                  max-md:!-translate-y-1/2
                 `}
               >
                 {/* OUTER FRAME */}
@@ -531,10 +591,16 @@ export default function IntelligenceSystem() {
                   className="
                     pointer-events-none
                     absolute
-                    -inset-4
-                    rounded-[24px]
+                    -inset-2
+                    rounded-[20px]
                     border
-                    border-white/[0.045]
+                    border-white/[0.04]
+
+                    sm:-inset-3
+                    sm:rounded-[22px]
+
+                    md:-inset-4
+                    md:rounded-[24px]
                   "
                 />
 
@@ -544,10 +610,15 @@ export default function IntelligenceSystem() {
                   className="
                     pointer-events-none
                     absolute
-                    -inset-2
-                    rounded-[20px]
+                    -inset-1
+                    rounded-[16px]
                     border
                     border-white/[0.025]
+
+                    sm:-inset-2
+                    sm:rounded-[18px]
+
+                    md:rounded-[20px]
                   "
                 />
 
@@ -562,11 +633,16 @@ export default function IntelligenceSystem() {
                     h-full
                     w-full
                     overflow-hidden
-                    rounded-[18px]
+                    rounded-[16px]
                     border
                     border-white/[0.08]
                     bg-[#080808]
-                    shadow-[0_40px_100px_rgba(0,0,0,0.5)]
+                    shadow-[0_25px_70px_rgba(0,0,0,0.5)]
+
+                    sm:rounded-[17px]
+
+                    md:rounded-[18px]
+                    md:shadow-[0_40px_100px_rgba(0,0,0,0.5)]
                   "
                 >
                   <video
@@ -575,7 +651,7 @@ export default function IntelligenceSystem() {
                     muted
                     loop
                     playsInline
-                    preload="metadata"
+                    preload={index === 0 ? "auto" : "metadata"}
                     className="
                       h-full
                       w-full
@@ -600,12 +676,17 @@ export default function IntelligenceSystem() {
                   <span
                     className="
                       absolute
-                      left-5
-                      top-5
-                      text-[8px]
+                      left-4
+                      top-4
+                      text-[7px]
                       uppercase
-                      tracking-[0.2em]
+                      tracking-[0.18em]
                       text-white/30
+
+                      sm:left-5
+                      sm:top-5
+                      sm:text-[8px]
+                      sm:tracking-[0.2em]
                     "
                   >
                     MENTROID
@@ -614,12 +695,17 @@ export default function IntelligenceSystem() {
                   <span
                     className="
                       absolute
-                      bottom-5
-                      right-5
-                      text-[8px]
+                      bottom-4
+                      right-4
+                      text-[7px]
                       uppercase
-                      tracking-[0.2em]
+                      tracking-[0.18em]
                       text-white/25
+
+                      sm:bottom-5
+                      sm:right-5
+                      sm:text-[8px]
+                      sm:tracking-[0.2em]
                     "
                   >
                     {scene.id}
@@ -629,8 +715,6 @@ export default function IntelligenceSystem() {
             </div>
           );
         })}
-
-       
       </div>
     </section>
   );

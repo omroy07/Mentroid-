@@ -1,16 +1,16 @@
 
 import Hero from "@/components/hero/Hero";
 import IntelligenceSystem from "@/components/sections/IntelligenceSystem";
-import WhatWeEngineer1 from "@/components/sections/WhatWeEngineer1";
+import WhatWeEngineer from "@/components/sections/WhatWeEngineer";
 import Solutions from "@/components/sections/Solutions";
 import SelectedWork from "@/components/sections/SelectedWork";
 import Industries from "@/components/sections/Industries";
-
+import ProjectSection from "@/components/sections/ProjectSection";
 import Proof from "@/components/sections/Proof";
 import LetsBuild from "@/components/sections/LetsBuild";
 import ClientStories from "@/components/sections/ClientStories";
 import KeyFacts from "@/components/sections/KeyFacts";
-import Project from "@/components/sections/Project";
+
 
 
 export default function Home() {
@@ -20,14 +20,14 @@ export default function Home() {
       
       <Hero/>
       <IntelligenceSystem/>
-      <WhatWeEngineer1/>
-    <Project/>
-      <SelectedWork/>
+      <WhatWeEngineer/>
+   <ProjectSection/>
+      {/* <SelectedWork/> */}
       <ClientStories/>
-      <Solutions/>
       <Industries/>
+      <Solutions/>
       <KeyFacts/>
-      <Proof/>
+      {/* <Proof/> */}
       <LetsBuild/>
     
     </main>

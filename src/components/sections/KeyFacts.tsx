@@ -9,36 +9,54 @@ gsap.registerPlugin(ScrollTrigger);
 
 const cards = [
   {
-  id: "left",
-  image: "/assets/solutions/01.webp",
-  eyebrow: "AI & ML SOLUTIONS",
-  title: "Intelligence.\nBuilt to scale.",
-  description: "AI systems, machine learning models, and intelligent workflows built around real business needs.",
-  number: "15+",
-},
-
-{
-  id: "middle",
-  eyebrow: "PROJECTS COMPLETED",
-  number: "4+",
-  description: "From intelligent automation to custom AI solutions, we turn complex ideas into working products.",
-},
-
-{
-  id: "right",
-  image: "/assets/solutions/02.webp",
-  eyebrow: "OUR TEAM",
-  title: "Different minds.\nOne vision.",
-  number: "14+",
-},
+    id: "left",
+    image: "/assets/solutions/01.webp",
+    eyebrow: "AI & ML SOLUTIONS",
+    title: "Intelligence.\nBuilt to scale.",
+    description:
+      "AI systems, machine learning models, and intelligent workflows built around real business needs.",
+    number: "15+",
+    type: "image" as const,
+  },
+  {
+    id: "middle",
+    eyebrow: "PROJECTS COMPLETED",
+    number: "4+",
+    description:
+      "From intelligent automation to custom AI solutions, we turn complex ideas into working products.",
+    type: "metric" as const,
+  },
+  {
+    id: "right",
+    image: "/assets/solutions/02.webp",
+    eyebrow: "OUR TEAM",
+    title: "Different minds.\nOne vision.",
+    number: "14+",
+    type: "image" as const,
+  },
 ];
 
 const partners = [
-  "Credible",
-  "Yellowtail",
-  "UX Design",
-  "Techni",
-  "Octo",
+  {
+    name: "Credible",
+    logo: "/assets/partners/01.png",
+  },
+  {
+    name: "Yellowtail",
+    logo: "/assets/partners/02.png",
+  },
+  {
+    name: "UX Design",
+    logo: "/assets/partners/03.png",
+  },
+  {
+    name: "Techni",
+    logo: "/assets/partners/04.png",
+  },
+  {
+    name: "Octo",
+    logo: "/assets/partners/05.png",
+  },
 ];
 
 export default function KeyFacts() {
@@ -46,8 +64,9 @@ export default function KeyFacts() {
   const stageRef = useRef<HTMLDivElement>(null);
 
   const stripsRef = useRef<HTMLDivElement[]>([]);
-
   const headingRef = useRef<HTMLDivElement>(null);
+
+  const cardsTrackRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<HTMLElement[]>([]);
   const cardImageRefs = useRef<HTMLDivElement[]>([]);
   const cardContentRefs = useRef<HTMLDivElement[]>([]);
@@ -57,12 +76,13 @@ export default function KeyFacts() {
   useLayoutEffect(() => {
     const section = sectionRef.current;
     const stage = stageRef.current;
+    const cardsTrack = cardsTrackRef.current;
 
-    if (!section || !stage) return;
+    if (!section || !stage || !cardsTrack) return;
 
     const ctx = gsap.context(() => {
       const strips = stripsRef.current;
-      const cardsEls = cardRefs.current;
+      const cardEls = cardRefs.current;
       const images = cardImageRefs.current;
       const contents = cardContentRefs.current;
 
@@ -71,7 +91,7 @@ export default function KeyFacts() {
 
       if (
         strips.length !== 7 ||
-        cardsEls.length !== 3 ||
+        cardEls.length !== 3 ||
         images.length !== 3 ||
         contents.length !== 3 ||
         !heading ||
@@ -83,92 +103,40 @@ export default function KeyFacts() {
       const mm = gsap.matchMedia();
 
       /* ============================================================
-         DESKTOP
+         DESKTOP / TABLET
       ============================================================ */
 
       mm.add("(min-width: 769px)", () => {
-        /*
-         * ----------------------------------------------------------
-         * INITIAL STATE
-         * ----------------------------------------------------------
-         */
-
-        /*
-         * The actual reference begins with horizontal strips
-         * covering the section.
-         */
         gsap.set(strips, {
           xPercent: 0,
         });
 
-        /*
-         * Heading starts slightly below.
-         */
         gsap.set(heading, {
-          opacity: 0,
+          autoAlpha: 0,
           y: 35,
         });
 
-        /*
-         * CARD INITIAL POSITIONS
-         *
-         * They are deliberately much smaller than the previous
-         * version.
-         *
-         * All three originate around the center.
-         */
-   /* ============================================================
-   CARDS — INITIAL
-   NO HORIZONTAL MOVEMENT
-============================================================ */
-
-gsap.set(cardsEls, {
-  x: 0,
-  opacity: 0,
-  transformOrigin: "50% 50%",
-});
-
-gsap.set(cardsEls[0], {
-  y: 30,
-  scale: 0.94,
-});
-
-gsap.set(cardsEls[1], {
-  y: 40,
-  scale: 0.94,
-});
-
-gsap.set(cardsEls[2], {
-  y: 30,
-  scale: 0.94,
-});
-
-        /*
-         * Images start zoomed.
-         */
-        // gsap.set(images, {
-        //   scale: 1.12,
-        // });
-
-        /*
-         * Card text starts hidden.
-         */
-        gsap.set(contents, {
+        gsap.set(cardEls, {
           opacity: 0,
+          y: 35,
+          scale: 0.94,
+          x: 0,
+          rotationZ: 0,
+        });
+
+        gsap.set(images, {
+          scale: 1.06,
+        });
+
+        gsap.set(contents, {
+          autoAlpha: 0,
           y: 12,
         });
 
-        /*
-         * Partners hidden.
-         */
-        // gsap.set(partnersEl, {
-        //   opacity: 0,
-        //   y: 15,
-        // });
-
-        /* ============================================================
-           MASTER TIMELINE
-        ============================================================ */
+        gsap.set(partnersEl, {
+          autoAlpha: 0,
+          y: 20,
+        });
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -182,99 +150,62 @@ gsap.set(cardsEls[2], {
           },
         });
 
-        /* ============================================================
-           01 — STRIPS HOLD
-        ============================================================ */
+        /* OPEN */
 
-        tl.to({}, {
-          duration: 0.35,
+        tl.to(strips, {
+          xPercent: (index) =>
+            index % 2 === 0 ? -110 : 110,
+          duration: 1,
+          stagger: 0.07,
+          ease: "power4.inOut",
         });
 
-        /* ============================================================
-           02 — STRIPS EXIT
-           
-           THIS IS THE IMPORTANT PART.
-
-           Alternating strips move in opposite directions,
-           creating the exact horizontal band reveal.
-        ============================================================ */
-
-        tl.to(
-          strips,
-          {
-            xPercent: (index) =>
-              index % 2 === 0 ? -110 : 110,
-
-            duration: 1.0,
-
-            stagger: {
-              each: 0.07,
-            },
-
-            ease: "power4.inOut",
-          }
-        );
-
-        /* ============================================================
-           03 — KEY FACTS HEADING
-        ============================================================ */
+        /* HEADING */
 
         tl.to(
           heading,
           {
-            opacity: 1,
+            autoAlpha: 1,
             y: 0,
-            duration: 0.65,
+            duration: 0.6,
             ease: "power3.out",
           },
           "-=0.45"
         );
 
-        /* ============================================================
-           04 — LEFT CARD ENTER
-        ============================================================ */
+        /* CARDS */
 
-       /* ============================================================
-   CARDS ENTER
-   SAME HORIZONTAL POSITION — NO SPREAD
-============================================================ */
+        tl.to(
+          cardEls,
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.75,
+            stagger: 0.07,
+            ease: "power4.out",
+          },
+          "-=0.3"
+        );
 
-tl.to(
-  cardsEls,
-  {
-    x: 0,
-    y: 0,
-    scale: 1,
-    opacity: 1,
-    duration: 0.8,
-    stagger: 0.06,
-    ease: "power4.out",
-  },
-  "-=0.35"
-);
-
-        /* ============================================================
-           07 — IMAGE SETTLE
-        ============================================================ */
+        /* IMAGE */
 
         tl.to(
           images,
           {
             scale: 1,
-            duration: 0.65,
+            duration: 0.6,
             ease: "power3.out",
           },
-          "-=0.4"
+          "-=0.45"
         );
 
-        /* ============================================================
-           08 — CARD CONTENT
-        ============================================================ */
+        /* CONTENT */
 
         tl.to(
           contents,
           {
-            opacity: 1,
+            autoAlpha: 1,
             y: 0,
             duration: 0.45,
             stagger: 0.08,
@@ -283,246 +214,299 @@ tl.to(
           "-=0.3"
         );
 
-        /* ============================================================
-           09 — PARTNERS
-        ============================================================ */
+        /* PARTNERS */
 
         tl.to(
           partnersEl,
           {
-            opacity: 1,
+            autoAlpha: 1,
             y: 0,
             duration: 0.5,
             ease: "power3.out",
           },
-          "+=0.25"
+          "+=0.3"
         );
 
-        /* ============================================================
-           10 — HOLD
-        ============================================================ */
+        /* HOLD */
 
         tl.to({}, {
-          duration: 1.2,
+          duration: 1,
         });
 
-        /* ============================================================
-           11 — EXIT
-        ============================================================ */
-
-       /* ============================================================
-   CARDS ENTER INTO THEIR GRID POSITIONS
-============================================================ */
-
-tl.to(
-  cardsEls,
-  {
-    x: 0,
-    y: 0,
-    scale: 1,
-    rotationZ: 0,
-    opacity: 1,
-    duration: 0.85,
-    stagger: 0.08,
-    ease: "power4.out",
-  },
-  "-=0.35"
-);
+        /* EXIT */
 
         tl.to(
-          partnersEl,
+          cardEls,
           {
+            y: -35,
+            scale: 0.97,
             opacity: 0,
-            y: -20,
-            duration: 0.45,
-          },
-          "<0.15"
-        );
-
-        /*
-         * Strips come back at the end so that the next section
-         * can transition through the same visual language.
-         */
-        tl.to(
-          strips,
-          {
-            xPercent: 0,
-            duration: 0.9,
-            stagger: {
-              each: 0.07,
-            },
-            ease: "power4.inOut",
-          },
-          "-=0.15"
-        );
-      });
-
-      /* ============================================================
-         MOBILE
-      ============================================================ */
-
-      mm.add("(max-width: 768px)", () => {
-        gsap.set(strips, {
-          xPercent: 0,
-        });
-
-        gsap.set(heading, {
-          opacity: 0,
-          y: 25,
-        });
-
-        gsap.set(cardsEls, {
-          x: 0,
-          y: 50,
-          scale: 0.88,
-          opacity: 0,
-          rotationZ: 0,
-        });
-
-        gsap.set(images, {
-          scale: 1.08,
-        });
-
-        gsap.set(contents, {
-          opacity: 0,
-          y: 10,
-        });
-
-        gsap.set(partnersEl, {
-          opacity: 0,
-          y: 10,
-        });
-
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: () => `+=${window.innerHeight * 5.4}`,
-            pin: stage,
-            scrub: 0.75,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        /*
-         * STRIP ENTRY
-         */
-        tl.to(
-          strips,
-          {
-            xPercent: (index) =>
-              index % 2 === 0 ? -110 : 110,
-
-            duration: 0.9,
-
-            stagger: {
-              each: 0.06,
-            },
-
-            ease: "power4.inOut",
+            duration: 0.6,
+            stagger: 0.05,
+            ease: "power3.inOut",
           }
         );
 
-        /*
-         * TITLE
-         */
-        tl.to(
-          heading,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.55,
-          },
-          "-=0.3"
-        );
-
-        /*
-         * CARDS
-         */
-        tl.to(
-          cardsEls,
-          {
-            y: 0,
-            scale: 1,
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.08,
-            ease: "power4.out",
-          },
-          "-=0.15"
-        );
-
-        tl.to(
-          images,
-          {
-            scale: 1,
-            duration: 0.5,
-          },
-          "<"
-        );
-
-        tl.to(
-          contents,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-            stagger: 0.06,
-          },
-          "-=0.15"
-        );
-
         tl.to(
           partnersEl,
           {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-          },
-          "+=0.25"
-        );
-
-        tl.to({}, {
-          duration: 0.9,
-        });
-
-        /*
-         * EXIT
-         */
-        tl.to(cardsEls, {
-          y: -35,
-          scale: 0.93,
-          opacity: 0,
-          duration: 0.6,
-          stagger: 0.06,
-        });
-
-        tl.to(
-          partnersEl,
-          {
-            opacity: 0,
+            autoAlpha: 0,
             y: -15,
-            duration: 0.3,
+            duration: 0.35,
           },
           "<0.1"
         );
 
-        /*
-         * STRIPS RETURN
-         */
         tl.to(
           strips,
           {
             xPercent: 0,
             duration: 0.8,
-            stagger: {
-              each: 0.06,
-            },
+            stagger: 0.07,
             ease: "power4.inOut",
           },
           "-=0.1"
         );
+
+        return () => {
+          tl.scrollTrigger?.kill();
+          tl.kill();
+        };
+      });
+
+      /* ============================================================
+         MOBILE
+         
+         Horizontal card movement.
+         
+         This is the important part.
+      ============================================================ */
+
+      mm.add("(max-width: 768px)", () => {
+        /*
+         * Measure the actual horizontal distance.
+         *
+         * The track contains:
+         *
+         * 85vw + gap
+         * 85vw + gap
+         * 85vw
+         */
+
+        const getHorizontalDistance = () => {
+          const viewport = window.innerWidth;
+
+          const firstCard = cardEls[0];
+
+          if (!firstCard) {
+            return viewport * 1.7;
+          }
+
+          const cardWidth = firstCard.getBoundingClientRect().width;
+
+          const gap = 16;
+
+          const totalWidth =
+            cardWidth * cardEls.length +
+            gap * (cardEls.length - 1);
+
+          return Math.max(
+            0,
+            totalWidth - viewport + 32
+          );
+        };
+
+        /* INITIAL STATE */
+
+        gsap.set(strips, {
+          xPercent: 0,
+        });
+
+        gsap.set(heading, {
+          autoAlpha: 0,
+          y: 25,
+        });
+
+        gsap.set(cardsTrack, {
+          x: 0,
+        });
+
+        gsap.set(cardEls, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+        });
+
+        gsap.set(images, {
+          scale: 1.04,
+        });
+
+        gsap.set(contents, {
+          autoAlpha: 1,
+          y: 0,
+        });
+
+        gsap.set(partnersEl, {
+          autoAlpha: 0,
+          y: 20,
+        });
+
+        /*
+         * Horizontal scrolling timeline.
+         */
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+
+            start: "top top",
+
+            /*
+             * The section itself owns the scrolling distance.
+             */
+            end: () => `+=${window.innerHeight * 5.2}`,
+
+            pin: stage,
+
+            scrub: 0.9,
+
+            anticipatePin: 1,
+
+            invalidateOnRefresh: true,
+          },
+        });
+
+        /* ==========================================================
+           01 — OPEN STRIPS
+        ========================================================== */
+
+        tl.to(strips, {
+          xPercent: (index) =>
+            index % 2 === 0 ? -110 : 110,
+
+          duration: 0.7,
+
+          stagger: 0.05,
+
+          ease: "power4.inOut",
+        });
+
+        /* ==========================================================
+           02 — HEADING
+        ========================================================== */
+
+        tl.to(
+          heading,
+          {
+            autoAlpha: 1,
+            y: 0,
+
+            duration: 0.45,
+
+            ease: "power3.out",
+          },
+          "-=0.2"
+        );
+
+        /* ==========================================================
+           03 — HORIZONTAL CARD MOVEMENT
+        ========================================================== */
+
+        tl.to(
+          cardsTrack,
+          {
+            x: () => -getHorizontalDistance(),
+
+            duration: 3.2,
+
+            ease: "none",
+          },
+          "+=0.15"
+        );
+
+        /* ==========================================================
+           04 — PARTNERS APPEAR
+        ========================================================== */
+
+        tl.to(
+          partnersEl,
+          {
+            autoAlpha: 1,
+            y: 0,
+
+            duration: 0.45,
+
+            ease: "power3.out",
+          },
+          "-=0.15"
+        );
+
+        /* ==========================================================
+           05 — HOLD
+        ========================================================== */
+
+        tl.to({}, {
+          duration: 0.55,
+        });
+
+        /* ==========================================================
+           06 — CARDS EXIT
+        ========================================================== */
+
+        tl.to(
+          cardEls,
+          {
+            y: -25,
+            scale: 0.97,
+            opacity: 0,
+
+            duration: 0.55,
+
+            stagger: 0.05,
+
+            ease: "power3.inOut",
+          }
+        );
+
+        /* ==========================================================
+           07 — PARTNERS EXIT
+        ========================================================== */
+
+        tl.to(
+          partnersEl,
+          {
+            autoAlpha: 0,
+            y: -15,
+
+            duration: 0.3,
+
+            ease: "power3.inOut",
+          },
+          "<0.1"
+        );
+
+        /* ==========================================================
+           08 — STRIPS CLOSE
+        ========================================================== */
+
+        tl.to(
+          strips,
+          {
+            xPercent: 0,
+
+            duration: 0.7,
+
+            stagger: 0.05,
+
+            ease: "power4.inOut",
+          },
+          "-=0.1"
+        );
+
+        return () => {
+          tl.scrollTrigger?.kill();
+          tl.kill();
+        };
       });
 
       requestAnimationFrame(() => {
@@ -542,52 +526,60 @@ tl.to(
       data-navbar-theme="light"
       className="
         relative
-        h-[620vh]
         w-full
-        -mt-[120vh]
-        overflow-hidden
+        overflow-visible
         bg-[#f1f1ef]
         text-[#111]
+
+        /*
+         * MOBILE
+         */
+        mt-0
+        h-[560vh]
+
+        /*
+         * TABLET
+         */
+        md:-mt-[110vh]
+        md:h-[680vh]
+
+        /*
+         * DESKTOP
+         */
+        lg:-mt-[120vh]
+        lg:h-[700vh]
+
+        xl:-mt-[125vh]
+        xl:h-[710vh]
+
+        md:overflow-hidden
       "
     >
+      {/* ============================================================
+          STAGE
+      ============================================================ */}
+
       <div
         ref={stageRef}
         className="
           relative
-          h-screen
+          h-[100svh]
+          min-h-[680px]
           w-full
           overflow-hidden
           bg-[#D8D8D8]
+
+          max-[380px]:min-h-[650px]
+
+          sm:min-h-[720px]
+
+          md:h-screen
+          md:min-h-0
         "
       >
-        {/* =========================================================
-            TOP NAV / META
-        ========================================================= */}
-
-        <div
-          className="
-            absolute
-            left-6
-            right-6
-            top-7
-            z-[100]
-            flex
-            items-center
-            justify-between
-            md:left-10
-            md:right-10
-            lg:left-16
-            lg:right-16
-          "
-        >
-          
-
-         
-        </div>
-
-        {/* =========================================================
-            HORIZONTAL STRIP TRANSITION
-        ========================================================= */}
+        {/* ==========================================================
+            STRIPS
+        ========================================================== */}
 
         <div
           className="
@@ -623,28 +615,43 @@ tl.to(
           ))}
         </div>
 
-        {/* =========================================================
+        {/* ==========================================================
             HEADING
-        ========================================================= */}
+        ========================================================== */}
 
         <div
           ref={headingRef}
           className="
             absolute
             left-1/2
-            top-[6vh]
+            top-[8vh]
             z-20
-            w-full
+            w-[calc(100%-40px)]
             -translate-x-1/2
             text-center
+
+            max-[380px]:top-[12vh]
+
+            sm:top-[8vh]
+            sm:w-[calc(100%-48px)]
+
+            md:top-[6vh]
+            md:w-full
           "
         >
           <h2
             className="
-              text-[clamp(2.5rem,4vw,5.5rem)]
+              text-[clamp(2.8rem,12vw,4.5rem)]
               font-medium
-              leading-none
-              tracking-[-0.07em]
+              leading-[0.88]
+              tracking-[-0.075em]
+
+              max-[380px]:text-[2.7rem]
+
+              sm:text-[clamp(3.3rem,9vw,5rem)]
+
+              md:text-[clamp(2.5rem,4vw,4.3rem)]
+              md:leading-none
             "
           >
             Key facts
@@ -653,11 +660,17 @@ tl.to(
           <p
             className="
               mx-auto
-              mt-2
-              max-w-[280px]
+              mt-3
+              max-w-[260px]
               text-[9px]
-              leading-[1.4]
+              leading-[1.5]
               text-black/45
+
+              sm:max-w-[300px]
+              sm:text-[10px]
+
+              md:mt-2
+              md:max-w-[280px]
               md:text-[12px]
             "
           >
@@ -666,89 +679,376 @@ tl.to(
             experience and impact.
           </p>
         </div>
-{/* =======================================================
-    CARDS
-======================================================= */}
 
-{/* =======================================================
-    CARDS
-======================================================= */}
+        {/* ==========================================================
+            CARD TRACK
+        ========================================================== */}
 
-<div
+       <div
+  ref={cardsTrackRef}
   className="
     absolute
-    left-1/2
+    left-0
     top-[28%]
     z-30
-    w-full
-    -translate-x-1/2
+
+    flex
+    w-max
+    items-stretch
+    gap-4
+
+    px-4
+
+    will-change-transform
+
+    md:top-[21vh]
+     md:left-[40vh]
+    md:mx-auto
+    md:flex
+    md:w-[calc(100%-80px)]
+    md:max-w-[980px]
+    md:translate-x-0
+    md:grid
+    md:grid-cols-3
+    md:gap-[10px]
+    md:px-0
+
+    lg:gap-[12px]
   "
 >
+          {cards.map((card, index) => (
+            <article
+              key={card.id}
+              ref={(el) => {
+                if (el) {
+                  cardRefs.current[index] = el;
+                }
+              }}
+              className={`
+                relative
+                shrink-0
+                overflow-hidden
+                rounded-[10px]
+                shadow-[0_20px_50px_rgba(0,0,0,0.08)]
+                will-change-transform
+
+                /*
+                 * MOBILE
+                 *
+                 * Same idea as the reference:
+                 * almost the entire viewport width.
+                 */
+                w-[85vw]
+                h-[50svh]
+                min-h-[300px]
+                max-h-[410px]
+
+                /*
+                 * SMALL PHONE
+                 */
+                max-[380px]:w-[86vw]
+                max-[380px]:h-[46svh]
+                max-[380px]:min-h-[280px]
+
+                /*
+                 * SMALL TABLET
+                 */
+                sm:w-[80vw]
+                sm:max-w-[620px]
+
+                /*
+                 * DESKTOP
+                 */
+                md:w-full
+                md:max-w-none
+                md:h-[390px]
+
+                lg:h-[400px]
+
+                xl:h-[420px]
+
+                ${
+                  card.type === "metric"
+                    ? "bg-[#e5e5e2]"
+                    : "bg-[#202124]"
+                }
+              `}
+            >
+              {card.type === "metric" ? (
+                <MetricCard
+                  card={card}
+                  imageRef={(el) => {
+                    if (el) {
+                      cardImageRefs.current[index] = el;
+                    }
+                  }}
+                  contentRef={(el) => {
+                    if (el) {
+                      cardContentRefs.current[index] = el;
+                    }
+                  }}
+                />
+              ) : (
+                <ImageCard
+                  card={card}
+                  index={index}
+                  imageRef={(el) => {
+                    if (el) {
+                      cardImageRefs.current[index] = el;
+                    }
+                  }}
+                  contentRef={(el) => {
+                    if (el) {
+                      cardContentRefs.current[index] = el;
+                    }
+                  }}
+                />
+              )}
+            </article>
+          ))}
+        </div>
+
+        {/* ==========================================================
+            BUSINESS PARTNERS
+        ========================================================== */}
+
+  <div
+  ref={partnersRef}
+  className="
+    absolute
+    bottom-[4vh]
+    left-1/2
+    z-40
+    w-full
+    -translate-x-1/2
+    overflow-hidden
+
+    max-[380px]:bottom-[12vh]
+
+    sm:bottom-[4vh]
+
+    md:bottom-[5vh]
+  "
+>
+  {/* TITLE */}
+
+  <p
+    className="
+      mb-4
+      text-center
+      text-[8px]
+      font-bold
+      uppercase
+      tracking-[0.08em]
+      text-black/70
+
+      sm:mb-5
+      sm:text-[9px]
+
+      md:mb-6
+      md:text-[16px]
+    "
+  >
+    OUR BUSINESS PARTNERS
+  </p>
+
+  {/* MARQUEE */}
+
   <div
     className="
-      mx-auto
-      grid
-      w-[calc(100%-80px)]
-      max-w-[980px]
-      grid-cols-3
-        gap-2
-      md:gap-[10px]
-      lg:gap-[12px]
-  "
+      relative
+      w-full
+      overflow-hidden
+    "
   >
-
-    {/* =======================================================
-        CARD 01
-    ======================================================= */}
-
-    <article
-      ref={(el) => {
-        if (el) cardRefs.current[0] = el;
-      }}
+    <div
       className="
-        relative
-        h-[260px]
-        w-full
-        overflow-hidden
-        rounded-[10px]
-        bg-[#202124]
-        shadow-[0_20px_50px_rgba(0,0,0,0.08)]
-        will-change-transform
-        md:h-[390px]
+        flex
+        w-max
+        items-center
+        gap-8
+        animate-partner-marquee
+
+        max-[380px]:gap-6
+
+        sm:gap-10
+
+        md:gap-14
+
+        lg:gap-16
       "
     >
-      {/* IMAGE */}
+      {/* FIRST SET */}
+
+      {partners.map((partner) => (
+        <div
+          key={`first-${partner.name}`}
+          className="
+            flex
+            h-[24px]
+            w-[70px]
+            shrink-0
+            items-center
+            justify-center
+
+            max-[380px]:h-[35px]
+            max-[380px]:w-[55px]
+
+            sm:h-[27px]
+            sm:w-[80px]
+
+            md:h-[34px]
+            md:w-[110px]
+
+            lg:h-[38px]
+            lg:w-[125px]
+          "
+        >
+          <Image
+            src={partner.logo}
+            alt={`${partner.name} logo`}
+            width={125}
+            height={40}
+            className="
+              h-full
+              w-full
+              object-contain
+              
+              opacity-50
+              mix-blend-multiply
+            "
+          />
+        </div>
+      ))}
+
+      {/* SECOND SET
+          Required for seamless looping
+      */}
+
+      {partners.map((partner) => (
+        <div
+          key={`second-${partner.name}`}
+          className="
+            flex
+            h-[24px]
+            w-[70px]
+            shrink-0
+            items-center
+            justify-center
+
+            max-[380px]:h-[35px]
+            max-[380px]:w-[55px]
+
+            sm:h-[27px]
+            sm:w-[80px]
+
+            md:h-[34px]
+            md:w-[110px]
+
+            lg:h-[38px]
+            lg:w-[125px]
+          "
+        >
+          <Image
+            src={partner.logo}
+            alt=""
+            aria-hidden="true"
+            width={125}
+            height={40}
+            className="
+              h-full
+              w-full
+              object-contain
+            
+              opacity-50
+              mix-blend-multiply
+            "
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+      </div>
+    </section>
+  );
+}
+
+/* ==================================================================
+   IMAGE CARD
+================================================================== */
+
+function ImageCard({
+  card,
+  index,
+  imageRef,
+  contentRef,
+}: {
+  card: (typeof cards)[number];
+  index: number;
+  imageRef: (el: HTMLDivElement | null) => void;
+  contentRef: (el: HTMLDivElement | null) => void;
+}) {
+  return (
+    <>
       <div
-        ref={(el) => {
-          if (el) cardImageRefs.current[0] = el;
-        }}
+        ref={imageRef}
         className="
           absolute
           inset-0
+          overflow-hidden
           will-change-transform
         "
       >
         <Image
-          src="/assets/solutions/01.webp"
-          alt="Mentroid featured work"
+          src={card.image ?? ""}
+          alt={
+            index === 0
+              ? "Mentroid featured work"
+              : "Mentroid team"
+          }
           fill
-          sizes="(max-width: 768px) calc(100vw - 40px), 33vw"
-          className="object-cover"
+          sizes="
+            (max-width: 768px) 85vw,
+            (max-width: 1023px) calc((100vw - 80px) / 3),
+            33vw
+          "
+          className="
+            object-cover
+            object-center
+            md:grayscale
+          "
         />
 
-        <div className="absolute inset-0 bg-black/25" />
+        <div
+          className={`
+            absolute
+            inset-0
+            ${
+              index === 0
+                ? "bg-black/25"
+                : "bg-black/35"
+            }
+          `}
+        />
       </div>
 
-      {/* CONTENT */}
       <div
-        ref={(el) => {
-          if (el) cardContentRefs.current[0] = el;
-        }}
+        ref={contentRef}
         className="
           absolute
-          inset-x-6
-          bottom-6
+          inset-x-5
+          bottom-5
           z-10
+
+          max-[380px]:inset-x-4
+          max-[380px]:bottom-4
+
+          sm:inset-x-6
+          sm:bottom-6
+
+          md:inset-x-6
+          md:bottom-6
         "
       >
         <p
@@ -757,354 +1057,252 @@ tl.to(
             text-[7px]
             uppercase
             tracking-[0.16em]
-            text-white/55
+            text-white/60
+
+            max-[380px]:text-[6px]
+
+            sm:text-[8px]
+
+            md:text-[7px]
           "
         >
-          {cards[0].eyebrow}
+          {card.eyebrow}
         </p>
 
-        <div className="flex items-end justify-between gap-4">
+        <div
+          className="
+            flex
+            items-end
+            justify-between
+            gap-4
+          "
+        >
           <div className="min-w-0">
             <h3
               className="
-                text-[28px]
+                whitespace-pre-line
+                text-[27px]
                 font-medium
-                leading-[0.9]
-                tracking-[-0.07em]
+                leading-[0.88]
+                tracking-[-0.075em]
                 text-white
+
+                max-[380px]:text-[23px]
+
+                sm:text-[32px]
+
                 md:text-[34px]
               "
             >
-              {cards[0].title}
+              {card.title}
             </h3>
 
-            <p
-              className="
-                mt-3
-                max-w-[150px]
-                text-[8px]
-                leading-[1.45]
-                text-white/55
-                md:text-[9px]
-              "
-            >
-              {cards[0].description}
-            </p>
-          </div>
-
-          <span
-            className="
-              shrink-0
-              text-[30px]
-              font-medium
-              leading-none
-              tracking-[-0.08em]
-              text-white
-              md:text-[36px]
-            "
-          >
-            {cards[0].number}
-          </span>
-        </div>
-      </div>
-    </article>
-
-
-    {/* =======================================================
-        CARD 02 — METRIC
-    ======================================================= */}
-
-    <article
-      ref={(el) => {
-        if (el) cardRefs.current[1] = el;
-      }}
-      className="
-        relative
-        h-[260px]
-        w-full
-        overflow-hidden
-        rounded-[10px]
-        bg-[#e5e5e2]
-        shadow-[0_20px_50px_rgba(0,0,0,0.05)]
-        will-change-transform
-        md:h-[390px]
-      "
-    >
-      <div
-        ref={(el) => {
-          if (el) cardImageRefs.current[1] = el;
-        }}
-        className="
-          absolute
-          inset-0
-          will-change-transform
-        "
-      >
-
-        {/* TOP LABEL */}
-
-        <div
-          className="
-            absolute
-            left-6
-            right-6
-            top-6
-            flex
-            items-center
-            justify-between
-          "
-        >
-          <span
-            className="
-              text-[7px]
-              uppercase
-              tracking-[0.16em]
-              text-black/40
-            "
-          >
-            {cards[1].eyebrow}
-          </span>
-
-          <span
-            className="
-              text-[7px]
-              uppercase
-              tracking-[0.12em]
-              text-black/25
-            "
-          >
-            02
-          </span>
-        </div>
-
-
-        {/* CENTER NUMBER */}
-
-        <div
-          className="
-            absolute
-            left-1/2
-            top-1/2
-            flex
-            h-[125px]
-            w-[125px]
-            -translate-x-1/2
-            -translate-y-1/2
-            items-center
-            justify-center
-            rounded-full
-            bg-white
-            shadow-[0_15px_45px_rgba(0,0,0,0.06)]
-            md:h-[150px]
-            md:w-[150px]
-          "
-        >
-          <span
-            className="
-              text-[34px]
-              font-medium
-              tracking-[-0.08em]
-              text-black
-              md:text-[42px]
-            "
-          >
-            {cards[1].number}
-          </span>
-        </div>
-
-
-        {/* BOTTOM DESCRIPTION */}
-
-        <p
-          className="
-            absolute
-            bottom-6
-            left-8
-            right-8
-            text-center
-            text-[8px]
-            leading-[1.5]
-            text-black/40
-            md:text-[9px]
-          "
-        >
-          {cards[1].description}
-        </p>
-
-      </div>
-    </article>
-
-
-    {/* =======================================================
-        CARD 03
-    ======================================================= */}
-
-    <article
-      ref={(el) => {
-        if (el) cardRefs.current[2] = el;
-      }}
-      className="
-        relative
-        h-[260px]
-        w-full
-        overflow-hidden
-        rounded-[10px]
-        bg-[#242528]
-        shadow-[0_20px_50px_rgba(0,0,0,0.08)]
-        will-change-transform
-        md:h-[390px]
-      "
-    >
-
-      {/* IMAGE */}
-
-      <div
-        ref={(el) => {
-          if (el) cardImageRefs.current[2] = el;
-        }}
-        className="
-          absolute
-          inset-0
-          will-change-transform
-        "
-      >
-        <Image
-          src="/assets/solutions/02.webp"
-          alt="Mentroid team"
-          fill
-          sizes="(max-width: 768px) calc(100vw - 40px), 33vw"
-          className="
-            object-cover
-            grayscale
-          "
-        />
-
-        <div className="absolute inset-0 bg-black/35" />
-      </div>
-
-
-      {/* CONTENT */}
-
-      <div
-        ref={(el) => {
-          if (el) cardContentRefs.current[2] = el;
-        }}
-        className="
-          absolute
-          inset-x-6
-          bottom-6
-          z-10
-        "
-      >
-        <p
-          className="
-            mb-2
-            text-[7px]
-            uppercase
-            tracking-[0.16em]
-            text-white/50
-          "
-        >
-          {cards[2].eyebrow}
-        </p>
-
-        <div className="flex items-end justify-between gap-4">
-
-          <h3
-            className="
-              whitespace-pre-line
-              text-[22px]
-              font-medium
-              leading-[0.9]
-              tracking-[-0.06em]
-              text-white
-              md:text-[28px]
-            "
-          >
-            {cards[2].title}
-          </h3>
-
-          <span
-            className="
-              shrink-0
-              text-[30px]
-              font-medium
-              leading-none
-              tracking-[-0.08em]
-              text-white
-              md:text-[36px]
-            "
-          >
-            {cards[2].number}
-          </span>
-
-        </div>
-      </div>
-
-    </article>
-
-  </div>
-</div>
-
-        {/* =========================================================
-            PARTNERS
-        ========================================================= */}
-
-        <div
-          ref={partnersRef}
-          className="
-            absolute
-            bottom-[5vh]
-            left-1/2
-            z-40
-            w-full
-            -translate-x-1/2
-            px-5
-          "
-        >
-          <p
-            className="
-              mb-4
-              text-center
-              text-[16px]
-              font-bold
-              uppercase
-              
-              text-black/85
-            "
-          >
-            OUR BUSINESS PARTNERS
-          </p>
-
-          <div
-            className="
-              mx-auto
-              flex
-              max-w-[500px]
-              items-center
-              justify-center
-              gap-8
-              md:gap-12
-            "
-          >
-            {partners.map((partner) => (
-              <span
-                key={partner}
+            {card.description && (
+              <p
                 className="
-                  whitespace-nowrap
-                  text-[6px]
-                  font-medium
-                  uppercase
-                  tracking-[0.08em]
-                  text-black/45
+                  mt-3
+                  max-w-[230px]
+                  text-[7px]
+                  leading-[1.45]
+                  text-white/60
+
+                  max-[380px]:max-w-[205px]
+                  max-[380px]:text-[6px]
+
+                  sm:max-w-[270px]
+                  sm:text-[8px]
+
+                  md:max-w-[150px]
+                  md:text-[9px]
                 "
               >
-                {partner}
-              </span>
-            ))}
+                {card.description}
+              </p>
+            )}
           </div>
+
+          <span
+            className="
+              shrink-0
+              text-[30px]
+              font-medium
+              leading-none
+              tracking-[-0.08em]
+              text-white
+
+              max-[380px]:text-[25px]
+
+              sm:text-[34px]
+
+              md:text-[36px]
+            "
+          >
+            {card.number}
+          </span>
         </div>
       </div>
-    </section>
+    </>
+  );
+}
+
+/* ==================================================================
+   METRIC CARD
+================================================================== */
+
+function MetricCard({
+  card,
+  imageRef,
+  contentRef,
+}: {
+  card: (typeof cards)[number];
+  imageRef: (el: HTMLDivElement | null) => void;
+  contentRef: (el: HTMLDivElement | null) => void;
+}) {
+  return (
+    <>
+      <div
+        ref={imageRef}
+        className="
+          absolute
+          inset-0
+          will-change-transform
+        "
+      />
+
+      {/* TOP LABEL */}
+
+      <div
+        className="
+          absolute
+          left-5
+          right-5
+          top-5
+          z-10
+          flex
+          items-center
+          justify-between
+
+          max-[380px]:left-4
+          max-[380px]:right-4
+          max-[380px]:top-4
+
+          sm:left-6
+          sm:right-6
+          sm:top-6
+
+          md:left-6
+          md:right-6
+          md:top-6
+        "
+      >
+        <span
+          className="
+            text-[7px]
+            uppercase
+            tracking-[0.14em]
+            text-black/40
+
+            max-[380px]:text-[6px]
+
+            sm:text-[8px]
+
+            md:text-[7px]
+          "
+        >
+          {card.eyebrow}
+        </span>
+
+        <span
+          className="
+            text-[7px]
+            uppercase
+            tracking-[0.1em]
+            text-black/25
+
+            max-[380px]:text-[6px]
+
+            sm:text-[8px]
+          "
+        >
+          02
+        </span>
+      </div>
+
+      {/* CENTER CIRCLE */}
+
+      <div
+        className="
+          absolute
+          left-1/2
+          top-1/2
+          flex
+          h-[150px]
+          w-[150px]
+          -translate-x-1/2
+          -translate-y-1/2
+          items-center
+          justify-center
+          rounded-full
+          bg-white
+          shadow-[0_15px_45px_rgba(0,0,0,0.06)]
+
+          max-[380px]:h-[115px]
+          max-[380px]:w-[115px]
+
+          sm:h-[150px]
+          sm:w-[150px]
+
+          md:h-[150px]
+          md:w-[150px]
+        "
+      >
+        <span
+          className="
+            text-[42px]
+            font-medium
+            tracking-[-0.08em]
+            text-black
+
+            max-[380px]:text-[34px]
+
+            sm:text-[42px]
+          "
+        >
+          {card.number}
+        </span>
+      </div>
+
+      {/* DESCRIPTION */}
+
+      <p
+        ref={contentRef}
+        className="
+          absolute
+          bottom-5
+          left-5
+          right-5
+          z-10
+          text-center
+          text-[7px]
+          leading-[1.5]
+          text-black/45
+
+          max-[380px]:bottom-4
+          max-[380px]:left-4
+          max-[380px]:right-4
+          max-[380px]:text-[6px]
+
+          sm:bottom-6
+          sm:text-[8px]
+
+          md:bottom-6
+          md:left-8
+          md:right-8
+          md:text-[9px]
+        "
+      >
+        {card.description}
+      </p>
+    </>
   );
 }

@@ -32,7 +32,7 @@ const solutions = [
     title: "Sales",
     accent: "Automation",
     description:
-      "Connect intelligence to your sales workflow and eliminate repetitive manual work.",
+      "Connect intelligence to your sales workflow and reduce repetitive manual work.",
     image: "/assets/solutions/03.webp",
   },
   {
@@ -548,7 +548,7 @@ export default function Solutions() {
 
             <h2
               className="
-                text-[clamp(4.5rem,9.5vw,10rem)]
+                text-[clamp(4rem,9.5vw,9.5rem)]
                 font-medium
                 leading-[0.76]
                 tracking-[-0.09em]
@@ -682,7 +682,7 @@ export default function Solutions() {
 
               {/* Image bottom label */}
 
-              <div
+              {/* <div
                 className="
                   absolute
                   bottom-6
@@ -695,85 +695,113 @@ export default function Solutions() {
                 "
               >
                 {solution.eyebrow}
-              </div>
+              </div> */}
             </div>
 
             {/* ==================================================
                 TITLE
             ================================================== */}
+<div
+  ref={(el) => {
+    if (el) {
+      titleRefs.current[index] = el;
+    }
+  }}
+  className="
+    absolute
+    bottom-[9vh]
+    left-[6vw]
+    z-30
+    w-[calc(100%-40px)]
+    max-w-[500px]
+    will-change-transform
 
-            <div
-              ref={(el) => {
-                if (el) {
-                  titleRefs.current[index] = el;
-                }
-              }}
-              className="
-                absolute
-                bottom-[7vh]
-                left-[5vw]
-                z-30
-                will-change-transform
+    max-md:left-5
+    max-md:bottom-[15vh]
+    max-md:w-[calc(100%-40px)]
 
-                max-md:left-6
-                max-md:bottom-[7vh]
-              "
-            >
-              <div
-                className="
-                  mb-5
-                  flex
-                  items-center
-                  gap-3
-                "
-              >
+    sm:left-6
+    sm:w-[calc(100%-48px)]
+    sm:max-w-[700px]
 
-                <span
-                  className="
-                    text-[9px]
-                    px-2
-                    uppercase
-                    tracking-[0.22em]
-                    text-white/70
-                  "
-                >
-                  {solution.eyebrow}
-                </span>
-              </div>
+    md:left-[5vw]
+    md:bottom-[15vh]
+    md:w-auto
+  "
+>
+  <div
+    className="
+      mb-2
+      flex
+      items-center
+      gap-3
+    "
+  >
+    <span
+      className="
+        px-2
+        text-[8px]
+        uppercase
+        tracking-[0.22em]
+        text-white/70
 
-              <h3
-                className="
-                  text-[clamp(3.2rem,7vw,7.5rem)]
-                  font-medium
-                  leading-[0.78]
-                  tracking-[-0.09em]
-                  text-white
-                "
-              >
-                {solution.title}
+        sm:text-[9px]
+      "
+    >
+      {solution.eyebrow}
+    </span>
+  </div>
 
-                <br />
+  <h3
+    className="
+      max-w-full
+      text-[clamp(2.7rem,11vw,4.5rem)]
+      font-medium
+      leading-[0.82]
+      tracking-[-0.08em]
+      text-white
 
-                <span className="text-white/45">
-                  {solution.accent}
-                </span>
-              </h3>
+      sm:text-[clamp(3.2rem,8vw,6rem)]
 
-              <p
-                className="
-                  mt-6
-                  px-2
-                  py-5
-                  max-w-[390px]
-                  text-[13px]
-                  leading-6
-                  text-white/65
-                  md:text-[14px]
-                "
-              >
-                {solution.description}
-              </p>
-            </div>
+      md:text-[clamp(3.2rem,6.5vw,7.5rem)]
+    "
+  >
+    {solution.title}
+
+    <br />
+
+    <span className="text-white/45">
+      {solution.accent}
+    </span>
+  </h3>
+
+  <p
+    className="
+      mt-4
+      w-full
+      max-w-[330px]
+      break-words
+      whitespace-normal
+      px-0
+      py-0
+      text-[12px]
+      leading-[1.5]
+      text-white/65
+
+      sm:mt-5
+      sm:max-w-[390px]
+      sm:text-[13px]
+      sm:leading-6
+
+      md:mt-6
+      md:max-w-[390px]
+      md:text-[14px]
+      md:leading-6
+    "
+  >
+    {solution.description}
+  </p>
+</div>
           </div>
         ))}
 
