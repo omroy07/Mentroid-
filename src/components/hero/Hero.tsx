@@ -22,7 +22,7 @@ const scenes: Scene[] = [
     title: "Intelligence built",
     accent: "for what’s next.",
     description:
-      "Mentroid builds intelligent systems that turn complex business problems into practical AI solutions.",
+      "Mentroid build AI agents, RAG systems, automation workflows and AI-powered products that solve real business problems.",
     media: "/videos/ai.webm",
   },
   {
@@ -357,20 +357,108 @@ export default function Hero() {
                     {scene.description}
                   </p>
 
-                  {index === 0 && (
-                    <div className="mt-7 flex items-center gap-3 sm:mt-8 md:mt-9">
-                      <a
-                        href="#services"
-                        className="group inline-flex items-center gap-2.5 rounded-full bg-white px-5 py-3 text-xs font-medium text-black transition-transform duration-300 hover:scale-[1.02] sm:gap-3 sm:px-6 sm:py-3.5 sm:text-sm"
-                      >
-                        Explore Mentroid
-                        <ArrowUpRight
-                          size={16}
-                          className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                        />
-                      </a>
-                    </div>
-                  )}
+                
+
+
+
+{index === 0 && (
+  <div
+    className="
+      mt-6 flex w-full flex-col items-stretch gap-3
+      sm:mt-8 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center
+      md:mt-9 md:gap-4 lg:mt-10 xl:gap-5
+    "
+  >
+    {/* Primary CTA */}
+    <a
+      href="#contact"
+      className="
+        group relative isolate inline-flex min-h-11 w-full
+        items-center justify-center gap-2 overflow-hidden rounded-full
+        bg-white px-5 py-3 text-xs font-medium text-black
+        transition-transform duration-300 ease-out
+        hover:-translate-y-0.5 
+        active:translate-y-0
+        focus-visible:outline-none focus-visible:ring-2
+        focus-visible:ring-white focus-visible:ring-offset-2
+        focus-visible:ring-offset-black
+        sm:w-auto sm:min-h-12 sm:gap-2.5 sm:px-5 sm:text-sm
+        md:px-6 lg:min-h-[52px] lg:px-7 xl:px-8
+      "
+    >
+      {/* Sliding shine */}
+      <span
+        aria-hidden="true"
+        className="
+          pointer-events-none absolute inset-y-0 -left-1/2 z-0
+          w-1/3 -skew-x-[20deg] bg-gradient-to-r
+          from-transparent via-black/10 to-transparent
+          transition-transform duration-700 ease-out
+          group-hover:translate-x-[450%]
+          motion-reduce:transition-none
+        "
+      />
+
+      <span className="relative z-10">Start Your AI Project</span>
+
+      <ArrowUpRight
+        size={16}
+        className="
+          relative z-10 shrink-0 transition-transform duration-300
+          group-hover:translate-x-0.5 group-hover:-translate-y-0.5
+          sm:h-[17px] sm:w-[17px]
+        "
+      />
+    </a>
+
+    {/* Secondary CTA */}
+    <a
+      href="#selected-work"
+      className="
+        group relative isolate inline-flex min-h-11 w-full
+        items-center justify-center gap-2 overflow-hidden rounded-full
+        border border-white/25 px-5 py-3 text-xs font-medium text-white
+        transition-all duration-300 ease-out
+        hover:-translate-y-0.5 hover:border-white/60
+        hover:bg-white/[0.06]
+        active:translate-y-0
+        focus-visible:outline-none focus-visible:ring-2
+        focus-visible:ring-white focus-visible:ring-offset-2
+        focus-visible:ring-offset-black
+        sm:w-auto sm:min-h-12 sm:gap-2.5 sm:px-5 sm:text-sm
+        md:px-6 lg:min-h-[52px] lg:px-7 xl:px-8
+      "
+    >
+      {/* Sliding outline highlight */}
+      <span
+        aria-hidden="true"
+        className="
+          pointer-events-none absolute inset-y-0 -left-1/2 z-0
+          w-1/3 -skew-x-[20deg] bg-gradient-to-r
+          from-transparent via-white/[0.12] to-transparent
+          transition-transform duration-700 ease-out
+          group-hover:translate-x-[450%]
+          motion-reduce:transition-none
+        "
+      />
+
+      <span className="relative z-10">See What We’ve Built</span>
+
+      <ArrowUpRight
+        size={16}
+        className="
+          relative z-10 shrink-0 transition-transform duration-300
+          group-hover:translate-x-0.5 group-hover:-translate-y-0.5
+          sm:h-[17px] sm:w-[17px]
+        "
+      />
+    </a>
+  </div>
+)}
+
+
+
+
                 </div>
               ))}
             </div>
