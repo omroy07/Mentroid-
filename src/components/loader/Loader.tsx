@@ -1,844 +1,266 @@
+
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type LoaderProps = {
   assets?: string[];
   onComplete?: () => void;
 };
 
-const DEFAULT_ASSETS = [
- "/videos/agentic-ai.webm",
-  "/videos/ai-webm",
-  "/videos/automation.webm",
+const INTRO_DURATION = 1800;
+const REVEAL_TO_100_DURATION = 420;
+const HUNDRED_HOLD = 180;
+const TEXT_FADE_DURATION = 260;
+const CURTAIN_DURATION = 850;
+const CURTAIN_COUNT = 12;
+
+const MILESTONES = [
+  { time: 0, value: 0 },
+  { time: 350, value: 25 },
+  { time: 800, value: 60 },
+  { time: 1200, value: 85 },
+  { time: 1550, value: 95 },
+  { time: INTRO_DURATION, value: 95 },
 ];
 
-export default function Loader({
-  assets = DEFAULT_ASSETS,
-  onComplete,
-}: LoaderProps) {
-  const loaderRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const counterRef = useRef<HTMLSpanElement>(null);
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
 
-  const completeRef = useRef(false);
+const easeInOut = (t: number) =>
+  t < 0.5
+    ? 4 * t * t * t
+    : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+export default function Loader({ onComplete }: LoaderProps) {
+  const [progress, setProgress] = useState(0);
+  const [contentVisible, setContentVisible] = useState(true);
+  const [curtainsOpening, setCurtainsOpening] = useState(false);
+  const [loaderHidden, setLoaderHidden] = useState(false);
+
+  const onCompleteRef = useRef(onComplete);
 
   useEffect(() => {
-    const loader = loaderRef.current;
-    const canvas = canvasRef.current;
-    const counter = counterRef.current;
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
-    if (!loader || !canvas || !counter) return;
+  useEffect(() => {
+    let rafId = 0;
+    let disposed = false;
+    let sequenceStarted = false;
 
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
+    let textTimer = 0;
+    let curtainTimer = 0;
+    let finishTimer = 0;
 
-    const gl =
-      canvas.getContext("webgl2", {
-        alpha: true,
-        antialias: false,
-        depth: false,
-        stencil: false,
-        premultipliedAlpha: false,
-      }) ||
-      canvas.getContext("webgl", {
-        alpha: true,
-        antialias: false,
-        depth: false,
-        stencil: false,
-        premultipliedAlpha: false,
-      });
+    const html = document.documentElement;
+    const body = document.body;
 
-    if (!gl) {
-      counter.textContent = "100%";
+    const oldHtmlOverflow = html.style.overflow;
+    const oldBodyOverflow = body.style.overflow;
 
-      const fallback = window.setTimeout(() => {
-        loader.remove();
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
 
-        document.documentElement.style.overflow = "";
-        document.body.style.overflow = "";
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
 
-        onComplete?.();
-      }, 600);
+    const start = performance.now();
 
-      return () => window.clearTimeout(fallback);
-    }
+    const finish = () => {
+      if (disposed) return;
 
-    // --------------------------------------------------
-    // EXACT REFERENCE SHADERS
-    // --------------------------------------------------
+      setLoaderHidden(true);
 
-    const vertexShaderSource = `
-      attribute vec3 position;
-      attribute vec2 uv;
+      html.style.overflow = oldHtmlOverflow;
+      body.style.overflow = oldBodyOverflow;
 
-      uniform mat4 modelViewMatrix;
-      uniform mat4 projectionMatrix;
-
-      uniform float p;
-      uniform float np;
-
-      varying vec2 vUv;
-
-      float easeInOut(float t) {
-        return t * t * (3.0 - 2.0 * t);
-      }
-
-      void main() {
-        vUv = uv;
-
-        float ease = easeInOut(np);
-
-        vec3 pos = position;
-
-        float curtain = smoothstep(
-          pos.y,
-          0.0,
-          ease
-        );
-
-        pos.y -= curtain;
-
-        gl_Position =
-          projectionMatrix *
-          modelViewMatrix *
-          vec4(pos, 1.0);
-      }
-    `;
-
-    const fragmentShaderSource = `
-      precision highp float;
-
-      uniform vec2 u_res;
-      uniform float uTime;
-      uniform float p;
-
-      varying vec2 vUv;
-
-      #define NUM_OCTAVES 5
-
-      vec3 toRGB(vec3 rgb) {
-        return rgb / 255.0;
-      }
-
-      float rand(vec2 n) {
-        return fract(
-          sin(
-            dot(
-              n,
-              vec2(12.9898, 4.1414)
-            )
-          ) * 43758.5453
-        );
-      }
-
-      float noise(vec2 p) {
-        vec2 ip = floor(p);
-        vec2 u = fract(p);
-
-        u = u * u * (3.0 - 2.0 * u);
-
-        float res = mix(
-          mix(
-            rand(ip),
-            rand(ip + vec2(1.0, 0.0)),
-            u.x
-          ),
-          mix(
-            rand(ip + vec2(0.0, 1.0)),
-            rand(ip + vec2(1.0, 1.0)),
-            u.x
-          ),
-          u.y
-        );
-
-        return res * res;
-      }
-
-      float fbm(vec2 x) {
-        float v = 0.0;
-        float a = 0.5;
-
-        vec2 shift = vec2(100.0);
-
-        mat2 rot = mat2(
-          cos(0.5),
-          sin(0.5),
-          -sin(0.5),
-          cos(0.50)
-        );
-
-        for (int i = 0; i < NUM_OCTAVES; ++i) {
-          v += a * noise(x);
-
-          x =
-            rot *
-            x *
-            2.0 +
-            shift;
-
-          a *= 0.5;
-        }
-
-        return v;
-      }
-
-      void main() {
-        vec2 uv = vUv;
-
-        vec3 color =
-          toRGB(
-            vec3(10.0)
-          );
-
-        float progress =
-          smoothstep(
-            p,
-            p - 0.01,
-            fbm(
-              gl_FragCoord.xy /
-              (u_res * 0.17)
-            )
-          );
-
-        float alpha =
-          mix(
-            0.0,
-            1.0,
-            progress
-          );
-
-        gl_FragColor =
-          vec4(
-            color,
-            alpha
-          );
-      }
-    `;
-
-    // --------------------------------------------------
-    // SHADER HELPERS
-    // --------------------------------------------------
-
-    const createShader = (
-      type: number,
-      source: string
-    ) => {
-      const shader = gl.createShader(type);
-
-      if (!shader) {
-        throw new Error("Unable to create shader");
-      }
-
-      gl.shaderSource(shader, source);
-      gl.compileShader(shader);
-
-      if (
-        !gl.getShaderParameter(
-          shader,
-          gl.COMPILE_STATUS
-        )
-      ) {
-        console.error(
-          gl.getShaderInfoLog(shader)
-        );
-
-        gl.deleteShader(shader);
-
-        throw new Error(
-          "Shader compilation failed"
-        );
-      }
-
-      return shader;
+      onCompleteRef.current?.();
     };
 
-    const vertexShader = createShader(
-      gl.VERTEX_SHADER,
-      vertexShaderSource
-    );
+    const startEndingSequence = () => {
+      if (sequenceStarted || disposed) return;
 
-    const fragmentShader = createShader(
-      gl.FRAGMENT_SHADER,
-      fragmentShaderSource
-    );
+      sequenceStarted = true;
+      setProgress(100);
 
-    const program = gl.createProgram();
+      // Hold 100% briefly before fading the loader content.
+      textTimer = window.setTimeout(() => {
+        if (disposed) return;
 
-    if (!program) {
-      throw new Error(
-        "Unable to create WebGL program"
-      );
-    }
+        setContentVisible(false);
 
-    gl.attachShader(
-      program,
-      vertexShader
-    );
+        // Start curtains only after the content fades away.
+        curtainTimer = window.setTimeout(() => {
+          if (disposed) return;
 
-    gl.attachShader(
-      program,
-      fragmentShader
-    );
+          setCurtainsOpening(true);
 
-    gl.linkProgram(program);
-
-    if (
-      !gl.getProgramParameter(
-        program,
-        gl.LINK_STATUS
-      )
-    ) {
-      console.error(
-        gl.getProgramInfoLog(program)
-      );
-
-      throw new Error(
-        "WebGL program linking failed"
-      );
-    }
-
-    gl.useProgram(program);
-
-    // --------------------------------------------------
-    // FULLSCREEN PLANE
-    // --------------------------------------------------
-
-    const vertices = new Float32Array([
-      -1, -1, 0,
-       1, -1, 0,
-      -1,  1, 0,
-       1,  1, 0,
-    ]);
-
-    const uvs = new Float32Array([
-      0, 0,
-      1, 0,
-      0, 1,
-      1, 1,
-    ]);
-
-    const positionBuffer =
-      gl.createBuffer();
-
-    gl.bindBuffer(
-      gl.ARRAY_BUFFER,
-      positionBuffer
-    );
-
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      vertices,
-      gl.STATIC_DRAW
-    );
-
-    const positionLocation =
-      gl.getAttribLocation(
-        program,
-        "position"
-      );
-
-    gl.enableVertexAttribArray(
-      positionLocation
-    );
-
-    gl.vertexAttribPointer(
-      positionLocation,
-      3,
-      gl.FLOAT,
-      false,
-      0,
-      0
-    );
-
-    const uvBuffer =
-      gl.createBuffer();
-
-    gl.bindBuffer(
-      gl.ARRAY_BUFFER,
-      uvBuffer
-    );
-
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      uvs,
-      gl.STATIC_DRAW
-    );
-
-    const uvLocation =
-      gl.getAttribLocation(
-        program,
-        "uv"
-      );
-
-    gl.enableVertexAttribArray(
-      uvLocation
-    );
-
-    gl.vertexAttribPointer(
-      uvLocation,
-      2,
-      gl.FLOAT,
-      false,
-      0,
-      0
-    );
-
-    // --------------------------------------------------
-    // UNIFORMS
-    // --------------------------------------------------
-
-    const uResolution =
-      gl.getUniformLocation(
-        program,
-        "u_res"
-      );
-
-    const uTime =
-      gl.getUniformLocation(
-        program,
-        "uTime"
-      );
-
-    const uP =
-      gl.getUniformLocation(
-        program,
-        "p"
-      );
-
-    const uNP =
-      gl.getUniformLocation(
-        program,
-        "np"
-      );
-
-    const uModelView =
-      gl.getUniformLocation(
-        program,
-        "modelViewMatrix"
-      );
-
-    const uProjection =
-      gl.getUniformLocation(
-        program,
-        "projectionMatrix"
-      );
-
-    // --------------------------------------------------
-    // ORTHOGRAPHIC MATRICES
-    // --------------------------------------------------
-
-    const identityMatrix = new Float32Array([
-      1, 0, 0, 0,
-      0, 1, 0, 0,
-      0, 0, 1, 0,
-      0, 0, 0, 1,
-    ]);
-
-    const projectionMatrix =
-      new Float32Array([
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, -1, 0,
-        0, 0, 0, 1,
-      ]);
-
-    // --------------------------------------------------
-    // RESIZE
-    // --------------------------------------------------
-
-    const resize = () => {
-      const dpr = Math.min(
-        window.devicePixelRatio || 1,
-        2
-      );
-
-      const width =
-        window.innerWidth;
-
-      const height =
-        window.innerHeight;
-
-      canvas.width =
-        width * dpr;
-
-      canvas.height =
-        height * dpr;
-
-      canvas.style.width =
-        `${width}px`;
-
-      canvas.style.height =
-        `${height}px`;
-
-      gl.viewport(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-
-      gl.useProgram(program);
-
-      gl.uniform2f(
-        uResolution,
-        canvas.width,
-        canvas.height
-      );
-
-      gl.uniformMatrix4fv(
-        uModelView,
-        false,
-        identityMatrix
-      );
-
-      gl.uniformMatrix4fv(
-        uProjection,
-        false,
-        projectionMatrix
-      );
+          finishTimer = window.setTimeout(
+            finish,
+            CURTAIN_DURATION + (CURTAIN_COUNT - 1) * 32 + 100
+          );
+        }, TEXT_FADE_DURATION);
+      }, HUNDRED_HOLD);
     };
 
-    resize();
+    if (reducedMotion) {
+      setProgress(100);
+      setContentVisible(false);
+      setCurtainsOpening(true);
 
-    window.addEventListener(
-      "resize",
-      resize
-    );
+      finishTimer = window.setTimeout(finish, 100);
 
-    // --------------------------------------------------
-    // REFERENCE VALUES
-    // --------------------------------------------------
-
-    let p = 1;
-    let np = 1;
-
-    let targetP = 1;
-    let targetNP = 1;
-
-  const startTime = performance.now();
-
-    // --------------------------------------------------
-    // PROGRESS
-    // --------------------------------------------------
-
-    let loaded = 0;
-
-    const progress = {
-      target: 0,
-      current: 0,
-    };
-
-    let loadingFinished = false;
-
-    const updateCounter = () => {
-      progress.current +=
-        (
-          progress.target -
-          progress.current
-        ) * 0.06;
-
-      if (
-        progress.current <= 99.6
-      ) {
-        counter.textContent =
-          `${Math.round(
-            progress.current
-          )}%`;
-      }
-    };
-
-    // --------------------------------------------------
-    // LOAD REFERENCE ASSETS
-    // --------------------------------------------------
-
-    const loadImage = (
-      src: string
-    ) => {
-      const image =
-        new Image();
-
-      image.crossOrigin =
-        "anonymous";
-
-      image.onload = () => {
-        loaded++;
-
-        progress.target =
-          (loaded /
-            assets.length) *
-          100;
-
-        if (
-          loaded ===
-          assets.length
-        ) {
-          loadingFinished = true;
-        }
+      return () => {
+        disposed = true;
+        window.clearTimeout(finishTimer);
+        html.style.overflow = oldHtmlOverflow;
+        body.style.overflow = oldBodyOverflow;
       };
+    }
 
-      image.onerror = () => {
-        loaded++;
+    const render = (now: number) => {
+      if (disposed || sequenceStarted) return;
 
-        progress.target =
-          (loaded /
-            assets.length) *
-          100;
+      const elapsed = now - start;
 
-        if (
-          loaded ===
-          assets.length
-        ) {
-          loadingFinished = true;
+      if (elapsed < INTRO_DURATION) {
+        let value = 0;
+
+        for (let i = 1; i < MILESTONES.length; i++) {
+          const previous = MILESTONES[i - 1];
+          const current = MILESTONES[i];
+
+          if (elapsed <= current.time) {
+            const duration = current.time - previous.time;
+            const raw =
+              duration > 0
+                ? clamp(
+                    (elapsed - previous.time) / duration,
+                    0,
+                    1
+                  )
+                : 1;
+
+            const eased = raw * raw * (3 - 2 * raw);
+
+            value =
+              previous.value +
+              (current.value - previous.value) * eased;
+
+            break;
+          }
         }
-      };
 
-      image.src = src;
-    };
-
-    assets.forEach(loadImage);
-
-    // --------------------------------------------------
-    // OUTRO
-    // --------------------------------------------------
-
-    let outroStarted = false;
-    let outroStartTime = 0;
-
-    const startOutro = () => {
-      if (outroStarted) return;
-
-      outroStarted = true;
-
-      outroStartTime =
-        performance.now();
-
-      targetP = 0;
-      targetNP = 0;
-    };
-
-    // --------------------------------------------------
-    // RENDER LOOP
-    // --------------------------------------------------
-
-    let animationFrame = 0;
-
-   
-const render = (now: number) => {
-  const elapsed = now - startTime;
-
-      gl.clearColor(
-        0,
-        0,
-        0,
-        0
-      );
-
-      gl.clear(
-        gl.COLOR_BUFFER_BIT
-      );
-
-      // Reference interpolation
-      p +=
-        (targetP - p) *
-        0.06;
-
-      np +=
-        (targetNP - np) *
-        0.06;
-
-      gl.useProgram(program);
-
-      gl.uniform1f(
-        uP,
-        p
-      );
-
-      gl.uniform1f(
-        uNP,
-        np
-      );
-
-      gl.uniform1f(
-        uTime,
-        elapsed * 0.001
-      );
-
-      gl.drawArrays(
-        gl.TRIANGLE_STRIP,
-        0,
-        4
-      );
-
-      updateCounter();
-
-      /*
-       * Reference:
-       *
-       * when progress reaches ~99.6%
-       * the loader outro starts.
-       */
-      if (
-        loadingFinished &&
-        progress.current >= 99.6
-      ) {
-        counter.textContent =
-          "100%";
-
-        startOutro();
+        setProgress(Math.floor(value));
+        rafId = requestAnimationFrame(render);
+        return;
       }
 
-      if (outroStarted) {
-        const outroElapsed =
-          now -
-          outroStartTime;
-
-        /*
-         * Reference:
-         * p + np animate during ~1600ms.
-         */
-
-        const t =
-          Math.min(
-            outroElapsed / 1600,
-            1
-          );
-
-        const eased =
-          t * t *
-          (3 - 2 * t);
-
-        p =
-          1 - eased;
-
-        np =
-          1 - eased;
-
-        /*
-         * Reference loader opacity:
-         * delay 500ms
-         * duration 600ms
-         */
-
-        if (
-          outroElapsed >= 500
-        ) {
-          const fade =
-            Math.min(
-              (
-                outroElapsed -
-                500
-              ) / 600,
-              1
-            );
-
-          loader.style.opacity =
-            `${1 - fade}`;
-        }
-
-        /*
-         * Remove after shader
-         * transition completes.
-         */
-
-        if (
-          outroElapsed >= 1600
-        ) {
-          loader.style.display =
-            "none";
-
-          document.documentElement.style.overflow =
-            "";
-
-          document.body.style.overflow =
-            "";
-
-          cancelAnimationFrame(
-            animationFrame
-          );
-
-          onComplete?.();
-
-          return;
-        }
-      }
-
-      animationFrame =
-        requestAnimationFrame(
-          render
-        );
-    };
-
-    animationFrame =
-      requestAnimationFrame(
-        render
+      const revealElapsed = elapsed - INTRO_DURATION;
+      const revealT = clamp(
+        revealElapsed / REVEAL_TO_100_DURATION,
+        0,
+        1
       );
 
-    // --------------------------------------------------
-    // CLEANUP
-    // --------------------------------------------------
+      const value = 95 + 5 * easeInOut(revealT);
+      setProgress(Math.floor(value));
+
+      if (revealT < 1) {
+        rafId = requestAnimationFrame(render);
+        return;
+      }
+
+      startEndingSequence();
+    };
+
+    rafId = requestAnimationFrame(render);
 
     return () => {
-      cancelAnimationFrame(
-        animationFrame
-      );
+      disposed = true;
 
-      window.removeEventListener(
-        "resize",
-        resize
-      );
+      if (rafId) cancelAnimationFrame(rafId);
 
-      document.documentElement.style.overflow =
-        "";
+      window.clearTimeout(textTimer);
+      window.clearTimeout(curtainTimer);
+      window.clearTimeout(finishTimer);
 
-      document.body.style.overflow =
-        "";
-
-      gl.deleteBuffer(
-        positionBuffer
-      );
-
-      gl.deleteBuffer(
-        uvBuffer
-      );
-
-      gl.deleteProgram(
-        program
-      );
-
-      gl.deleteShader(
-        vertexShader
-      );
-
-      gl.deleteShader(
-        fragmentShader
-      );
+      html.style.overflow = oldHtmlOverflow;
+      body.style.overflow = oldBodyOverflow;
     };
-  }, [assets, onComplete]);
+  }, []);
+
+  if (loaderHidden) return null;
 
   return (
     <div
       id="loader"
-      ref={loaderRef}
-      className="fixed inset-0 z-[99999] h-screen w-screen overflow-hidden bg-[#0a0a0a]"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading Mentroid website"
+      className="fixed inset-0 z-[99999] h-[100vh] h-[100dvh] w-full overflow-hidden bg-transparent"
     >
-      <canvas
-        id="loader-gl"
-        ref={canvasRef}
-        className="absolute inset-0 h-full w-full"
-      />
-
+      {/* Staggered curtain panels */}
       <div
-        id="l-c"
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        aria-hidden="true"
+        className="absolute inset-0 flex"
       >
-        <span
-          id="counter"
-          ref={counterRef}
-          className="font-mono text-[85px] text-white"
-        >
-          0%
+        {Array.from({ length: CURTAIN_COUNT }, (_, index) => (
+          <div
+            key={index}
+            className="h-full min-w-0 flex-1 bg-[#0a0a0a] will-change-transform"
+            style={{
+              transform: curtainsOpening
+                ? "translate3d(0, -105%, 0)"
+                : "translate3d(0, 0, 0)",
+              transitionProperty: "transform",
+              transitionDuration: `${CURTAIN_DURATION}ms`,
+              transitionTimingFunction:
+                "cubic-bezier(0.76, 0, 0.24, 1)",
+              transitionDelay: curtainsOpening
+                ? `${index * 32}ms`
+                : "0ms",
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Counter and progress */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-1/2 z-10 w-[min(78vw,320px)]"
+        style={{
+          opacity: contentVisible ? 1 : 0,
+          transform: contentVisible
+            ? "translate3d(-50%, -50%, 0)"
+            : "translate3d(-50%, -56%, 0)",
+          transition: `opacity ${TEXT_FADE_DURATION}ms ease, transform ${TEXT_FADE_DURATION}ms ease`,
+        }}
+      >
+        <span className="block text-center font-mono text-[clamp(2.5rem,12vw,5.3125rem)] font-normal leading-none tracking-[-0.06em] text-white tabular-nums">
+          {progress}%
         </span>
+
+        <div className="mt-7 h-[2px] w-full overflow-hidden bg-white/20">
+          <div
+            className="h-full bg-white"
+            style={{
+              width: `${progress}%`,
+              transition: "width 90ms linear",
+            }}
+          />
+        </div>
+
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <span className="text-[9px] uppercase tracking-[0.2em] text-white/45">
+            Mentroid
+          </span>
+
+          <span className="text-right text-[9px] uppercase tracking-[0.2em] text-white/45">
+            Intelligence in motion
+          </span>
+        </div>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
@@ -13,7 +14,6 @@ type Scene = {
   accent: string;
   description: string;
   media: string;
-  type: "video" | "image";
 };
 
 const scenes: Scene[] = [
@@ -24,7 +24,6 @@ const scenes: Scene[] = [
     description:
       "Mentroid builds intelligent systems that turn complex business problems into practical AI solutions.",
     media: "/videos/ai.webm",
-    type: "video",
   },
   {
     eyebrow: "AGENTIC AI / 02",
@@ -33,7 +32,6 @@ const scenes: Scene[] = [
     description:
       "From AI agents and RAG systems to custom copilots, we build AI that can reason, respond and execute.",
     media: "/videos/agentic-ai.webm",
-    type: "video",
   },
   {
     eyebrow: "AUTOMATION / 03",
@@ -42,16 +40,15 @@ const scenes: Scene[] = [
     description:
       "Connect data, people and workflows through intelligent automation designed around your business.",
     media: "/videos/automation.webm",
-    type: "video",
   },
 ];
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const pinRef = useRef<HTMLDivElement | null>(null);
-
   const mediaRefs = useRef<(HTMLDivElement | null)[]>([]);
   const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -61,23 +58,31 @@ export default function Hero() {
 
     const ctx = gsap.context(() => {
       const media = mediaRefs.current.filter(
-        Boolean
-      ) as HTMLDivElement[];
-
+        (item): item is HTMLDivElement => item !== null
+      );
       const content = contentRefs.current.filter(
-        Boolean
-      ) as HTMLDivElement[];
+        (item): item is HTMLDivElement => item !== null
+      );
 
-      if (!media.length || !content.length) {
+      if (media.length !== scenes.length || content.length !== scenes.length) {
         return;
       }
 
-      /*
-       * ========================================================
-       * CONTENT INITIAL STATE
-       * ========================================================
-       */
+      const setActiveVideo = (activeIndex: number) => {
+        videoRefs.current.forEach((video, index) => {
+          if (!video) return;
 
+          if (index === activeIndex) {
+            void video.play().catch(() => {
+              // Playback can be restricted by browser settings.
+            });
+          } else {
+            video.pause();
+          }
+        });
+      };
+
+      // Set the first scene as the initial visible scene.
       gsap.set(content, {
         autoAlpha: 0,
         y: 80,
@@ -88,12 +93,6 @@ export default function Hero() {
         autoAlpha: 1,
         y: 0,
       });
-
-      /*
-       * ========================================================
-       * MEDIA INITIAL STATE
-       * ========================================================
-       */
 
       gsap.set(media, {
         autoAlpha: 0,
@@ -108,31 +107,33 @@ export default function Hero() {
         scale: 1,
       });
 
-      /*
-       * ========================================================
-       * MAIN TIMELINE
-       * ========================================================
-       */
+      setActiveVideo(0);
 
-      const tl = gsap.timeline({
+      const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: "top top",
           end: "bottom bottom",
           scrub: 1,
-          pin: pin,
+          pin,
           anticipatePin: 1,
           invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            // Each scene occupies a section of the scroll timeline.
+            const index =
+              self.progress < 0.39
+                ? 0
+                : self.progress < 0.73
+                  ? 1
+                  : 2;
+
+            setActiveVideo(index);
+          },
         },
       });
 
-      /*
-       * ========================================================
-       * SCENE 01
-       * ========================================================
-       */
-
-      tl.to(media[0], {
+      // Scene 01: cinematic movement.
+      timeline.to(media[0], {
         scale: 1.1,
         xPercent: -2,
         yPercent: -3,
@@ -140,13 +141,8 @@ export default function Hero() {
         ease: "none",
       });
 
-      /*
-       * ========================================================
-       * SCENE 01 → 02
-       * ========================================================
-       */
-
-      tl.to(
+      // Scene 01 → Scene 02.
+      timeline.to(
         content[0],
         {
           autoAlpha: 0,
@@ -157,7 +153,7 @@ export default function Hero() {
         "+=0.15"
       );
 
-      tl.to(
+      timeline.to(
         media[0],
         {
           autoAlpha: 0,
@@ -168,7 +164,7 @@ export default function Hero() {
         "<"
       );
 
-      tl.to(
+      timeline.to(
         media[1],
         {
           autoAlpha: 1,
@@ -179,7 +175,7 @@ export default function Hero() {
         "<0.1"
       );
 
-      tl.to(
+      timeline.to(
         content[1],
         {
           autoAlpha: 1,
@@ -190,13 +186,8 @@ export default function Hero() {
         "<0.1"
       );
 
-      /*
-       * ========================================================
-       * SCENE 02 MOVEMENT
-       * ========================================================
-       */
-
-      tl.to(media[1], {
+      // Scene 02 movement.
+      timeline.to(media[1], {
         scale: 1.11,
         xPercent: 3,
         yPercent: -4,
@@ -204,13 +195,8 @@ export default function Hero() {
         ease: "none",
       });
 
-      /*
-       * ========================================================
-       * SCENE 02 → 03
-       * ========================================================
-       */
-
-      tl.to(
+      // Scene 02 → Scene 03.
+      timeline.to(
         content[1],
         {
           autoAlpha: 0,
@@ -221,7 +207,7 @@ export default function Hero() {
         "+=0.1"
       );
 
-      tl.to(
+      timeline.to(
         media[1],
         {
           autoAlpha: 0,
@@ -232,7 +218,7 @@ export default function Hero() {
         "<"
       );
 
-      tl.to(
+      timeline.to(
         media[2],
         {
           autoAlpha: 1,
@@ -243,7 +229,7 @@ export default function Hero() {
         "<0.1"
       );
 
-      tl.to(
+      timeline.to(
         content[2],
         {
           autoAlpha: 1,
@@ -254,13 +240,8 @@ export default function Hero() {
         "<0.1"
       );
 
-      /*
-       * ========================================================
-       * FINAL SCENE
-       * ========================================================
-       */
-
-      tl.to(media[2], {
+      // Final scene movement and text exit.
+      timeline.to(media[2], {
         scale: 1.08,
         xPercent: -2,
         yPercent: -2,
@@ -268,31 +249,18 @@ export default function Hero() {
         ease: "none",
       });
 
-      /*
-       * Remove final scene typography.
-       */
-
-      tl.to(content[2], {
+      timeline.to(content[2], {
         autoAlpha: 0,
         y: -60,
         duration: 0.25,
         ease: "none",
       });
 
-      /*
-       * ========================================================
-       * GLOBAL PARALLAX
-       * ========================================================
-       */
-
-      const parallaxElements =
-        section.querySelectorAll(".hero-parallax");
-
-      gsap.to(parallaxElements, {
+      // Subtle parallax for the scene backgrounds.
+      gsap.to(section.querySelectorAll(".hero-parallax"), {
         yPercent: -12,
         ease: "none",
         force3D: true,
-
         scrollTrigger: {
           trigger: section,
           start: "top top",
@@ -301,19 +269,12 @@ export default function Hero() {
         },
       });
 
-      /*
-       * ========================================================
-       * REFRESH AFTER EVERYTHING EXISTS
-       * ========================================================
-       */
-
-      requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
-      });
+      requestAnimationFrame(() => ScrollTrigger.refresh());
     }, section);
 
     return () => {
       ctx.revert();
+      videoRefs.current.forEach((video) => video?.pause());
     };
   }, []);
 
@@ -322,318 +283,90 @@ export default function Hero() {
       ref={sectionRef}
       id="hero"
       data-navbar-theme="dark"
-      className="
-        relative
-        h-[400vh]
-        w-full
-        max-w-full
-        overflow-x-clip
-        bg-black
-      "
+      className="relative h-[400vh] w-full max-w-full overflow-x-clip bg-black"
     >
-      {/* ======================================================
-          PINNED VIEWPORT
-      ======================================================= */}
-
       <div
         ref={pinRef}
-        className="
-          relative
-          h-[100svh]
-          min-h-[520px]
-          w-full
-          max-w-full
-          overflow-hidden
-          bg-black
-        "
+        className="relative h-[100svh] min-h-[520px] w-full max-w-full overflow-hidden bg-black"
       >
-        {/* ====================================================
-            MEDIA
-        ==================================================== */}
-
-        <div
-          className="
-            absolute
-            inset-0
-            h-full
-            w-full
-            max-w-full
-            overflow-hidden
-          "
-        >
+        {/* Background videos */}
+        <div className="absolute inset-0 h-full w-full overflow-hidden">
           {scenes.map((scene, index) => (
             <div
               key={scene.media}
               ref={(element) => {
                 mediaRefs.current[index] = element;
               }}
-              className={`
-                absolute
-                inset-0
-                h-full
-                w-full
-                max-w-full
-                overflow-hidden
-                ${
-                  index === 0
-                    ? "visible opacity-100"
-                    : "invisible opacity-0"
-                }
-              `}
+              className={`absolute inset-0 h-full w-full overflow-hidden ${
+                index === 0 ? "visible opacity-100" : "invisible opacity-0"
+              }`}
             >
-              {scene.type === "video" ? (
-                <video
-                  className="
-                    hero-parallax
-                    absolute
-                    inset-0
-                    h-full
-                    w-full
-                    max-w-full
-                    object-cover
-                  "
-                  src={scene.media}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload={index < 2 ? "auto" : "metadata"}
-                />
-              ) : (
-                <img
-                  className="
-                    hero-parallax
-                    absolute
-                    inset-0
-                    h-full
-                    w-full
-                    max-w-full
-                    object-cover
-                  "
-                  src={scene.media}
-                  alt=""
-                  loading={index === 0 ? "eager" : "lazy"}
-                  decoding="async"
-                />
-              )}
+              <video
+                ref={(element) => {
+                  videoRefs.current[index] = element;
+                }}
+                className="hero-parallax absolute inset-0 h-full w-full object-cover"
+                src={scene.media}
+                autoPlay={index === 0}
+                muted
+                loop
+                playsInline
+                preload={index === 0 ? "auto" : "metadata"}
+              />
             </div>
           ))}
         </div>
 
-        {/* ====================================================
-            CINEMATIC OVERLAY
-        ==================================================== */}
+        {/* Cinematic overlays */}
+        <div className="pointer-events-none absolute inset-0 z-[2] bg-black/25" />
 
-        <div
-          className="
-            pointer-events-none
-            absolute
-            inset-0
-            z-[2]
-            bg-black/25
-          "
-        />
+        <div className="pointer-events-none absolute inset-0 z-[3] bg-[linear-gradient(90deg,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.38)_35%,rgba(0,0,0,0.08)_75%,rgba(0,0,0,0.22)_100%)]" />
 
-        <div
-          className="
-            pointer-events-none
-            absolute
-            inset-0
-            z-[3]
-            bg-[linear-gradient(90deg,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.38)_35%,rgba(0,0,0,0.08)_75%,rgba(0,0,0,0.22)_100%)]
-          "
-        />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-[30%] bg-gradient-to-t from-black/55 to-transparent" />
 
-        <div
-          className="
-            pointer-events-none
-            absolute
-            inset-x-0
-            bottom-0
-            z-[3]
-            h-[30%]
-            bg-gradient-to-t
-            from-black/55
-            to-transparent
-          "
-        />
-
-        {/* ====================================================
-            SCENE CONTENT
-        ==================================================== */}
-
-        <div
-          className="
-            absolute
-            inset-0
-            z-10
-            flex
-            items-center
-            overflow-hidden
-          "
-        >
-          <div
-            className="
-              w-full
-              max-w-full
-              px-5
-              sm:px-6
-              md:px-10
-              lg:px-14
-              xl:px-16
-            "
-          >
-            <div
-              className="
-                relative
-                min-h-[420px]
-                w-full
-                max-w-full
-                sm:min-h-[460px]
-                md:min-h-[500px]
-                lg:min-h-[520px]
-              "
-            >
+        {/* Scene content */}
+        <div className="absolute inset-0 z-10 flex items-center overflow-hidden">
+          <div className="w-full px-5 sm:px-6 md:px-10 lg:px-14 xl:px-16">
+            <div className="relative min-h-[420px] w-full sm:min-h-[460px] md:min-h-[500px] lg:min-h-[520px]">
               {scenes.map((scene, index) => (
                 <div
                   key={scene.title}
                   ref={(element) => {
                     contentRefs.current[index] = element;
                   }}
-                  className={`
-                    absolute
-                    left-0
-                    top-1/2
-                    w-full
-                    max-w-[850px]
-                    -translate-y-1/2
-                    ${
-                      index === 0
-                        ? "visible opacity-100"
-                        : "invisible opacity-0"
-                    }
-                  `}
+                  className={`absolute left-0 top-1/2 w-full max-w-[850px] -translate-y-1/2 ${
+                    index === 0 ? "visible opacity-100" : "invisible opacity-0"
+                  }`}
                 >
-                  {/* EYEBROW */}
-
-                  <div
-                    className="
-                      mb-5
-                      flex
-                      items-center
-                      gap-3
-                      sm:mb-6
-                      md:mb-7
-                    "
-                  >
-                    <span
-                      className="
-                        text-[9px]
-                        font-medium
-                        uppercase
-                        tracking-[0.2em]
-                        text-white/70
-                        sm:text-[10px]
-                        sm:tracking-[0.25em]
-                      "
-                    >
+                  <div className="mb-5 flex items-center gap-3 sm:mb-6 md:mb-7">
+                    <span className="text-[9px] font-medium uppercase tracking-[0.2em] text-white/70 sm:text-[10px] sm:tracking-[0.25em]">
                       {scene.eyebrow}
                     </span>
                   </div>
 
-                  {/* HEADING */}
-
                   <div className="overflow-hidden">
-                    <h1
-                      className="
-                        max-w-[950px]
-                        text-[clamp(2.8rem,10vw,5.8rem)]
-                        font-medium
-                        leading-[0.9]
-                        tracking-[-0.065em]
-                        text-white
-                        sm:text-[clamp(3.2rem,8vw,5.8rem)]
-                        sm:tracking-[-0.075em]
-                      "
-                    >
-                      <span className="block">
-                        {scene.title}
-                      </span>
-
+                    <h1 className="max-w-[950px] text-[clamp(2.8rem,10vw,5.8rem)] font-medium leading-[0.9] tracking-[-0.065em] text-white sm:text-[clamp(3.2rem,8vw,5.8rem)] sm:tracking-[-0.075em]">
+                      <span className="block">{scene.title}</span>
                       <span className="block text-white/60">
                         {scene.accent}
                       </span>
                     </h1>
                   </div>
 
-                  {/* DESCRIPTION */}
-
-                  <p
-                    className="
-                      mt-6
-                      max-w-[390px]
-                      text-[13px]
-                      leading-6
-                      text-white/65
-                      sm:mt-7
-                      sm:max-w-[440px]
-                      sm:text-sm
-                      sm:leading-7
-                      md:mt-8
-                      md:max-w-[480px]
-                      md:text-base
-                      md:leading-8
-                    "
-                  >
+                  <p className="mt-6 max-w-[390px] text-[13px] leading-6 text-white/65 sm:mt-7 sm:max-w-[440px] sm:text-sm sm:leading-7 md:mt-8 md:max-w-[480px] md:text-base md:leading-8">
                     {scene.description}
                   </p>
 
-                  {/* CTA */}
-
                   {index === 0 && (
-                    <div
-                      className="
-                        mt-7
-                        flex
-                        items-center
-                        gap-3
-                        sm:mt-8
-                        md:mt-9
-                      "
-                    >
+                    <div className="mt-7 flex items-center gap-3 sm:mt-8 md:mt-9">
                       <a
                         href="#services"
-                        className="
-                          group
-                          inline-flex
-                          items-center
-                          gap-2.5
-                          rounded-full
-                          bg-white
-                          px-5
-                          py-3
-                          text-xs
-                          font-medium
-                          text-black
-                          transition-transform
-                          duration-300
-                          hover:scale-[1.02]
-                          sm:gap-3
-                          sm:px-6
-                          sm:py-3.5
-                          sm:text-sm
-                        "
+                        className="group inline-flex items-center gap-2.5 rounded-full bg-white px-5 py-3 text-xs font-medium text-black transition-transform duration-300 hover:scale-[1.02] sm:gap-3 sm:px-6 sm:py-3.5 sm:text-sm"
                       >
                         Explore Mentroid
-
                         <ArrowUpRight
                           size={16}
-                          className="
-                            transition-transform
-                            duration-300
-                            group-hover:translate-x-0.5
-                            group-hover:-translate-y-0.5
-                          "
+                          className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                         />
                       </a>
                     </div>
@@ -644,49 +377,10 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* ====================================================
-            BOTTOM UI
-        ==================================================== */}
-
-        <div
-          className="
-            pointer-events-none
-            absolute
-            bottom-5
-            left-5
-            right-5
-            z-20
-            flex
-            items-end
-            justify-between
-            sm:bottom-6
-            sm:left-6
-            sm:right-6
-            md:bottom-7
-            md:left-10
-            md:right-10
-            lg:left-14
-            lg:right-14
-            xl:left-16
-            xl:right-16
-          "
-        >
-          <div
-            className="
-              flex
-              items-center
-              gap-2.5
-              text-[8px]
-              uppercase
-              tracking-[0.17em]
-              text-white/50
-              sm:gap-3
-              sm:text-[9px]
-              sm:tracking-[0.2em]
-            "
-          >
+        {/* Bottom scroll indicator */}
+        <div className="pointer-events-none absolute bottom-5 left-5 right-5 z-20 flex items-end justify-between sm:bottom-6 sm:left-6 sm:right-6 md:bottom-7 md:left-10 md:right-10 lg:left-14 lg:right-14 xl:left-16 xl:right-16">
+          <div className="flex items-center gap-2.5 text-[8px] uppercase tracking-[0.17em] text-white/50 sm:gap-3 sm:text-[9px] sm:tracking-[0.2em]">
             <ArrowDown size={13} />
-
             <span>Scroll to explore</span>
           </div>
         </div>
