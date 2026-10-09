@@ -14,6 +14,7 @@ const HUNDRED_HOLD = 180;
 const TEXT_FADE_DURATION = 260;
 const CURTAIN_DURATION = 850;
 const CURTAIN_COUNT = 12;
+const CURTAIN_STAGGER = 32;
 
 const MILESTONES = [
   { time: 0, value: 0 },
@@ -35,6 +36,7 @@ const easeInOut = (t: number) =>
 export default function Loader({ onComplete }: LoaderProps) {
   const [progress, setProgress] = useState(0);
   const [contentVisible, setContentVisible] = useState(true);
+  const [curtainsVisible, setCurtainsVisible] = useState(false);
   const [curtainsOpening, setCurtainsOpening] = useState(false);
   const [loaderHidden, setLoaderHidden] = useState(false);
 
@@ -46,6 +48,7 @@ export default function Loader({ onComplete }: LoaderProps) {
 
   useEffect(() => {
     let rafId = 0;
+    let openingRafId = 0;
     let disposed = false;
     let sequenceStarted = false;
 
@@ -72,11 +75,36 @@ export default function Loader({ onComplete }: LoaderProps) {
       if (disposed) return;
 
       setLoaderHidden(true);
-
       html.style.overflow = oldHtmlOverflow;
       body.style.overflow = oldBodyOverflow;
 
       onCompleteRef.current?.();
+    };
+
+    const openCurtains = () => {
+      if (disposed) return;
+
+      // First render the closed panels.
+      setCurtainsVisible(true);
+
+      // Start the transition after the closed state has painted.
+      openingRafId = requestAnimationFrame(() => {
+        if (disposed) return;
+
+        openingRafId = requestAnimationFrame(() => {
+          if (disposed) return;
+
+          setCurtainsOpening(true);
+
+          // Wait for the last staggered panel to finish.
+          finishTimer = window.setTimeout(
+            finish,
+            CURTAIN_DURATION +
+              (CURTAIN_COUNT - 1) * CURTAIN_STAGGER +
+              250
+          );
+        });
+      });
     };
 
     const startEndingSequence = () => {
@@ -85,22 +113,15 @@ export default function Loader({ onComplete }: LoaderProps) {
       sequenceStarted = true;
       setProgress(100);
 
-      // Hold 100% briefly before fading the loader content.
       textTimer = window.setTimeout(() => {
         if (disposed) return;
 
         setContentVisible(false);
 
-        // Start curtains only after the content fades away.
         curtainTimer = window.setTimeout(() => {
           if (disposed) return;
 
-          setCurtainsOpening(true);
-
-          finishTimer = window.setTimeout(
-            finish,
-            CURTAIN_DURATION + (CURTAIN_COUNT - 1) * 32 + 100
-          );
+          openCurtains();
         }, TEXT_FADE_DURATION);
       }, HUNDRED_HOLD);
     };
@@ -108,6 +129,7 @@ export default function Loader({ onComplete }: LoaderProps) {
     if (reducedMotion) {
       setProgress(100);
       setContentVisible(false);
+      setCurtainsVisible(true);
       setCurtainsOpening(true);
 
       finishTimer = window.setTimeout(finish, 100);
@@ -134,6 +156,7 @@ export default function Loader({ onComplete }: LoaderProps) {
 
           if (elapsed <= current.time) {
             const duration = current.time - previous.time;
+
             const raw =
               duration > 0
                 ? clamp(
@@ -158,15 +181,13 @@ export default function Loader({ onComplete }: LoaderProps) {
         return;
       }
 
-      const revealElapsed = elapsed - INTRO_DURATION;
       const revealT = clamp(
-        revealElapsed / REVEAL_TO_100_DURATION,
+        (elapsed - INTRO_DURATION) / REVEAL_TO_100_DURATION,
         0,
         1
       );
 
-      const value = 95 + 5 * easeInOut(revealT);
-      setProgress(Math.floor(value));
+      setProgress(Math.floor(95 + 5 * easeInOut(revealT)));
 
       if (revealT < 1) {
         rafId = requestAnimationFrame(render);
@@ -182,6 +203,7 @@ export default function Loader({ onComplete }: LoaderProps) {
       disposed = true;
 
       if (rafId) cancelAnimationFrame(rafId);
+      if (openingRafId) cancelAnimationFrame(openingRafId);
 
       window.clearTimeout(textTimer);
       window.clearTimeout(curtainTimer);
@@ -200,18 +222,30 @@ export default function Loader({ onComplete }: LoaderProps) {
       role="status"
       aria-live="polite"
       aria-label="Loading Mentroid website"
-      className="fixed inset-0 z-[99999] h-[100vh] h-[100dvh] w-full overflow-hidden bg-transparent"
+      className="fixed inset-0 z-[99999] h-[100vh] h-[100dvh] w-full overflow-hidden"
+      style={{
+        // Solid during loading; transparent when curtains take over.
+        backgroundColor: curtainsVisible
+          ? "transparent"
+          : "#0a0a0a",
+      }}
     >
-      {/* Staggered curtain panels */}
+      {/* Curtains do not render visibly during the percentage counter. */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 flex"
+        className="absolute inset-0 flex overflow-hidden"
+        style={{
+          visibility: curtainsVisible ? "visible" : "hidden",
+          zIndex: 2,
+        }}
       >
         {Array.from({ length: CURTAIN_COUNT }, (_, index) => (
           <div
             key={index}
-            className="h-full min-w-0 flex-1 bg-[#0a0a0a] will-change-transform"
+            className="relative h-full min-w-0 flex-1 bg-[#0a0a0a] will-change-transform"
             style={{
+              // Slight overlap prevents subpixel gaps on desktop.
+              marginRight: "-1px",
               transform: curtainsOpening
                 ? "translate3d(0, -105%, 0)"
                 : "translate3d(0, 0, 0)",
@@ -220,7 +254,7 @@ export default function Loader({ onComplete }: LoaderProps) {
               transitionTimingFunction:
                 "cubic-bezier(0.76, 0, 0.24, 1)",
               transitionDelay: curtainsOpening
-                ? `${index * 32}ms`
+                ? `${index * CURTAIN_STAGGER}ms`
                 : "0ms",
             }}
           />
