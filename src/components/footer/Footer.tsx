@@ -267,6 +267,25 @@ export default function Footer() {
     if (!footerRef.current) return;
 
     const ctx = gsap.context(() => {
+      /* Subtle drifting mist — kept monochrome and low contrast. */
+      const fogLayers = footerRef.current?.querySelectorAll<HTMLElement>(".footer-fog");
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (fogLayers?.length && !reduceMotion) {
+        fogLayers.forEach((layer, index) => {
+          gsap.to(layer, {
+            x: index === 0 ? 46 : -38,
+            y: index === 0 ? -18 : 22,
+            opacity: index === 0 ? 0.16 : 0.11,
+            duration: index === 0 ? 13 : 17,
+            ease: "sine.inOut",
+            repeat: -1,
+            yoyo: true,
+            delay: index * -3,
+          });
+        });
+      }
+
       /* CTA reveal */
       if (ctaRef.current) {
         gsap.fromTo(
@@ -344,8 +363,32 @@ export default function Footer() {
   return (
     <footer
       ref={footerRef}
-      className="relative overflow-hidden bg-[#090909] text-white"
+      className="relative isolate overflow-hidden bg-black text-white"
     >
+      
+      {/* Full-footer smoke video overlay. Keep the video asset at public/videos/footer-smoke.webm. */}
+      <video
+        aria-hidden="true"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover opacity-35 mix-blend-screen"
+      >
+        <source src="/videos/footer-smoke.webm" type="video/webm" />
+      </video>
+
+      {/* Soft monochrome mist adds depth without a neon glow. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-0 overflow-hidden"
+      >
+        <div className="footer-fog footer-fog--one absolute -left-24 top-[18%] h-64 w-[70%] rounded-full bg-white/[0.07] blur-[90px] opacity-[0.08]" />
+        <div className="footer-fog footer-fog--two absolute -right-24 top-[48%] h-72 w-[65%] rounded-full bg-[#079dad]/[0.08] blur-[110px] opacity-[0.06]" />
+      </div>
+
+      <div className="relative z-[1]">
       {/* ------------------------------------------------------------------ */}
       {/* TOP CTA                                                             */}
       {/* ------------------------------------------------------------------ */}
@@ -364,10 +407,24 @@ export default function Footer() {
               <div>
                 <Link
                   href="/"
-                  className="inline-block text-[2.3rem] font-semibold tracking-[-0.065em]"
+                  aria-label="Mentroid home"
+                  className="group inline-flex items-center"
                 >
-                  mentroid
-                  <span className="text-neutral-600">.</span>
+                  <img
+                    src="/assets/mentroid-logo.png"
+                    width={52}
+                    height={52}
+                    alt=""
+                    className="h-11 w-11 shrink-0 object-contain transition-transform duration-300 group-hover:scale-[1.04] sm:h-12 sm:w-12"
+                  />
+                  <span className="ml-1.5 flex min-w-0 flex-col justify-center gap-[4px]">
+                    <span className="whitespace-nowrap text-[21px] font-semibold leading-none tracking-[-0.045em] text-white sm:text-[23px]">
+                      Mentroid
+                    </span>
+                    <span className="whitespace-nowrap text-[7px] font-medium uppercase leading-none tracking-[0.16em] text-[#079dad] sm:text-[8px]">
+                      AI · ML SERVICES
+                    </span>
+                  </span>
                 </Link>
 
                 <p className="mt-5 max-w-[250px] text-[13px] leading-6 text-neutral-500">
@@ -442,9 +499,30 @@ export default function Footer() {
 
             <span className="hidden h-3 w-px bg-neutral-800 sm:block" />
 
-            <p className="text-[10px] uppercase tracking-[0.16em] text-neutral-600">
-              Intelligence · Automation · Software
-            </p>
+           
+             <nav
+              aria-label="Legal links"
+              className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:ml-1"
+            >
+              <Link
+                href="/privacy"
+                className="text-[10px] uppercase tracking-[0.14em] text-neutral-500 transition-colors duration-300 hover:text-white"
+              >
+                Privacy
+              </Link>
+              <Link
+                href="/terms"
+                className="text-[10px] uppercase tracking-[0.14em] text-neutral-500 transition-colors duration-300 hover:text-white"
+              >
+                Terms
+              </Link>
+              <Link
+                href="/security"
+                className="text-[10px] uppercase tracking-[0.14em] text-neutral-500 transition-colors duration-300 hover:text-white"
+              >
+                Security
+              </Link>
+            </nav>
           </div>
 
           {/* SOCIALS + BACK TO TOP */}
@@ -501,6 +579,7 @@ export default function Footer() {
         <div className="select-none whitespace-nowrap text-center text-[25vw] font-semibold leading-[0.72] tracking-[-0.09em] text-white/[0.035]">
           mentroid
         </div>
+      </div>
       </div>
     </footer>
   );

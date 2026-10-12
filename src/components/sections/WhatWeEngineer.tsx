@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -59,175 +59,165 @@ const capabilities = [
   },
 ];
 
+function CapabilityImage({
+  number,
+  label,
+  priority = false,
+}: {
+  number: string;
+  label: string;
+  priority?: boolean;
+}) {
+  return (
+    <div className="group relative aspect-[1.35/1] w-full overflow-hidden border border-white/10 bg-[#0b0b0b] sm:aspect-[1.6/1] lg:aspect-auto lg:h-full">
+      <Image
+        src={`/assets/whatweengineer/${number}.webp`}
+        alt={`${label.toLowerCase()} capability at Mentroid`}
+        fill
+        priority={priority}
+        sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1023px) 48vw, 34vw"
+        className="object-cover grayscale transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+      />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/5" />
+      <span className="absolute bottom-4 left-4 z-10 text-[9px] uppercase tracking-[0.2em] text-white/65 sm:bottom-5 sm:left-5">
+        {label}
+      </span>
+    </div>
+  );
+}
+
 export default function WhatWeEngineer() {
   const sectionRef = useRef<HTMLElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-
+  const desktopStageRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-
-  const panelsRef = useRef<HTMLElement[]>([]);
-  const visualRef = useRef<HTMLDivElement[]>([]);
+  const desktopVisualsRef = useRef<HTMLDivElement[]>([]);
+  const mobileCardsRef = useRef<HTMLElement[]>([]);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
-    const stage = stageRef.current;
+    const stage = desktopStageRef.current;
     const intro = introRef.current;
     const track = trackRef.current;
 
     if (!section || !stage || !intro || !track) return;
 
-    const ctx = gsap.context(() => {
-      const panels = panelsRef.current;
-      const visuals = visualRef.current;
+    const context = gsap.context(() => {
+      const media = gsap.matchMedia();
 
-      if (!panels.length || !visuals.length) return;
+      // DESKTOP / TABLET: pinned cinematic horizontal scrolling.
+      media.add("(min-width: 768px)", () => {
+        const visuals = desktopVisualsRef.current.filter(Boolean);
+        const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
 
-      /*
-       * ============================================================
-       * INITIAL STATE
-       * ============================================================
-       */
+        gsap.set(track, { x: "100vw", force3D: true });
+        gsap.set(intro, { autoAlpha: 1, yPercent: 0, scale: 1 });
+        gsap.set(visuals, { scale: 1.06, xPercent: 3, force3D: true });
 
-      gsap.set(track, {
-        x: "100vw",
-        force3D: true,
+        const timeline = gsap.timeline({
+          defaults: { ease: "power2.inOut" },
+          
+scrollTrigger: {
+  trigger: section,
+  start: "top top",
+  end: () => `+=${window.innerHeight * 7}`,
+  scrub: 1.3,
+  pin: stage,
+  pinSpacing: true,
+  anticipatePin: 1,
+  invalidateOnRefresh: true,
+},
+
+        });
+
+        timeline.to(intro, {
+          yPercent: -35,
+          autoAlpha: 0,
+          scale: 0.97,
+          duration: 0.75,
+        });
+
+        timeline.to(track, { x: 0, duration: 0.8 }, "<0.15");
+
+       
+timeline.to(track, {
+  x: () => -distance(),
+  duration: 5.8,
+  ease: "none",
+});
+
+timeline.to(
+  visuals,
+  {
+    scale: 1,
+    xPercent: 0,
+    duration: 5.8,
+    ease: "none",
+  },
+  "<"
+);
+
+
+       
+
+        const refreshFrame = window.requestAnimationFrame(() => {
+          ScrollTrigger.refresh();
+        });
+
+        return () => window.cancelAnimationFrame(refreshFrame);
       });
 
-      gsap.set(panels, {
-        opacity: 1,
-      });
+      // MOBILE: natural vertical page scroll with alternating left/right reveals.
+     
+media.add("(max-width: 767px)", () => {
+  const cards = mobileCardsRef.current.filter(Boolean);
 
-      gsap.set(visuals, {
-        scale: 1.08,
-        xPercent: 6,
-        force3D: true,
-      });
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
 
-      /*
-       * ============================================================
-       * MAIN TIMELINE
-       * ============================================================
-       */
+  if (reduceMotion) {
+    gsap.set(cards, {
+      x: 0,
+      y: 0,
+      autoAlpha: 1,
+    });
+    return;
+  }
 
-      const timeline = gsap.timeline({
+  cards.forEach((card, index) => {
+    // Odd cards enter from the right; even cards from the left.
+    const fromX = index % 2 === 0 ? -45 : 45;
+
+    gsap.fromTo(
+      card,
+      {
+        x: fromX,
+        y: 18,
+        autoAlpha: 0,
+      },
+      {
+        x: 0,
+        y: 0,
+        autoAlpha: 1,
+        duration: 0.72,
+        ease: "power2.out",
+        immediateRender: false,
         scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: () => `+=${window.innerHeight * 6.5}`,
-          scrub: 1.1,
-          pin: stage,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
+          trigger: card,
+          start: "top 88%",
+          end: "bottom 12%",
+          toggleActions: "play none restart reverse",
         },
-      });
+      }
+    );
+  });
+});
 
-      /*
-       * ============================================================
-       * INTRO EXIT
-       * ============================================================
-       */
-
-      timeline.to(intro, {
-        yPercent: -120,
-        opacity: 0,
-        scale: 0.92,
-        duration: 1,
-        ease: "power3.inOut",
-      });
-
-      /*
-       * ============================================================
-       * FIRST CAPABILITY ENTER
-       * ============================================================
-       */
-
-      timeline.to(
-        track,
-        {
-          x: 0,
-          duration: 1,
-          ease: "power3.inOut",
-        },
-        "<0.2"
-      );
-
-      /*
-       * ============================================================
-       * HORIZONTAL MOVEMENT
-       * ============================================================
-       */
-
-      timeline.to(track, {
-        x: () => {
-          const distance =
-            track.scrollWidth - window.innerWidth;
-
-          return -Math.max(0, distance);
-        },
-        duration: 5,
-        ease: "none",
-      });
-
-      /*
-       * ============================================================
-       * VISUAL PARALLAX
-       * ============================================================
-       */
-
-      visuals.forEach((visual, index) => {
-        gsap.fromTo(
-          visual,
-          {
-            scale: 1.08,
-            xPercent: index % 2 === 0 ? 6 : -6,
-          },
-          {
-            scale: 1,
-            xPercent: index % 2 === 0 ? -6 : 6,
-            ease: "none",
-            force3D: true,
-            scrollTrigger: {
-              trigger: section,
-              start: "top top",
-              end: () => `+=${window.innerHeight * 6.5}`,
-              scrub: 1.5,
-              invalidateOnRefresh: true,
-            },
-          }
-        );
-      });
-
-      /*
-       * ============================================================
-       * CLEAN EXIT
-       * ============================================================
-       */
-
-      timeline.to(
-        track,
-        {
-          scale: 0.96,
-          opacity: 0,
-          duration: 0.6,
-          ease: "power2.inOut",
-        },
-        ">-0.25"
-      );
-
-      /*
-       * ============================================================
-       * REFRESH
-       * ============================================================
-       */
-
-      requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
-      });
     }, section);
 
     return () => {
-      ctx.revert();
+      context.revert();
     };
   }, []);
 
@@ -236,471 +226,182 @@ export default function WhatWeEngineer() {
       ref={sectionRef}
       id="what-we-engineer"
       data-navbar-theme="dark"
-      className="
-        relative
-        z-30
-        -mt-10
-        h-[650vh]
-        w-full
-        overflow-hidden
-        bg-[#050505]
-        text-white
-
-        sm:-mt-12
-
-        md:-mt-16
-
-        lg:-mt-24
-
-        xl:-mt-28
-      "
+      className="relative z-30 -mt-10 w-full overflow-x-clip bg-[#050505] text-white sm:-mt-12 md:-mt-16 lg:-mt-20"
     >
-      {/* ========================================================
-          PINNED STAGE
-      ======================================================== */}
-
+      {/* Desktop / tablet cinematic horizontal experience */}
       <div
-        ref={stageRef}
-        className="
-          relative
-          h-[100svh]
-          w-full
-          overflow-hidden
-          bg-[#050505]
-        "
+        ref={desktopStageRef}
+        className="relative hidden h-[100svh] w-full overflow-hidden bg-[#050505] md:block"
       >
-        {/* ======================================================
-            INTRO
-        ======================================================= */}
-
         <div
           ref={introRef}
-          className="
-            absolute
-            inset-0
-            z-40
-            flex
-            items-center
-            px-5
-
-            sm:px-6
-
-            md:px-10
-
-            lg:px-16
-
-            xl:px-20
-          "
+          className="absolute inset-0 z-40 flex items-center px-8 lg:px-16 xl:px-20"
         >
           <div className="w-full max-w-[1100px]">
-            <div
-              className="
-                mb-5
-                flex
-                items-center
-                gap-3
-
-                sm:mb-6
-
-                md:mb-8
-              "
-            >
-              <span
-                className="
-                  text-[8px]
-                  uppercase
-                  tracking-[0.2em]
-                  text-white/35
-
-                  sm:text-[9px]
-                  sm:tracking-[0.24em]
-                "
-              >
+            <div className="mb-7 flex items-center gap-3">
+              
+              <span className="text-[9px] uppercase tracking-[0.24em] text-white/45">
                 What we engineer
               </span>
             </div>
 
-            <h2
-              className="
-                max-w-[1050px]
-                text-[clamp(3rem,12vw,5.2rem)]
-                font-medium
-                leading-[0.84]
-                tracking-[-0.075em]
-
-                sm:text-[clamp(3.8rem,10vw,7rem)]
-
-                md:text-[clamp(5rem,8vw,8rem)]
-
-                lg:text-[clamp(6rem,9vw,10rem)]
-
-                xl:text-[clamp(7rem,8.5vw,10rem)]
-              "
-            >
+            <h2 className="max-w-[1050px] text-[clamp(5rem,8.4vw,9.5rem)] font-medium leading-[0.84] tracking-[-0.085em]">
               We build intelligence{" "}
-              <span className="text-white/30">
-                that works.
-              </span>
+              <span className="text-white/30">that works.</span>
             </h2>
 
-            <p
-              className="
-                mt-6
-                max-w-[340px]
-                text-[11px]
-                leading-6
-                text-white/40
-
-                sm:mt-7
-                sm:max-w-[400px]
-                sm:text-[13px]
-                sm:leading-7
-
-                md:mt-10
-                md:max-w-[420px]
-                md:text-[14px]
-                md:leading-7
-              "
-            >
-              From generative AI and intelligent agents
-              to machine learning and automation, we
-              engineer systems around real business
-              problems.
+            <p className="mt-8 max-w-[430px] text-sm leading-7 text-white/50">
+              From generative AI and intelligent agents to machine learning and
+              automation, we engineer systems around real business problems.
             </p>
+
+            <div className="mt-10 flex items-center gap-3 text-[9px] uppercase tracking-[0.2em] text-white/35">
+              <span>Explore our capabilities</span>
+              <ArrowDownRight size={14} />
+            </div>
           </div>
         </div>
 
-        {/* ======================================================
-            HORIZONTAL TRACK
-        ======================================================= */}
-
         <div
           ref={trackRef}
-          className="
-            absolute
-            left-0
-            top-0
-            flex
-            h-full
-            w-max
-            will-change-transform
-          "
+          className="absolute left-0 top-0 flex h-full w-max will-change-transform"
         >
           {capabilities.map((item, index) => (
             <article
               key={item.number}
-              ref={(el) => {
-                if (el) {
-                  panelsRef.current[index] = el;
-                }
-              }}
-              className="
-                relative
-                h-[100svh]
-                w-screen
-                shrink-0
-                overflow-hidden
-              "
+              className="relative h-[100svh] w-screen shrink-0 overflow-hidden px-[6vw]"
             >
-              {/* ==================================================
-                  BACKGROUND NUMBER
-              ================================================== */}
-
-              <div
-                className="
-                  pointer-events-none
-                  absolute
-                  bottom-[-4%]
-                  right-[3%]
-                  select-none
-                  text-[52vw]
-                  font-medium
-                  leading-none
-                  tracking-[-0.12em]
-                  text-white/[0.025]
-
-                  sm:text-[45vw]
-
-                  md:text-[38vw]
-
-                  lg:text-[32vw]
-                "
-              >
+              <span className="pointer-events-none absolute bottom-[-5%] right-[3%] select-none text-[34vw] font-medium leading-none tracking-[-0.12em] text-white/[0.025]">
                 {item.number}
-              </div>
+              </span>
 
-              {/* ==================================================
-                  CONTENT
-              ================================================== */}
+              <div className="relative z-10 flex h-full items-center">
+                <div className="w-[53%] max-w-[760px] pr-8 xl:pr-12">
+                  <div className="mb-7 flex items-center gap-3">
+                    <span className="text-[9px] tracking-[0.22em] text-white/35">
+                      {item.number} / 06
+                    </span>
+                    
+                    <span className="text-[9px] tracking-[0.22em] text-white/50">
+                      {item.label}
+                    </span>
+                  </div>
 
-              <div
-                className="
-                  absolute
-                  left-5
-                  top-[12%]
-                  z-30
-                  w-[calc(100%-40px)]
+                  <h3 className="text-[clamp(4rem,7.8vw,8.6rem)] font-medium leading-[0.84] tracking-[-0.085em]">
+                    {item.title}
+                    <br />
+                    <span className="text-white/30">{item.accent}</span>
+                  </h3>
 
-                  sm:left-6
-                  sm:top-[12%]
-                  sm:w-[calc(100%-48px)]
+                  <p className="mt-8 max-w-[390px] text-[15px] leading-7 text-white/50">
+                    {item.description}
+                  </p>
 
-                  md:left-[6vw]
-                  md:top-1/2
-                  md:w-[52vw]
-                  md:max-w-[820px]
-                  md:-translate-y-1/2
-
-                  lg:w-[54vw]
-                "
-              >
-                {/* LABEL */}
+                  <a
+                    href="#contact"
+                    className="group mt-9 inline-flex items-center gap-3 text-[9px] uppercase tracking-[0.2em] text-white/55 transition-colors hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-white"
+                  >
+                    <span>Discuss a project</span>
+                    <ArrowUpRight
+                      size={14}
+                      className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                    />
+                  </a>
+                </div>
 
                 <div
-                  className="
-                    mb-4
-                    flex
-                    items-center
-                    gap-3
-
-                    sm:mb-5
-
-                    md:mb-8
-                  "
+                  ref={(element) => {
+                    if (element) desktopVisualsRef.current[index] = element;
+                  }}
+                  className="absolute right-[1vw] top-1/2 h-[44vh] w-[34vw] max-w-[560px] -translate-y-1/2 overflow-hidden border border-white/10 bg-[#0a0a0a] xl:right-[3vw] xl:h-[48vh] xl:w-[33vw]"
                 >
-                  <span
-                    className="
-                      text-[7px]
-                      uppercase
-                      tracking-[0.18em]
-                      text-white/30
+                  <Image
+                    src={`/assets/whatweengineer/${item.number}.webp`}
+                    alt={`${item.label.toLowerCase()} visual`}
+                    fill
+                    priority={index === 0}
+                    sizes="(min-width: 1280px) 33vw, 34vw"
+                    className="object-cover grayscale"
+                  />
+                  {/* <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/5" />
+                  <span className="absolute bottom-5 right-5 text-[8px] uppercase tracking-[0.2em] text-white/50">
+                    Mentroid / {item.number}
+                  </span> */}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
 
-                      sm:text-[8px]
-                      sm:tracking-[0.2em]
+      {/* Mobile: vertical cards with alternating entrance animation */}
+      <div className="mx-auto w-full max-w-7xl px-5 pb-20 pt-20 sm:px-7 sm:pb-24 sm:pt-24 md:hidden">
+        <div className="mb-12 sm:mb-14">
+          <div className="mb-5 flex items-center gap-3">
+            <span className="h-px w-7 bg-white/35" />
+            <span className="text-[9px] uppercase tracking-[0.22em] text-white/45">
+              What we engineer
+            </span>
+          </div>
 
-                      md:text-[9px]
-                      md:tracking-[0.24em]
-                    "
-                  >
+          <h2 className="max-w-[650px] text-[clamp(3.25rem,13vw,5.5rem)] font-medium leading-[0.86] tracking-[-0.08em]">
+            We build intelligence{" "}
+            <span className="text-white/30">that works.</span>
+          </h2>
+
+          <p className="mt-6 max-w-[420px] text-[13px] leading-6 text-white/50 sm:text-sm sm:leading-7">
+            We engineer AI and software around the real problems your business
+            needs to solve.
+          </p>
+        </div>
+
+        <div className="space-y-12 sm:space-y-16">
+          {capabilities.map((item, index) => (
+            <article
+              key={item.number}
+              ref={(element) => {
+                if (element) mobileCardsRef.current[index] = element;
+              }}
+              className="grid grid-cols-1 gap-5 sm:grid-cols-[0.9fr_1.1fr] sm:items-center sm:gap-7"
+            >
+              <div>
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="text-[9px] tracking-[0.2em] text-white/35">
                     {item.number} / 06
                   </span>
-
-                  <span
-                    className="
-                      max-w-[180px]
-                      truncate
-                      text-[7px]
-                      uppercase
-                      tracking-[0.18em]
-                      text-white/45
-
-                      sm:text-[8px]
-                      sm:tracking-[0.2em]
-
-                      md:text-[9px]
-                      md:tracking-[0.24em]
-                    "
-                  >
+                  <span className="h-px w-6 bg-white/20" />
+                  <span className="text-[8px] uppercase tracking-[0.16em] text-white/45">
                     {item.label}
                   </span>
                 </div>
 
-                {/* TITLE */}
-
-                <h3
-                  className="
-                    max-w-full
-                    text-[clamp(2.7rem,11.5vw,4.3rem)]
-                    font-medium
-                    leading-[0.84]
-                    tracking-[-0.075em]
-
-                    sm:text-[clamp(3rem,10vw,5.2rem)]
-
-                    md:whitespace-nowrap
-                    md:text-[clamp(4rem,9vw,9.5rem)]
-                    md:tracking-[-0.09em]
-
-                    lg:text-[clamp(5rem,8.5vw,9.5rem)]
-                  "
-                >
+                <h3 className="text-[clamp(2.9rem,11vw,4.8rem)] font-medium leading-[0.86] tracking-[-0.08em]">
                   {item.title}
-
                   <br />
-
-                  <span className="text-white/30">
-                    {item.accent}
-                  </span>
+                  <span className="text-white/30">{item.accent}</span>
                 </h3>
 
-                {/* DESCRIPTION */}
-
-                <p
-                  className="
-                    mt-4
-                    max-w-[300px]
-                    text-[11px]
-                    leading-5
-                    text-white/40
-
-                    sm:mt-5
-                    sm:max-w-[350px]
-                    sm:text-[12px]
-                    sm:leading-6
-
-                    md:mt-10
-                    md:max-w-[390px]
-                    md:text-[15px]
-                    md:leading-8
-                  "
-                >
+                <p className="mt-5 max-w-[340px] text-[13px] leading-6 text-white/50">
                   {item.description}
                 </p>
 
-                {/* LINK */}
-
-                <div
-                  className="
-                    mt-4
-                    flex
-                    items-center
-                    gap-3
-                    text-[7px]
-                    uppercase
-                    tracking-[0.16em]
-                    text-white/25
-
-                    sm:mt-5
-                    sm:text-[8px]
-                    sm:tracking-[0.18em]
-
-                    md:mt-8
-                    md:text-[9px]
-                    md:tracking-[0.2em]
-                  "
+                <a
+                  href="#contact"
+                  className="group mt-5 inline-flex items-center gap-3 text-[9px] uppercase tracking-[0.18em] text-white/60 transition-colors hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-white"
                 >
-                  <span>Explore capability</span>
-
+                  <span>Discuss a project</span>
                   <ArrowUpRight
-                    size={12}
-                    className="shrink-0"
+                    size={14}
+                    className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                   />
-                </div>
+                </a>
               </div>
 
-              {/* ==================================================
-                  VISUAL
-              ================================================== */}
-
-              <div
-                ref={(el) => {
-                  if (el) {
-                    visualRef.current[index] = el;
-                  }
-                }}
-                className="
-                  absolute
-                  z-20
-
-                  left-5
-                  right-13
-                  top-[62%]
-
-                  h-[21vh]
-                  min-h-[180px]
-
-                  -translate-y-1/2
-
-                  overflow-hidden
-                 
-                  border
-                  border-white/[0.08]
-                  bg-[#080808]
-                  will-change-transform
-
-                  sm:left-6
-                  sm:right-13
-                  sm:top-[63%]
-                  sm:h-[23vh]
-                  sm:min-h-[180px]
-                
-
-                  md:left-6
-                  md:right-6
-                  md:top-auto
-                  md:bottom-[6vh]
-                  md:h-[28vh]
-                  md:min-h-[220px]
-                  md:-translate-y-0
-
-                  lg:left-auto
-                  lg:right-[7vw]
-                  lg:top-1/2
-                  lg:bottom-auto
-                  lg:h-[45vh]
-                  lg:w-[31vw]
-                  lg:min-h-[300px]
-                  lg:min-w-[360px]
-                  lg:max-w-[560px]
-                  lg:-translate-y-1/2
-                  
-
-                  xl:h-[47vh]
-                "
-              >
-                <Image
-  src={`/assets/whatweengineer/${item.number}.webp`}
-  alt={item.label}
-  fill
-  loading="lazy"
-  sizes="(max-width: 1023px) calc(100vw - 40px), 31vw"
-  className="
-    object-cover
-    grayscale
-    scale-[1.06]
-  "
-/>
-
-                {/* CINEMATIC OVERLAY */}
-
-                <div
-                  className="
-                    pointer-events-none
-                    absolute
-                    inset-0
-                    bg-black/10
-                  "
-                />
-
-                {/* IMAGE LABEL */}
-
-                <div
-                  className="
-                    absolute
-                    bottom-3
-                    right-3
-                    z-10
-                    max-w-[70%]
-                    truncate
-                    text-[6px]
-                    uppercase
-                    tracking-[0.16em]
-                    text-white/40
-
-                    sm:bottom-4
-                    sm:right-4
-                    sm:text-[7px]
-                    sm:tracking-[0.18em]
-
-                    md:bottom-5
-                    md:right-5
-                    md:text-[8px]
-                    md:tracking-[0.2em]
-                  "
-                >
-                  {item.label}
-                </div>
-              </div>
+              <CapabilityImage
+                number={item.number}
+                label={item.label}
+                priority={index === 0}
+              />
             </article>
           ))}
         </div>

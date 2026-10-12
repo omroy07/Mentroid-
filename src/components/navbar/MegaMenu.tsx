@@ -5,6 +5,8 @@ import {
   motion,
 } from "framer-motion";
 
+import { useEffect, useState } from "react";
+
 import { ArrowUpRight } from "lucide-react";
 
 import type {
@@ -32,6 +34,21 @@ export default function MegaMenu({
   onPreviewChange,
   onNavigate,
 }: MegaMenuProps) {
+  const [imageStage, setImageStage] = useState(0);
+
+  useEffect(() => {
+    setImageStage(0);
+  }, [previewImage, menuKey]);
+
+  const previewSources = [
+    previewImage,
+    menuPreviewImages[menuKey],
+    "/assets/navbar/services.webp",
+  ];
+
+  const safeImageSrc =
+    previewSources[Math.min(imageStage, previewSources.length - 1)];
+
   return (
     <div
       className="
@@ -206,9 +223,14 @@ export default function MegaMenu({
         >
           <AnimatePresence mode="sync">
             <motion.img
-              key={previewImage}
-              src={previewImage}
+              key={`${menuKey}-${safeImageSrc}`}
+              src={safeImageSrc}
               alt=""
+              onError={() => {
+                setImageStage((current) =>
+                  Math.min(current + 1, previewSources.length - 1)
+                );
+              }}
               initial={{
                 opacity: 0,
                 scale: 1.04,

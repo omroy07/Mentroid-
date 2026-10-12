@@ -11,6 +11,7 @@ type DesktopNavProps = {
   activeMenu: MenuKey | null;
   navTheme: "dark" | "light";
   onOpenMenu: (menu: MenuKey) => void;
+  onToggleMenu: (menu: MenuKey) => void;
 };
 
 const menuOrder: MenuKey[] = [
@@ -25,6 +26,7 @@ export default function DesktopNav({
   activeMenu,
   navTheme,
   onOpenMenu,
+  onToggleMenu,
 }: DesktopNavProps) {
   /*
     heroActive = true
@@ -75,6 +77,9 @@ const navHover =
               key={key}
               type="button"
               onMouseEnter={() => onOpenMenu(key)}
+              onClick={() => onToggleMenu(key)}
+              aria-haspopup="true"
+              aria-expanded={isActive}
               className={`
                 group
                 flex

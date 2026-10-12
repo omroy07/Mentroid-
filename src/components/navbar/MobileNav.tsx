@@ -1,27 +1,12 @@
 "use client";
 
-import {
-  useState,
-} from "react";
-
+import { useId, useState } from "react";
 import Link from "next/link";
-
-import {
-  AnimatePresence,
-  motion,
-} from "framer-motion";
-
-import {
-  ArrowUpRight,
-  ChevronDown,
-} from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 
 import { navigation } from "@/data/navigation";
-
-import type {
-  MenuKey,
-  MenuData,
-} from "./Navbar";
+import type { MenuKey, MenuData } from "./Navbar";
 
 const menuOrder: MenuKey[] = [
   "services",
@@ -35,363 +20,126 @@ type MobileNavProps = {
   onClose: () => void;
 };
 
-export default function MobileNav({
-  onClose,
-}: MobileNavProps) {
-  const [
-    openSection,
-    setOpenSection,
-  ] = useState<MenuKey | null>(null);
+const footerLinks = [
+  { label: "About Mentroid", href: "/about" },
+  { label: "Our Team", href: "/team" },
+  { label: "Careers", href: "/careers" },
+  { label: "Our Work", href: "/work" },
+  { label: "Contact", href: "/contact" },
+  { label: "Our Process", href: "/process" },
+];
+
+export default function MobileNav({ onClose }: MobileNavProps) {
+  const [openSection, setOpenSection] = useState<MenuKey | null>(null);
+  const id = useId();
+  const prefersReducedMotion = useReducedMotion();
 
   return (
-    <div
-      className="
-        flex
-        h-full
-        flex-col
-        overflow-y-auto
-        overflow-x-clip
-        bg-white
-        px-5
-        pb-8
-        pt-4
-        text-[#07111f]
-        sm:px-7
-      "
-    >
-      {/* =================================================
-          MAIN MENU
-      ================================================= */}
-
-      <div className="flex-1">
+    <div className="flex min-h-full w-full flex-col overflow-x-clip overflow-y-auto overscroll-contain bg-white px-4 pb-[max(18px,env(safe-area-inset-bottom))] text-[#07111f] sm:px-6">
+      <nav aria-label="Mobile navigation" className="flex-1">
         {menuOrder.map((key) => {
-          const menu =
-            navigation[key] as MenuData;
-
-          const isOpen =
-            openSection === key;
+          const menu = navigation[key] as MenuData;
+          const isOpen = openSection === key;
+          const panelId = `${id}-${key}-panel`;
+          const buttonId = `${id}-${key}-button`;
 
           return (
-            <div
-              key={key}
-              className="
-                border-b
-                border-black/[0.08]
-              "
-            >
-              {/* =================================================
-                  SECTION BUTTON
-              ================================================= */}
-
+            <section key={key} className="border-b border-[#07111f]/[0.09]">
               <button
+                id={buttonId}
                 type="button"
-                onClick={() =>
-                  setOpenSection(
-                    isOpen
-                      ? null
-                      : key
-                  )
-                }
-                className="
-                  flex
-                  w-full
-                  items-center
-                  justify-between
-                  py-[18px]
-                  text-left
-                  text-[16px]
-                  font-medium
-                  tracking-[-0.015em]
-                  text-[#07111f]
-                "
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                onClick={() => setOpenSection(isOpen ? null : key)}
+                className="group flex min-h-[51px] w-full items-center justify-between gap-4 py-3 text-left text-[15px] font-medium tracking-[-0.02em] text-[#07111f] transition-colors duration-200 hover:text-[#079dad] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#079dad] sm:min-h-[55px] sm:text-base"
               >
-                <span>
-                  {menu.title}
-                </span>
-
-                <span
-                  className={`
-                    flex
-                    size-8
-                    items-center
-                    justify-center
-                    rounded-full
-                    border
-                    border-black/10
-                    transition-all
-                    duration-300
-                    ${
-                      isOpen
-                        ? "bg-[#07111f] text-white"
-                        : "bg-transparent text-black/60"
-                    }
-                  `}
-                >
-                  <ChevronDown
-                    size={15}
-                    strokeWidth={1.7}
-                    className={`
-                      transition-transform
-                      duration-300
-                      ${
-                        isOpen
-                          ? "rotate-180"
-                          : "rotate-0"
-                      }
-                    `}
-                  />
-                </span>
+                <span>{menu.title}</span>
+                <ChevronDown
+                  size={16}
+                  strokeWidth={1.6}
+                  className={`shrink-0 text-[#07111f]/55 transition-transform duration-200 ${isOpen ? "rotate-180 text-[#079dad]" : "rotate-0"}`}
+                />
               </button>
 
-              {/* =================================================
-                  EXPANDABLE CONTENT
-              ================================================= */}
-
-              <AnimatePresence
-                initial={false}
-              >
+              <AnimatePresence initial={false}>
                 {isOpen && (
                   <motion.div
-                    initial={{
-                      height: 0,
-                      opacity: 0,
-                    }}
-                    animate={{
-                      height: "auto",
-                      opacity: 1,
-                    }}
-                    exit={{
-                      height: 0,
-                      opacity: 0,
-                    }}
-                    transition={{
-                      duration: 0.3,
-                      ease: [
-                        0.22,
-                        1,
-                        0.36,
-                        1,
-                      ],
-                    }}
-                    className="
-                      overflow-hidden
-                    "
+                    id={panelId}
+                    role="region"
+                    aria-labelledby={buttonId}
+                    initial={prefersReducedMotion ? false : { height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={prefersReducedMotion ? undefined : { height: 0, opacity: 0 }}
+                    transition={{ duration: prefersReducedMotion ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
+                    className="overflow-hidden"
                   >
-                    <div className="pb-5">
-                      {menu.groups.map(
-                        (group) => (
-                          <div
-                            key={
-                              group.title
-                            }
-                            className="mb-6 last:mb-0"
-                          >
-                            {/* GROUP TITLE */}
-
-                            <p
-                              className="
-                                mb-2.5
-                                text-[9px]
-                                font-medium
-                                uppercase
-                                tracking-[0.18em]
-                                text-black/40
-                              "
-                            >
-                              {
-                                group.title
-                              }
-                            </p>
-
-                            {/* ITEMS */}
-
-                            <div className="space-y-0.5">
-                              {group.items.map(
-                                (item) => (
-                                  <Link
-                                    key={
-                                      item.title
-                                    }
-                                    href={
-                                      item.href
-                                    }
-                                    onClick={
-                                      onClose
-                                    }
-                                    className="
-                                      group
-                                      flex
-                                      items-center
-                                      justify-between
-                                      border-b
-                                      border-black/[0.045]
-                                      py-3
-                                      text-[14px]
-                                      tracking-[-0.01em]
-                                      text-black/70
-                                      transition-colors
-                                      duration-200
-                                      last:border-b-0
-                                      hover:text-black
-                                    "
-                                  >
-                                    <span>
-                                      {
-                                        item.title
-                                      }
-                                    </span>
-
-                                    <ArrowUpRight
-                                      size={14}
-                                      strokeWidth={
-                                        1.6
-                                      }
-                                      className="
-                                        -translate-x-1
-                                        opacity-0
-                                        transition-all
-                                        duration-200
-                                        group-hover:translate-x-0
-                                        group-hover:opacity-60
-                                      "
-                                    />
-                                  </Link>
-                                )
-                              )}
-                            </div>
+                    <div className="pb-4 pt-1">
+                      {menu.groups.map((group) => (
+                        <div key={group.title} className="mb-4 last:mb-0">
+                          <p className="mb-2 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#07111f]/45">
+                            {group.title}
+                          </p>
+                          <div className="grid grid-cols-1">
+                            {group.items.map((item) => (
+                              <Link
+                                key={item.title}
+                                href={item.href}
+                                onClick={onClose}
+                                className="group/item flex min-h-10 items-center justify-between gap-3 py-2 text-[13px] leading-5 text-[#07111f]/75 transition-colors duration-200 hover:text-[#079dad] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#079dad]"
+                              >
+                                <span>{item.title}</span>
+                                <ArrowUpRight size={13} strokeWidth={1.6} className="shrink-0 text-[#079dad] opacity-0 transition-opacity duration-150 group-hover/item:opacity-100 group-focus-visible/item:opacity-100" />
+                              </Link>
+                            ))}
                           </div>
-                        )
-                      )}
+                        </div>
+                      ))}
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </section>
           );
         })}
-
-        {/* =================================================
-            WORK
-        ================================================= */}
 
         <Link
           href="/work"
           onClick={onClose}
-          className="
-            flex
-            items-center
-            justify-between
-            border-b
-            border-black/[0.08]
-            py-[18px]
-            text-[16px]
-            font-medium
-            tracking-[-0.015em]
-            text-[#07111f]
-          "
+          className="group flex min-h-[51px] items-center justify-between border-b border-[#07111f]/[0.09] py-3 text-[15px] font-medium tracking-[-0.02em] text-[#07111f] transition-colors duration-200 hover:text-[#079dad] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#079dad] sm:min-h-[55px] sm:text-base"
         >
           <span>Work</span>
-
-          <ArrowUpRight
-            size={17}
-            strokeWidth={1.6}
-          />
+          <ArrowUpRight size={16} strokeWidth={1.6} className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </Link>
-      </div>
+      </nav>
 
-      {/* =================================================
-          BOTTOM AREA
-      ================================================= */}
-
-      <div className="mt-7">
-        {/* SMALL LABEL */}
-
-        <p
-          className="
-            mb-3
-            text-[9px]
-            font-medium
-            uppercase
-            tracking-[0.18em]
-            text-black/40
-          "
-        >
-          Start a conversation
-        </p>
-
-        {/* CTA */}
+      <footer className="mt-7 shrink-0 border-t border-[#07111f]/[0.08] pt-5 sm:mt-8 sm:pt-6">
+        <nav aria-label="Additional links" className="grid grid-cols-2 gap-x-5 gap-y-0.5">
+          {footerLinks.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              onClick={onClose}
+              className="flex min-h-8 items-center py-1 text-[12px] font-medium text-[#07111f]/65 transition-colors duration-200 hover:text-[#079dad] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#079dad]"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
 
         <Link
           href="/contact"
           onClick={onClose}
-          className="
-            group
-            flex
-            w-full
-            items-center
-            justify-between
-            rounded-[10px]
-            bg-[#07111f]
-            px-5
-            py-4
-            text-sm
-            font-semibold
-            text-white
-            transition-all
-            duration-300
-            hover:bg-[#168cff]
-          "
+          className="group mt-5 flex min-h-[46px] w-full items-center justify-between rounded-[7px] bg-[#07111f] px-4 py-3 text-[13px] font-semibold text-white transition-colors duration-200 hover:bg-[#102536] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#079dad] focus-visible:ring-offset-2"
         >
-          <span>
-            Let's Talk
-          </span>
-
-          <span
-            className="
-              flex
-              size-8
-              items-center
-              justify-center
-              rounded-full
-              bg-white/10
-              transition-transform
-              duration-300
-              group-hover:translate-x-1
-            "
-          >
-            <ArrowUpRight
-              size={15}
-              strokeWidth={1.7}
-            />
-          </span>
+          <span>Let&apos;s Talk</span>
+          <ArrowUpRight size={16} strokeWidth={1.7} className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </Link>
 
-        {/* FOOTER META */}
-
-        <div className="mt-6 flex items-center justify-between">
-          <p
-            className="
-              text-[9px]
-              uppercase
-              tracking-[0.16em]
-              text-black/35
-            "
-          >
-            AI · Software · Automation
-          </p>
-
-          <p
-            className="
-              text-[9px]
-              uppercase
-              tracking-[0.16em]
-              text-black/35
-            "
-          >
-            India · Global
-          </p>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 pb-1 text-[9px] font-medium uppercase tracking-[0.12em] text-[#07111f]/40">
+          <span>AI · ML · Software</span>
+          <span>India · Global</span>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }

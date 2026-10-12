@@ -202,7 +202,7 @@ export default function ClientStories() {
           ...vars,
           scrollTrigger: {
             trigger,
-            start: "top 82%",
+            start: "top 78%",
             once: true,
           },
         });
@@ -234,9 +234,9 @@ export default function ClientStories() {
       reveal(".stories-stage", {
         y: 55,
         opacity: 0,
-        duration: 1.1,
-        delay: 0.1,
-        ease: "power4.out",
+        duration: 0.95,
+        delay: 0.08,
+        ease: "power3.out",
       });
     }, sectionRef);
 
@@ -521,24 +521,30 @@ export default function ClientStories() {
         data-navbar-theme="dark"
         className="
           relative
+          z-0
+          isolate
           overflow-hidden
           bg-[#050505]
        
           px-5
-          py-24
+          pt-24
+          pb-20
           text-white
 
          sm:px-6
     sm:py-24
 
     md:px-10
-    md:py-28
+    md:pt-28
+    md:pb-24
 
     lg:px-16
-    lg:py-24
+    lg:pt-24
+    lg:pb-20
 
     xl:px-20
-    xl:py-28
+    xl:pt-28
+    xl:pb-24
         "
       >
         {/* TOP LINE */}

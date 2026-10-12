@@ -4,15 +4,25 @@ import { useLayoutEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const solutions = [
+type Solution = {
+  number: string;
+  eyebrow: string;
+  title: string;
+  accent: string;
+  description: string;
+  image: string;
+};
+
+const solutions: Solution[] = [
   {
     number: "01",
     eyebrow: "CUSTOMER EXPERIENCE",
-    title: "24/7 AI",
-    accent: "Customer Support",
+    title: "24/7 AI Customer",
+    accent: "Support",
     description:
       "Give customers instant, intelligent support across the channels they already use.",
     image: "/assets/solutions/01.webp",
@@ -23,7 +33,7 @@ const solutions = [
     title: "AI Lead",
     accent: "Qualification",
     description:
-      "Identify, understand and prioritize high-intent leads automatically.",
+      "Identify, understand, and prioritize high-intent leads automatically.",
     image: "/assets/solutions/02.webp",
   },
   {
@@ -57,9 +67,9 @@ const solutions = [
     number: "06",
     eyebrow: "INTELLIGENCE",
     title: "AI",
-    accent: "Recommendation",
+    accent: "Recommendations",
     description:
-      "Use your data to deliver personalized recommendations and better decisions.",
+      "Use your data to deliver personalized recommendations and support better decisions.",
     image: "/assets/solutions/06.webp",
   },
   {
@@ -77,7 +87,7 @@ const solutions = [
     title: "Custom AI",
     accent: "Platforms",
     description:
-      "Build a complete AI platform around the unique requirements of your organization.",
+      "Build an AI platform around the unique requirements of your organization.",
     image: "/assets/solutions/08.webp",
   },
 ];
@@ -86,728 +96,264 @@ export default function Solutions() {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
-
   const sceneRefs = useRef<HTMLDivElement[]>([]);
   const imageRefs = useRef<HTMLDivElement[]>([]);
   const titleRefs = useRef<HTMLDivElement[]>([]);
-  const numberRefs = useRef<HTMLSpanElement[]>([]);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
     const stage = stageRef.current;
+    const intro = introRef.current;
 
-    if (!section || !stage) return;
+    if (!section || !stage || !intro) return;
 
-    const ctx = gsap.context(() => {
-      const scenes = sceneRefs.current;
-      const images = imageRefs.current;
-      const titles = titleRefs.current;
-      const numbers = numberRefs.current;
+    const context = gsap.context(() => {
+      const scenes = sceneRefs.current.slice(0, solutions.length);
+      const images = imageRefs.current.slice(0, solutions.length);
+      const titles = titleRefs.current.slice(0, solutions.length);
 
-      /*
-      ============================================================
-      INITIAL STATE
-      ============================================================
-      */
+      if (
+        scenes.length !== solutions.length ||
+        images.length !== solutions.length ||
+        titles.length !== solutions.length
+      ) {
+        return;
+      }
 
-      // EVERYTHING starts hidden.
-      gsap.set(scenes, {
-        autoAlpha: 0,
-        xPercent: 0,
-      });
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
 
+      // Use the same cinematic scene sequence on every screen size.
+      // Only typography, spacing and image framing change responsively in CSS.
+      gsap.set(scenes, { autoAlpha: 0, xPercent: 3 });
       gsap.set(images, {
-        clipPath: "inset(35% 25% 35% 25%)",
-        scale: 1.12,
+        clipPath: reduceMotion ? "inset(0% 0% 0% 0%)" : "inset(9% 7% 9% 7%)",
+        scale: reduceMotion ? 1 : 1.07,
       });
-
-      gsap.set(titles, {
-        yPercent: 110,
-        opacity: 0,
-      });
-
-      gsap.set(numbers, {
-        opacity: 0,
-      });
-
-      /*
-      ============================================================
-      MASTER TIMELINE
-      ============================================================
-      */
+      gsap.set(titles, { y: reduceMotion ? 0 : 24, autoAlpha: 0 });
+      gsap.set(intro, { autoAlpha: 1, y: 0, scale: 1 });
 
       const timeline = gsap.timeline({
+        defaults: { ease: "power2.out" },
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: () => `+=${window.innerHeight * 10}`,
+          // Slightly shorter than the original 10-viewport sequence.
+          // Keep enough scroll room for eight readable scenes on phones too.
+          end: () => `+=${window.innerHeight * (reduceMotion ? 5.5 : 8.2)}`,
           pin: stage,
-          scrub: 0.7,
+          pinSpacing: true,
+          scrub: reduceMotion ? 0.35 : 1.1,
           anticipatePin: 1,
           invalidateOnRefresh: true,
         },
       });
 
-      /*
-      ============================================================
-      INTRO
-      ============================================================
-      */
-
-      if (introRef.current) {
-        // INTRO ENTER
-        timeline.fromTo(
-          introRef.current,
-          {
-            opacity: 0,
-            y: 70,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "power3.out",
-          }
-        );
-
-        // INTRO HOLD
-        timeline.to({}, {
-          duration: 0.7,
-        });
-
-        // INTRO EXIT
-        timeline.to(
-          introRef.current,
-          {
-            opacity: 0,
-            y: -100,
-            scale: 0.94,
-            duration: 0.7,
-            ease: "power3.inOut",
-          }
-        );
-      }
-
-      /*
-      ============================================================
-      FIRST SCENE
-      IMPORTANT:
-      It only becomes visible AFTER intro has disappeared.
-      ============================================================
-      */
-
-      timeline.set(scenes[0], {
-        autoAlpha: 1,
-        xPercent: 0,
+      // Intro moves away before the first solution appears.
+      timeline.to(intro, {
+        y: reduceMotion ? 0 : -35,
+        autoAlpha: 0,
+        scale: 0.985,
+        duration: 0.65,
+        ease: "power2.inOut",
       });
 
-      timeline.fromTo(
+      timeline.set(scenes[0], { autoAlpha: 1, xPercent: 0 });
+      timeline.to(
         images[0],
-        {
-          clipPath: "inset(35% 25% 35% 25%)",
-          scale: 1.12,
-        },
         {
           clipPath: "inset(0% 0% 0% 0%)",
           scale: 1,
-          duration: 0.8,
-          ease: "power3.inOut",
-        }
-      );
-
-      timeline.fromTo(
-        titles[0],
-        {
-          yPercent: 110,
-          opacity: 0,
-        },
-        {
-          yPercent: 0,
-          opacity: 1,
           duration: 0.65,
-          ease: "power3.out",
-        },
-        "<0.18"
-      );
-
-      timeline.to(
-        numbers[0],
-        {
-          opacity: 1,
-          duration: 0.2,
-        },
-        "<0.1"
-      );
-
-      /*
-      ============================================================
-      SCENE → SCENE
-      ============================================================
-      */
-
-      for (let i = 0; i < solutions.length - 1; i++) {
-        const currentScene = scenes[i];
-        const nextScene = scenes[i + 1];
-
-        const currentImage = images[i];
-        const nextImage = images[i + 1];
-
-        const currentTitle = titles[i];
-        const nextTitle = titles[i + 1];
-
-        const currentNumber = numbers[i];
-        const nextNumber = numbers[i + 1];
-
-        /*
-        ------------------------------------------------------------
-        HOLD CURRENT SCENE
-        ------------------------------------------------------------
-        */
-
-        timeline.to({}, {
-          duration: 0.55,
-        });
-
-        /*
-        ------------------------------------------------------------
-        CURRENT TITLE EXITS
-        ------------------------------------------------------------
-        */
-
-        timeline.to(
-          currentTitle,
-          {
-            yPercent: -110,
-            opacity: 0,
-            duration: 0.45,
-            ease: "power3.inOut",
-          }
-        );
-
-        /*
-        ------------------------------------------------------------
-        CURRENT IMAGE ZOOMS
-        ------------------------------------------------------------
-        */
-
-        timeline.to(
-          currentImage,
-          {
-            scale: 1.1,
-            duration: 0.55,
-            ease: "power2.inOut",
-          },
-          "<0.05"
-        );
-
-        /*
-        ------------------------------------------------------------
-        CURRENT SCENE EXITS
-        ------------------------------------------------------------
-        */
-
-        timeline.to(
-          currentScene,
-          {
-            xPercent: -7,
-            opacity: 0,
-            duration: 0.4,
-            ease: "power3.inOut",
-          },
-          "<0.15"
-        );
-
-        /*
-        ------------------------------------------------------------
-        NEXT SCENE IS NOW ALLOWED TO APPEAR
-        ------------------------------------------------------------
-        */
-
-        timeline.set(nextScene, {
-          autoAlpha: 1,
-          xPercent: 7,
-        });
-
-        /*
-        ------------------------------------------------------------
-        NEXT SCENE ENTER
-        ------------------------------------------------------------
-        */
-
-        timeline.to(
-          nextScene,
-          {
-            xPercent: 0,
-            opacity: 1,
-            duration: 0.4,
-            ease: "power3.out",
-          }
-        );
-
-        /*
-        ------------------------------------------------------------
-        NEXT IMAGE REVEAL
-        ------------------------------------------------------------
-        */
-
-        timeline.fromTo(
-          nextImage,
-          {
-            clipPath: "inset(35% 25% 35% 25%)",
-            scale: 1.12,
-          },
-          {
-            clipPath: "inset(0% 0% 0% 0%)",
-            scale: 1,
-            duration: 0.75,
-            ease: "power3.inOut",
-          },
-          "<0.05"
-        );
-
-        /*
-        ------------------------------------------------------------
-        NEXT TITLE ENTER
-        ------------------------------------------------------------
-        */
-
-        timeline.fromTo(
-          nextTitle,
-          {
-            yPercent: 110,
-            opacity: 0,
-          },
-          {
-            yPercent: 0,
-            opacity: 1,
-            duration: 0.6,
-            ease: "power3.out",
-          },
-          "<0.2"
-        );
-
-        /*
-        ------------------------------------------------------------
-        NUMBER CHANGE
-        ------------------------------------------------------------
-        */
-
-        timeline.to(
-          currentNumber,
-          {
-            opacity: 0,
-            duration: 0.15,
-          },
-          "<"
-        );
-
-        timeline.to(
-          nextNumber,
-          {
-            opacity: 1,
-            duration: 0.15,
-          },
-          "<0.1"
-        );
-      }
-
-      /*
-      ============================================================
-      FINAL HOLD
-      ============================================================
-      */
-
-      timeline.to({}, {
-        duration: 0.6,
-      });
-
-      /*
-      ============================================================
-      FINAL EXIT
-      ============================================================
-      */
-
-      timeline.to(
-        titles[titles.length - 1],
-        {
-          yPercent: -100,
-          opacity: 0,
-          duration: 0.5,
-          ease: "power3.inOut",
-        }
-      );
-
-      timeline.to(
-        images[images.length - 1],
-        {
-          scale: 1.08,
-          duration: 0.5,
           ease: "power2.inOut",
         },
         "<"
       );
+      timeline.to(titles[0], { y: 0, autoAlpha: 1, duration: 0.45 }, "<0.15");
+      timeline.to({}, { duration: 0.3 });
 
-      requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
-      });
+      for (let index = 0; index < solutions.length - 1; index++) {
+        const currentScene = scenes[index];
+        const nextScene = scenes[index + 1];
+        const currentImage = images[index];
+        const nextImage = images[index + 1];
+        const currentTitle = titles[index];
+        const nextTitle = titles[index + 1];
+
+        // Small reading beat before transitioning to the next use case.
+        timeline.to({}, { duration: 0.28 });
+
+        timeline.to(
+          [currentTitle, currentScene],
+          {
+            y: reduceMotion ? 0 : -16,
+            xPercent: -2,
+            autoAlpha: 0,
+            duration: 0.32,
+            ease: "power2.inOut",
+          }
+        );
+        timeline.to(currentImage, { scale: 1.035, duration: 0.32 }, "<");
+
+        timeline.set(nextScene, { autoAlpha: 1, xPercent: 3 });
+        timeline.set(nextTitle, { y: reduceMotion ? 0 : 20, autoAlpha: 0 });
+
+        timeline.fromTo(
+          nextImage,
+          {
+            clipPath: reduceMotion ? "inset(0% 0% 0% 0%)" : "inset(9% 7% 9% 7%)",
+            scale: reduceMotion ? 1 : 1.055,
+          },
+          {
+            clipPath: "inset(0% 0% 0% 0%)",
+            scale: 1,
+            duration: 0.52,
+            ease: "power2.inOut",
+          }
+        );
+        timeline.to(
+          nextScene,
+          { xPercent: 0, autoAlpha: 1, duration: 0.32, ease: "power2.out" },
+          "<"
+        );
+        timeline.to(nextTitle, { y: 0, autoAlpha: 1, duration: 0.42 }, "<0.12");
+      }
+
+      timeline.to({}, { duration: 0.3 });
+      timeline.to(
+        titles[titles.length - 1],
+        { y: reduceMotion ? 0 : -12, autoAlpha: 0, duration: 0.35, ease: "power2.inOut" }
+      );
+      timeline.to(images[images.length - 1], { scale: 1.025, duration: 0.35 }, "<");
+
+      const refreshFrame = window.requestAnimationFrame(() => ScrollTrigger.refresh());
+      return () => window.cancelAnimationFrame(refreshFrame);
     }, section);
 
-    return () => {
-      ctx.revert();
-    };
+    return () => context.revert();
   }, []);
 
   return (
     <section
       ref={sectionRef}
       id="solutions"
-       data-navbar-theme="light"
-      className="
-        relative
-        h-[1050vh]
-        w-full
-        overflow-hidden
-        bg-[#f5f5f2]
-        text-[#080808]
-      "
+      data-navbar-theme="light"
+      className="relative z-20 w-full overflow-x-clip bg-[#f5f5f2] text-[#080808]"
     >
       <div
         ref={stageRef}
-        className="
-          relative
-          h-screen
-          w-full
-          overflow-hidden
-          bg-[#f5f5f2]
-        "
+        className="relative h-[100svh] min-h-[560px] w-full overflow-hidden bg-[#f5f5f2] max-sm:min-h-[520px]"
       >
-        {/* ======================================================
-            TOP META
-        ======================================================= */}
+        {/* Persistent metadata */}
+       
 
-        <div
-          className="
-            absolute
-            left-6
-            right-6
-            top-24
-            z-[110]
-            flex
-            items-center
-            justify-between
-            md:left-10
-            md:right-10
-            lg:left-16
-            lg:right-16
-          "
-        >
-         
-
-          
-        </div>
-
-        {/* ======================================================
-            INTRO
-        ======================================================= */}
-
+        {/* Intro — same full-screen visual treatment on all devices */}
         <div
           ref={introRef}
-          className="
-            absolute
-            inset-0
-            z-[90]
-            flex
-            items-center
-            px-6
-            md:px-10
-            lg:px-16
-          "
+          className="absolute inset-0 z-[90] flex items-center px-5 sm:px-7 md:px-10 lg:px-16"
         >
-          <div className="max-w-[1000px]">
-            <div
-              className="
-                mb-8
-                flex
-                items-center
-                gap-3
-              "
-            >
-              
-
-              <span
-                className="
-                  text-[9px]
-                  uppercase
-                  tracking-[0.24em]
-                  text-black/40
-                "
-              >
-               
+          <div className="w-full max-w-[1000px]">
+            <div className="mb-5 flex items-center gap-3 sm:mb-7">
+             
+              <span className="text-[8px] uppercase tracking-[0.19em] text-black/45 sm:text-[9px] sm:tracking-[0.24em]">
+                Solutions built around you
               </span>
             </div>
-
-            <h2
-              className="
-                text-[clamp(4rem,9.5vw,9.5rem)]
-                font-medium
-                leading-[0.76]
-                tracking-[-0.09em]
-              "
-            >
+            <h2 className="text-[clamp(3.15rem,12.5vw,5rem)] font-medium leading-[0.82] tracking-[-0.085em] sm:text-[clamp(4.5rem,10vw,7rem)] md:text-[clamp(5rem,8.5vw,8rem)] lg:text-[clamp(6rem,9.5vw,9.5rem)]">
               Intelligence
               <br />
-              with an
-              {/* <br /> */} <span className="text-black/30">  outcome.
-              </span>
+              with an <span className="text-black/30">outcome.</span>
             </h2>
-
-            <p
-              className="
-                mt-9
-                max-w-[430px]
-                text-[14px]
-                leading-7
-                text-black/40
-              "
-            >
-              We connect intelligence to the moments
-              that matter — customers, sales, knowledge,
-              operations and decisions.
+            <p className="mt-5 max-w-[330px] text-[11px] leading-[1.65] text-black/50 sm:mt-7 sm:max-w-[390px] sm:text-[13px] sm:leading-6 md:mt-8 md:max-w-[430px] md:text-[14px] md:leading-7">
+              We connect intelligence to the moments that matter — customers,
+              sales, knowledge, operations, and decisions.
             </p>
+            <div className="mt-6 flex items-center gap-3 text-[7px] uppercase tracking-[0.16em] text-black/45 sm:mt-8 sm:text-[8px] sm:tracking-[0.2em] md:mt-9 md:text-[9px]">
+              <span>Explore our solutions</span>
+              <ArrowDownRight size={13} />
+            </div>
           </div>
         </div>
 
-        {/* ======================================================
-            SOLUTION SCENES
-        ======================================================= */}
-
+        {/* Solution scenes — shared markup and animation across all breakpoints */}
         {solutions.map((solution, index) => (
           <div
             key={solution.number}
-            ref={(el) => {
-              if (el) {
-                sceneRefs.current[index] = el;
-              }
+            ref={(element) => {
+              if (element) sceneRefs.current[index] = element;
             }}
-            className="
-              absolute
-              inset-0
-              overflow-hidden
-              opacity-0
-              will-change-transform
-            "
+            className="absolute inset-0 overflow-hidden opacity-0 will-change-transform"
+            aria-label={solution.eyebrow}
           >
-            {/* ==================================================
-                GIANT BACKGROUND NUMBER
-            ================================================== */}
-
-            <div
-              className="
-                pointer-events-none
-                absolute
-                -bottom-[16vw]
-                -left-[3vw]
-                z-0
-                select-none
-                text-[42vw]
-                font-medium
-                leading-none
-                tracking-[-0.12em]
-                text-black/[0.035]
-              "
-            >
+            <span className="pointer-events-none absolute -bottom-[10vw] -left-[2vw] z-0 select-none text-[45vw] font-medium leading-none tracking-[-0.12em] text-black/[0.035] sm:text-[40vw] md:text-[34vw] lg:text-[30vw]">
               {solution.number}
-            </div>
+            </span>
 
-            {/* ==================================================
-                IMAGE
-            ================================================== */}
-
+            {/* Full-bleed responsive image frame */}
             <div
-              ref={(el) => {
-                if (el) {
-                  imageRefs.current[index] = el;
-                }
+              ref={(element) => {
+                if (element) imageRefs.current[index] = element;
               }}
-              className="
-                absolute
-                inset-[8vh_5vw]
-                z-10
-                overflow-hidden
-                bg-black
-                will-change-transform
-
-                max-md:inset-[20vh_6vw_14vh]
-              "
+              className="absolute inset-[10vh_4vw_7vh] z-10 overflow-hidden bg-black sm:inset-[9vh_4vw_7vh] md:inset-[7vh_5vw]"
             >
               <Image
                 src={solution.image}
-                alt={solution.eyebrow}
+                alt={`${solution.eyebrow.toLowerCase()} solution`}
                 fill
                 priority={index === 0}
-                sizes="100vw"
-                className="
-                  object-cover
-                  grayscale
-                "
+                loading={index === 0 ? undefined : "lazy"}
+                sizes="(max-width: 767px) 92vw, (max-width: 1023px) 92vw, 90vw"
+                className="object-cover grayscale"
               />
-
-              {/* Image overlay */}
-
-              <div
-                className="
-                  pointer-events-none
-                  absolute
-                  inset-0
-                  bg-black/[0.12]
-                "
-              />
-
-              {/* Image top label */}
-
-              <div
-                className="
-                  absolute
-                  left-6
-                  top-6
-                  z-20
-                  text-[9px]
-                  uppercase
-                  tracking-[0.22em]
-                  text-white/60
-                "
-              >
-                MENTROID / {solution.number}
-              </div>
-
-              {/* Image bottom label */}
-
-              {/* <div
-                className="
-                  absolute
-                  bottom-6
-                  right-6
-                  z-20
-                  text-[9px]
-                  uppercase
-                  tracking-[0.22em]
-                  text-white/60
-                "
-              >
+              <div className="pointer-events-none absolute inset-0 bg-black/15" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-black/20" />
+            
+              <span className="absolute bottom-3 right-3 z-20 max-w-[55%] text-right text-[7px] uppercase tracking-[0.14em] text-white/55 sm:bottom-5 sm:right-5 sm:text-[8px] sm:tracking-[0.18em] md:bottom-6 md:right-6 md:text-[9px] md:tracking-[0.22em]">
                 {solution.eyebrow}
-              </div> */}
+              </span>
             </div>
 
-            {/* ==================================================
-                TITLE
-            ================================================== */}
-<div
-  ref={(el) => {
-    if (el) {
-      titleRefs.current[index] = el;
-    }
-  }}
-  className="
-    absolute
-    bottom-[9vh]
-    left-[6vw]
-    z-30
-    w-[calc(100%-40px)]
-    max-w-[500px]
-    will-change-transform
+            {/* Responsive title overlay */}
+            <div
+              ref={(element) => {
+                if (element) titleRefs.current[index] = element;
+              }}
+              className="absolute bottom-[11vh] left-[7vw] z-30 w-[86vw] max-w-[660px] will-change-transform sm:bottom-[10vh] sm:left-[7vw] sm:w-[82vw] md:bottom-[13vh] md:left-[8vw] md:w-auto md:max-w-[min(720px,75vw)]"
+            >
+              <div className="mb-2 flex items-center gap-2 sm:mb-3 sm:gap-3">
+                <span className="text-[7px] uppercase tracking-[0.16em] text-white/65 sm:text-[8px] sm:tracking-[0.2em] md:text-[9px] md:tracking-[0.22em]">
+                  {solution.number} / 08
+                </span>
+                
+                <span className="max-w-[52vw] truncate text-[7px] uppercase tracking-[0.14em] text-white/70 sm:text-[8px] sm:tracking-[0.18em] md:text-[9px] md:tracking-[0.22em]">
+                  {solution.eyebrow}
+                </span>
+              </div>
 
-    max-md:left-5
-    max-md:bottom-[15vh]
-    max-md:w-[calc(100%-40px)]
+              <h3 className="text-[clamp(2.45rem,10.5vw,4.1rem)] font-medium leading-[0.84] tracking-[-0.085em] text-white sm:text-[clamp(3.2rem,8vw,5.5rem)] md:text-[clamp(3.4rem,6.5vw,7.2rem)]">
+                {solution.title}
+                <br />
+                <span className="text-white/55">{solution.accent}</span>
+              </h3>
 
-    sm:left-6
-    sm:w-[calc(100%-48px)]
-    sm:max-w-[700px]
+              <p className="mt-3 max-w-[290px] text-[10px] leading-[1.55] text-white/80 sm:mt-4 sm:max-w-[350px] sm:text-[12px] sm:leading-5 md:mt-5 md:max-w-[390px] md:text-[13px] md:leading-6 lg:text-[14px]">
+                {solution.description}
+              </p>
 
-    md:left-[5vw]
-    md:bottom-[15vh]
-    md:w-auto
-  "
->
-  <div
-    className="
-      mb-2
-      flex
-      items-center
-      gap-3
-    "
-  >
-    <span
-      className="
-        px-2
-        text-[8px]
-        uppercase
-        tracking-[0.22em]
-        text-white/70
-
-        sm:text-[9px]
-      "
-    >
-      {solution.eyebrow}
-    </span>
-  </div>
-
-  <h3
-    className="
-      max-w-full
-      text-[clamp(2.7rem,11vw,4.5rem)]
-      font-medium
-      leading-[0.82]
-      tracking-[-0.08em]
-      text-white
-
-      sm:text-[clamp(3.2rem,8vw,6rem)]
-
-      md:text-[clamp(3.2rem,6.5vw,7.5rem)]
-    "
-  >
-    {solution.title}
-
-    <br />
-
-    <span className="text-white/45">
-      {solution.accent}
-    </span>
-  </h3>
-
-  <p
-    className="
-      mt-4
-      w-full
-      max-w-[330px]
-      break-words
-      whitespace-normal
-      px-0
-      py-0
-      text-[12px]
-      leading-[1.5]
-      text-white/65
-
-      sm:mt-5
-      sm:max-w-[390px]
-      sm:text-[13px]
-      sm:leading-6
-
-      md:mt-6
-      md:max-w-[390px]
-      md:text-[14px]
-      md:leading-6
-    "
-  >
-    {solution.description}
-  </p>
-</div>
+              <a
+                href="#contact"
+                className="group mt-3 inline-flex items-center gap-2 py-1 text-[7px] uppercase tracking-[0.14em] text-white/85 transition-colors hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-white sm:mt-4 sm:gap-3 sm:text-[8px] sm:tracking-[0.18em] md:mt-6 md:text-[9px] md:tracking-[0.2em]"
+              >
+                <span>Discuss this use case</span>
+                <ArrowUpRight
+                  size={13}
+                  className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                />
+              </a>
+            </div>
           </div>
         ))}
-
-      
-
-      
       </div>
     </section>
   );

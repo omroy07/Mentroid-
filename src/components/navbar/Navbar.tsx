@@ -73,7 +73,7 @@ export const menuOrder: MenuKey[] = [
 export const menuPreviewImages: Record<MenuKey, string> = {
   services: "/assets/navbar/Ai-automation.webp",
   solutions: "/assets/navbar/Ai-development.webp",
-  expertise: "/assets/navbar/Ai-automation.webp",
+  expertise: "/assets/navbar/experties.webp",
   industries: "/assets/navbar/Ai-development.webp",
   company: "/assets/navbar/Ai-automation.webp",
 };
@@ -98,6 +98,7 @@ export default function Navbar() {
 
   const [activeMenu, setActiveMenu] = useState<MenuKey | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isNavVisible, setIsNavVisible] = useState(true);
 
   const [navTheme, setNavTheme] = useState<"dark" | "light">("dark");
 
@@ -214,6 +215,43 @@ export default function Navbar() {
   }, []);
 
   /* =======================================================
+     HIDE NAVBAR ON SCROLL DOWN, SHOW ON SCROLL UP
+  ======================================================= */
+
+  useEffect(() => {
+    let previousScrollY = window.scrollY;
+    let ticking = false;
+
+    const updateNavbarVisibility = () => {
+      const currentScrollY = window.scrollY;
+      const delta = currentScrollY - previousScrollY;
+
+      // Keep the navbar visible at the very top.
+      if (currentScrollY <= 12) {
+        setIsNavVisible(true);
+      } else if (Math.abs(delta) > 4) {
+        // Scrolling down: hide. Scrolling up: show.
+        setIsNavVisible(delta < 0);
+      }
+
+      previousScrollY = currentScrollY;
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(updateNavbarVisibility);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  /* =======================================================
      ESCAPE
   ======================================================= */
 
@@ -268,6 +306,15 @@ export default function Navbar() {
 
     setActiveMenu(menu);
     setPreviewImage(menuPreviewImages[menu]);
+  };
+
+  const toggleMenu = (menu: MenuKey) => {
+    if (activeMenu === menu) {
+      setActiveMenu(null);
+      return;
+    }
+
+    openMenu(menu);
   };
 
   /* =======================================================
@@ -338,8 +385,8 @@ export default function Navbar() {
         <motion.nav
           initial={false}
           animate={{
-            y: 0,
-            opacity: 1,
+            y: isNavVisible || activeMenu || mobileOpen ? 0 : "-110%",
+            opacity: isNavVisible || activeMenu || mobileOpen ? 1 : 0,
           }}
           transition={{
             y: {
@@ -439,29 +486,43 @@ export default function Navbar() {
                     "
                   />
 
-                  <span
-                    className={`
-                      ml-1.5
-                      whitespace-nowrap
-                      text-[19px]
-                      font-semibold
-                      leading-none
-                      tracking-[-0.045em]
-                      transition-colors
-                      duration-300
-
-                      sm:text-[20px]
-
-                      lg:text-[21px]
-
-                      ${
-                        navTheme === "dark"
-                          ? "text-white"
-                          : "text-[#07111f]"
-                      }
-                    `}
-                  >
-                    Mentroid
+                  <span className="ml-1.5 flex min-w-0 flex-col justify-center gap-[4px]">
+                    <span
+                      className={`
+                        whitespace-nowrap
+                        text-[19px]
+                        font-semibold
+                        leading-none
+                        tracking-[-0.045em]
+                        transition-colors
+                        duration-300
+                        sm:text-[20px]
+                        lg:text-[21px]
+                        ${
+                          navTheme === "dark"
+                            ? "text-white"
+                            : "text-[#07111f]"
+                        }
+                      `}
+                    >
+                      Mentroid
+                    </span>
+                   <span
+  className="
+    whitespace-nowrap
+    text-[7px]
+    font-medium
+    uppercase
+    leading-none
+    tracking-[0.16em]
+    text-[#079dad]
+    transition-colors
+    duration-300
+    sm:text-[8px]
+  "
+>
+  AI · ML SERVICES
+</span>
                   </span>
                 </div>
               </Link>
@@ -475,6 +536,7 @@ export default function Navbar() {
               activeMenu={activeMenu}
               navTheme={navTheme}
               onOpenMenu={openMenu}
+              onToggleMenu={toggleMenu}
             />
 
             {/* =================================================
@@ -499,10 +561,13 @@ export default function Navbar() {
                   LET'S TALK
               ================================================= */}
 
-              <Link
+           
+
+<Link
   href="/contact"
   onClick={closeNavigation}
   className="
+    mentroid-gradient-border
     group
     relative
     hidden
@@ -510,11 +575,9 @@ export default function Navbar() {
     shrink-0
     items-center
     justify-center
-    gap-2
     overflow-hidden
-    rounded-[9px]
-    bg-[#07111f]
-    px-3.5
+    rounded-[10px]
+    p-[1.5px]
     text-[13px]
     font-semibold
     leading-none
@@ -522,51 +585,63 @@ export default function Navbar() {
     transition-transform
     duration-300
     hover:scale-[1.015]
-
     lg:inline-flex
     lg:h-11
-    lg:px-5
   "
 >
-                <span
-                  className="
-                    absolute
-                    inset-0
-                    translate-y-full
-                    bg-white/[0.08]
-                    transition-transform
-                    duration-300
-                    group-hover:translate-y-0
-                  "
-                />
+  <span
+    className={`
+      relative
+      flex
+      h-full
+      w-full
+      items-center
+      justify-center
+      gap-2
+      overflow-hidden
+      rounded-[8.5px]
+      bg-transparent
+      px-3.5
+      lg:px-5
+     ${
+                          navTheme === "dark"
+                            ? "text-white"
+                            : "text-[#07111f]"
+                        }
+                      `}
+  >
+    <span
+      className="
+        absolute
+        inset-0
+        translate-y-full
+       
+        transition-transform
+        duration-300
+        
+      "
+    />
 
-                <span
-                  className="
-                    relative
-                    z-[1]
-                    flex
-                    items-center
-                    gap-2
-                    whitespace-nowrap
-                  "
-                >
-                  Let's Talk
+    <span className="relative z-[1] flex items-center gap-2 whitespace-nowrap">
+      Let's Talk
 
-                  <ArrowUpRight
-                    size={14}
-                    strokeWidth={1.7}
-                    className="
-                      shrink-0
-                      transition-transform
-                      duration-300
-                      group-hover:-translate-y-0.5
-                      group-hover:translate-x-0.5
+      <ArrowUpRight
+        size={14}
+        strokeWidth={1.7}
+        className="
+          shrink-0
+          transition-transform
+          duration-300
+          group-hover:-translate-y-0.5
+          group-hover:translate-x-0.5
+          lg:size-[15px]
+        "
+      />
+    </span>
+  </span>
+</Link>
 
-                      lg:size-[15px]
-                    "
-                  />
-                </span>
-              </Link>
+
 
               {/* =================================================
                   MOBILE / TABLET BUTTON
@@ -585,7 +660,7 @@ export default function Navbar() {
     items-center
     justify-center
     rounded-[9px]
-    bg-[#07111f]
+    
     text-white
     transition-transform
     duration-300

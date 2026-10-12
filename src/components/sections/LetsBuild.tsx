@@ -896,7 +896,7 @@ export default function LetsBuild() {
         text-white
 
         h-[400vh]
-        -mt-[30vh]
+        -mt-[0vh]
 
         sm:h-[430vh]
         sm:-mt-[35vh]
@@ -908,7 +908,7 @@ export default function LetsBuild() {
         lg:-mt-[60vh]
 
         xl:h-[560vh]
-        xl:-mt-[65vh]
+        xl:-mt-[51vh]
       "
     >
       <div
@@ -1115,7 +1115,7 @@ export default function LetsBuild() {
 
                 text-[18vw]
 
-                sm:text-[17vw]
+                sm:text-[22vw]
 
                 md:text-[14vw]
 
@@ -1140,9 +1140,9 @@ export default function LetsBuild() {
                 tracking-[-0.065em]
                 text-white/45
 
-                text-[13vw]
+                text-[14vw]
 
-                sm:text-[12vw]
+                sm:text-[14vw]
 
                 md:text-[9vw]
 
@@ -1166,7 +1166,7 @@ export default function LetsBuild() {
 
                 text-[9.5vw]
 
-                sm:text-[10vw]
+                sm:text-[12vw]
 
                 md:text-[10.5vw]
 
@@ -1212,16 +1212,16 @@ export default function LetsBuild() {
                   leading-[0.78]
                   tracking-[-0.075em]
 
-                  text-[14vw]
+                  text-[8.5vw]
 
-                  sm:text-[14vw]
+                  sm:text-[8.5vw]
 
-                  md:text-[12vw]
+                  md:text-[9.5vw]
 
-                  lg:text-[11.5vw]
+                  lg:text-[9.5vw]
                 "
               >
-                WE BUILD
+                HAVE AN AI PROJECT
               </div>
             </div>
 
@@ -1237,18 +1237,24 @@ export default function LetsBuild() {
                   tracking-[-0.095em]
                   text-white/40
 
-                  text-[14vw]
+                  text-[13vw]
 
-                  sm:text-[14vw]
+                  sm:text-[13vw]
 
-                  md:text-[12vw]
+                  md:text-[10vw]
 
-                  lg:text-[11.5vw]
+                  lg:text-[9.5vw]
                 "
               >
-                WHAT COMES NEXT
+                IN MIND?
               </div>
             </div>
+
+            <p
+              className="mx-auto mt-6 max-w-[560px] px-4 text-center text-[12px] leading-6 text-white/60 sm:mt-8 sm:text-sm sm:leading-7 md:mt-10 md:text-[15px]"
+            >
+              Tell us what you’re trying to build, automate or improve. We’ll review your requirements and suggest the right technical approach.
+            </p>
           </div>
         </div>
 
@@ -1260,16 +1266,19 @@ export default function LetsBuild() {
           ref={ctaWrapRef}
           className="
             absolute
-            bottom-[9%]
+            bottom-[10%]
             left-1/2
             z-40
             -translate-x-1/2
-
+            flex
+            flex-col
+            items-center
+            gap-3
             sm:bottom-[10%]
-
+            sm:flex-row
+            sm:gap-4
             md:bottom-[12%]
-
-            lg:bottom-[16%]
+            lg:bottom-[14%]
           "
         >
           <a
@@ -1297,6 +1306,7 @@ export default function LetsBuild() {
               duration-500
 
               hover:border-white
+              hover:text-black
 
               sm:gap-4
               sm:px-5
@@ -1310,7 +1320,7 @@ export default function LetsBuild() {
             "
           >
             <span>
-              Start a conversation
+              Start Your Project
             </span>
 
             <span
@@ -1354,6 +1364,16 @@ export default function LetsBuild() {
                 group-hover:scale-x-100
               "
             />
+          </a>
+
+          <a
+            href="https://wa.me/?text=Hi%20Mentroid%2C%20I%27d%20like%20to%20discuss%20an%20AI%20project."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex min-h-12 items-center justify-center gap-2 border border-white/20 px-4 py-3 text-[9px] font-medium uppercase tracking-[0.14em] text-white/75 transition-colors duration-300 hover:border-white hover:text-white sm:px-5 md:text-[10px]"
+          >
+            WhatsApp Us
+            <ArrowUpRight size={13} strokeWidth={1.5} className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </a>
         </div>
 

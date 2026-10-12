@@ -1,54 +1,83 @@
+
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  Bot,
+  BrainCircuit,
+  Check,
+  Database,
+  FileText,
+  Network,
+  Workflow,
+  Zap,
+} from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowUpRight } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const scenes = [
+const stages = [
   {
     id: "01",
-    label: "APPLICATIONS",
-    title: "AI systems that",
-    accent: "actually work.",
+    eyebrow: "THE BUSINESS CHALLENGE",
+    title: "Start with the",
+    accent: "real problem.",
     description:
-      "Mentroid designs intelligent systems around real business problems — from customer experiences to complex operational workflows.",
+      "Repetitive enquiries, scattered knowledge and manual handoffs slow teams down. We start by understanding the work that needs to change.",
     video: "/videos/ai.webm",
-    side: "right",
-    tag: "AI / SYSTEMS",
+    inputTitle: "BEFORE MENTROID",
+    inputs: ["Manual enquiries", "Scattered information", "Repetitive tasks"],
+    outputTitle: "THE OPPORTUNITY",
+    outputs: ["Find the bottleneck", "Map the workflow", "Define the outcome"],
+    engineLabel: "PROBLEM DISCOVERY",
+    tag: "UNDERSTAND",
   },
   {
     id: "02",
-    label: "DATA",
-    title: "Intelligence",
-    accent: "starts with data.",
+    eyebrow: "DATA & INTELLIGENCE",
+    title: "Give information",
+    accent: "a purpose.",
     description:
-      "We connect your knowledge, documents, conversations and business systems into a foundation AI can actually use.",
+      "We connect documents, databases and business tools to give AI systems useful context through retrieval, models and structured knowledge.",
     video: "/videos/agentic-ai.webm",
-    side: "left",
-    tag: "DATA / KNOWLEDGE",
+    inputTitle: "CONNECTED KNOWLEDGE",
+    inputs: ["Documents & files", "Databases & CRM", "Business context"],
+    outputTitle: "AI CAN UNDERSTAND",
+    outputs: ["Retrieve relevant facts", "Ground responses", "Use the right context"],
+    engineLabel: "KNOWLEDGE + REASONING",
+    tag: "CONNECT",
   },
   {
     id: "03",
-    label: "AGENTIC AI",
-    title: "From understanding",
-    accent: "to action.",
+    eyebrow: "AGENTS & AUTOMATION",
+    title: "Turn insight into",
+    accent: "action.",
     description:
-      "AI agents connect intelligence to tools and workflows, allowing systems to reason, decide and execute.",
+      "AI agents connect knowledge to tools and APIs to route requests, update systems and move work forward—with human oversight when needed.",
     video: "/videos/automation.webm",
-    side: "right",
-    tag: "AGENTS / ACTION",
+    inputTitle: "INTELLIGENT WORKFLOW",
+    inputs: ["Customer request", "AI agent & tools", "Business rules"],
+    outputTitle: "AFTER MENTROID",
+    outputs: ["Respond or route", "Trigger an action", "Update the workflow"],
+    engineLabel: "TOOLS → ACTIONS",
+    tag: "EXECUTE",
   },
 ];
+
+const inputIcons = [FileText, Database, Workflow];
+const outputIcons = [BrainCircuit, Network, Zap];
 
 export default function IntelligenceSystem() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const pinRef = useRef<HTMLDivElement | null>(null);
-
-  const sceneRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const visualRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const stageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const progressRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const orbitRef = useRef<HTMLDivElement | null>(null);
+  const mobileStageRefs = useRef<(HTMLElement  | null)[]>([]);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -57,266 +86,211 @@ export default function IntelligenceSystem() {
     if (!section || !pin) return;
 
     const ctx = gsap.context(() => {
-      const sceneElements = sceneRefs.current.filter(
-        Boolean
-      ) as HTMLDivElement[];
+      const mm = gsap.matchMedia();
 
-      const visuals = visualRefs.current.filter(
-        Boolean
-      ) as HTMLDivElement[];
+      // DESKTOP: PINNED CINEMATIC EXPERIENCE
+      mm.add("(min-width: 768px)", () => {
+        const sceneElements = stageRefs.current.filter(
+          (el): el is HTMLDivElement => el !== null
+        );
 
-      if (!sceneElements.length || !visuals.length) {
-        return;
-      }
+        const videos = videoRefs.current.filter(
+          (el): el is HTMLVideoElement => el !== null
+        );
 
-      /*
-       * ============================================================
-       * INITIAL STATE
-       * ============================================================
-       */
+        const progressElements = progressRefs.current.filter(
+          (el): el is HTMLDivElement => el !== null
+        );
 
-      gsap.set(sceneElements, {
-        autoAlpha: 0,
-        force3D: true,
-      });
+        if (sceneElements.length !== stages.length) return;
 
-      gsap.set(sceneElements[0], {
-        autoAlpha: 1,
-      });
-
-      gsap.set(visuals, {
-        opacity: 0,
-        scale: 0.92,
-        xPercent: 0,
-        transformOrigin: "center center",
-        force3D: true,
-      });
-
-      gsap.set(visuals[0], {
-        opacity: 1,
-        scale: 0.96,
-      });
-
-      /*
-       * ============================================================
-       * MAIN CINEMATIC TIMELINE
-       * ============================================================
-       */
-
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 1,
-          pin,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-        },
-      });
-
-      /*
-       * ============================================================
-       * SCENE 01
-       * ============================================================
-       */
-
-      timeline.to(
-        visuals[0],
-        {
-          scale: 1.04,
-          duration: 1,
-          ease: "none",
-        },
-        0
-      );
-
-      /*
-       * ============================================================
-       * SCENE 01 → 02
-       * ============================================================
-       */
-
-      timeline.to(
-        sceneElements[0],
-        {
+        gsap.set(sceneElements, {
           autoAlpha: 0,
-          yPercent: -8,
-          duration: 0.45,
-          ease: "power2.inOut",
-        },
-        1
-      );
+          y: 22,
+        });
 
-      timeline.to(
-        visuals[0],
-        {
-          opacity: 0,
-          scale: 1.12,
-          xPercent: -5,
-          duration: 0.55,
-          ease: "power2.inOut",
-        },
-        1
-      );
-
-      timeline.fromTo(
-        sceneElements[1],
-        {
-          autoAlpha: 0,
-          yPercent: 8,
-        },
-        {
+        gsap.set(sceneElements[0], {
           autoAlpha: 1,
-          yPercent: 0,
-          duration: 0.5,
-          ease: "power3.out",
-        },
-        1.12
-      );
+          y: 0,
+        });
 
-      timeline.fromTo(
-        visuals[1],
-        {
-          opacity: 0,
-          scale: 0.9,
-          xPercent: 5,
-        },
-        {
-          opacity: 1,
-          scale: 1,
-          xPercent: 0,
-          duration: 0.65,
-          ease: "power3.out",
-        },
-        1.12
-      );
+        gsap.set(progressElements, {
+          scaleX: 0.25,
+          transformOrigin: "left center",
+        });
 
-      /*
-       * ============================================================
-       * SCENE 02 CAMERA
-       * ============================================================
-       */
+        gsap.set(progressElements[0], {
+          scaleX: 1,
+        });
 
-      timeline.to(
-        visuals[1],
-        {
-          scale: 1.05,
-          xPercent: 2,
-          duration: 0.9,
-          ease: "none",
-        },
-        1.75
-      );
+        if (orbitRef.current) {
+          gsap.to(orbitRef.current, {
+            rotation: 360,
+            duration: 36,
+            repeat: -1,
+            ease: "none",
+          });
+        }
 
-      /*
-       * ============================================================
-       * SCENE 02 → 03
-       * ============================================================
-       */
+        const activateVideo = (activeIndex: number) => {
+          videos.forEach((video, index) => {
+            if (index === activeIndex) {
+              if (video.paused) {
+                void video.play().catch(() => undefined);
+              }
+            } else {
+              video.pause();
+            }
+          });
+        };
 
-      timeline.to(
-        sceneElements[1],
-        {
+        const timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 0.85,
+            pin,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              const activeIndex =
+                self.progress < 0.34
+                  ? 0
+                  : self.progress < 0.68
+                    ? 1
+                    : 2;
+
+              activateVideo(activeIndex);
+            },
+          },
+        });
+
+        // Stage 01 remains visible long enough to read.
+        timeline.to({}, { duration: 0.9 });
+
+        timeline.to(sceneElements[0], {
           autoAlpha: 0,
-          yPercent: -8,
-          duration: 0.45,
-          ease: "power2.inOut",
-        },
-        2.05
-      );
-
-      timeline.to(
-        visuals[1],
-        {
-          opacity: 0,
-          scale: 1.12,
-          xPercent: 5,
-          duration: 0.55,
-          ease: "power2.inOut",
-        },
-        2.05
-      );
-
-      timeline.fromTo(
-        sceneElements[2],
-        {
-          autoAlpha: 0,
-          yPercent: 8,
-        },
-        {
-          autoAlpha: 1,
-          yPercent: 0,
-          duration: 0.5,
-          ease: "power3.out",
-        },
-        2.17
-      );
-
-      timeline.fromTo(
-        visuals[2],
-        {
-          opacity: 0,
-          scale: 0.9,
-          xPercent: -5,
-        },
-        {
-          opacity: 1,
-          scale: 1,
-          xPercent: 0,
-          duration: 0.65,
-          ease: "power3.out",
-        },
-        2.17
-      );
-
-      /*
-       * ============================================================
-       * SCENE 03 FINAL CAMERA
-       * ============================================================
-       */
-
-      timeline.to(
-        visuals[2],
-        {
-          scale: 1.08,
-          xPercent: -2,
-          duration: 0.9,
-          ease: "none",
-        },
-        2.8
-      );
-
-      /*
-       * ============================================================
-       * FINAL TEXT EXIT
-       * ============================================================
-       */
-
-      timeline.to(
-        sceneElements[2],
-        {
-          autoAlpha: 0,
-          yPercent: -10,
+          y: -18,
           duration: 0.35,
-          ease: "power2.in",
-        },
-        3.55
-      );
+          ease: "power2.inOut",
+        });
 
-      /*
-       * ============================================================
-       * REFRESH
-       * ============================================================
-       */
+        timeline.to(
+          progressElements[0],
+          {
+            scaleX: 0.25,
+            duration: 0.3,
+          },
+          "<"
+        );
 
-      requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
+        // Stage 02: connect data and knowledge.
+        timeline.fromTo(
+          sceneElements[1],
+          { autoAlpha: 0, y: 24 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.45,
+            ease: "power3.out",
+          }
+        );
+
+        timeline.to(
+          progressElements[1],
+          { scaleX: 1, duration: 0.4 },
+          "<"
+        );
+
+        timeline.to({}, { duration: 0.9 });
+
+        timeline.to(sceneElements[1], {
+          autoAlpha: 0,
+          y: -18,
+          duration: 0.35,
+          ease: "power2.inOut",
+        });
+
+        timeline.to(
+          progressElements[1],
+          { scaleX: 0.25, duration: 0.3 },
+          "<"
+        );
+
+        // Stage 03: transform intelligence into action.
+        timeline.fromTo(
+          sceneElements[2],
+          { autoAlpha: 0, y: 24 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.45,
+            ease: "power3.out",
+          }
+        );
+
+        timeline.to(
+          progressElements[2],
+          { scaleX: 1, duration: 0.4 },
+          "<"
+        );
+
+        // Hold the final scene before releasing the pin.
+        timeline.to({}, { duration: 1.1 });
+
+        activateVideo(0);
+
+        return () => {
+          timeline.scrollTrigger?.kill();
+          timeline.kill();
+          videos.forEach((video) => video.pause());
+        };
       });
+
+      // MOBILE: NATURAL FLOW, NO PINNED SCROLL.
+      mm.add("(max-width: 767px)", () => {
+        const cards = mobileStageRefs.current.filter(
+          (el): el is HTMLDivElement => el !== null
+        );
+
+        const videos = videoRefs.current.filter(
+          (el): el is HTMLVideoElement => el !== null
+        );
+
+        cards.forEach((card) => {
+          gsap.fromTo(
+            card,
+            { y: 18, autoAlpha: 0.5 },
+            {
+              y: 0,
+              autoAlpha: 1,
+              duration: 0.6,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: card,
+                start: "top 85%",
+                once: true,
+              },
+            }
+          );
+        });
+
+        videos.forEach((video) => video.pause());
+
+        return () => {
+          cards.forEach((card) => gsap.killTweensOf(card));
+        };
+      });
+
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+
+      return () => mm.revert();
     }, section);
 
     return () => {
       ctx.revert();
+      videoRefs.current.forEach((video) => video?.pause());
     };
   }, []);
 
@@ -326,395 +300,396 @@ export default function IntelligenceSystem() {
       id="intelligence-system"
       data-navbar-theme="dark"
       className="
-        relative
-        z-20
-        -mt-[120px]
-        h-[300vh]
-        w-full
-        overflow-x-clip
-        bg-black
-        text-white
-
-        sm:-mt-[150px]
-
-        md:-mt-[180px]
-
-        lg:-mt-[220px]
-
-        xl:-mt-[250px]
+        relative z-20
+        -mt-[80px]
+        w-full overflow-x-clip
+        bg-[#080808] text-white
+        sm:-mt-[110px]
+        md:-mt-[140px]
+        lg:-mt-[170px]
       "
     >
-      {/* ========================================================
-          PINNED VIEWPORT
-      ======================================================== */}
-
-      <div
-        ref={pinRef}
-        className="
-          relative
-          h-[100svh]
-          min-h-[620px]
-          w-full
-          overflow-hidden
-          bg-black
-
-          sm:min-h-[650px]
-
-          md:min-h-[680px]
-
-          lg:min-h-[700px]
-        "
-      >
-        {/* ======================================================
-            SCENES
-        ====================================================== */}
-
-        {scenes.map((scene, index) => {
-          const textLeft = scene.side === "left";
-
-          return (
+      {/* DESKTOP EXPERIENCE */}
+      <div className="hidden md:block">
+        <div className="h-[300vh]">
+          <div
+            ref={pinRef}
+            className="
+              relative h-[100svh]
+              min-h-[680px]
+              overflow-hidden
+              bg-[#080808]
+              px-[5vw]
+              pb-8 pt-[7vh]
+            "
+          >
+            {/* Subtle technical grid */}
             <div
-              key={scene.id}
-              ref={(element) => {
-                sceneRefs.current[index] = element;
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 opacity-[0.12]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px)",
+                backgroundSize: "72px 72px",
+                maskImage:
+                  "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)",
               }}
-              className="
-                invisible
-                absolute
-                inset-0
-              "
-            >
-              {/* ==================================================
-                  TEXT
-              ================================================== */}
+            />
 
-              <div
-                className={`
-                  absolute
-                  z-30
-                  w-[calc(100%-40px)]
-                  max-w-[520px]
-
-                  -translate-y-1/2
-
-                  left-5
-                  top-[30%]
-
-                  sm:left-6
-                  sm:w-[calc(100%-48px)]
-                  sm:top-[30%]
-
-                  md:top-1/2
-                  md:w-[min(42vw,520px)]
-
-                  lg:w-[min(40vw,520px)]
-
-                  xl:w-[min(38vw,520px)]
-
-                  ${
-                    textLeft
-                      ? `
-                        md:left-[5vw]
-                        md:right-auto
-                      `
-                      : `
-                        md:right-[5vw]
-                        md:left-auto
-                      `
-                  }
-                `}
-              >
-                {/* LABEL */}
-
-                <div
-                  className="
-                    mb-5
-                    flex
-                    items-center
-                    gap-3
-
-                    sm:mb-6
-
-                    md:mb-6
-                  "
-                >
-                  <span
-                    className="
-                      h-1.5
-                      w-1.5
-                      shrink-0
-                      bg-white
-                    "
-                  />
-
-                  <span
-                    className="
-                      text-[8px]
-                      uppercase
-                      tracking-[0.18em]
-                      text-white/45
-
-                      sm:text-[9px]
-                      sm:tracking-[0.2em]
-                    "
-                  >
-                    {scene.label}
-                  </span>
+            {/* SECTION HEADING */}
+            <div className="relative z-10 flex items-end justify-between gap-10">
+              <div className="max-w-[720px]">
+                <div className="mb-5 flex items-center gap-3">
+                 
                 </div>
 
-                {/* TITLE */}
-
-                <h2
-                  className="
-                    text-[clamp(2.65rem,10vw,4.5rem)]
-                    font-medium
-                    leading-[0.9]
-                    tracking-[-0.065em]
-
-                    sm:text-[clamp(3rem,8vw,5.2rem)]
-
-                    md:text-[clamp(3.4rem,5.5vw,6rem)]
-
-                    lg:text-[clamp(4rem,5.3vw,6.8rem)]
-
-                    xl:text-[clamp(4.5rem,5vw,6.8rem)]
-                  "
-                >
-                  {scene.title}
-
+                <h2 className="text-[clamp(3.2rem,5.5vw,6.2rem)] font-medium leading-[0.88] tracking-[-0.07em]">
+                  From business complexity
                   <br />
-
                   <span className="text-white/35">
-                    {scene.accent}
+                    to intelligent action.
                   </span>
                 </h2>
-
-                {/* DESCRIPTION */}
-
-                <p
-                  className="
-                    mt-5
-                    max-w-[360px]
-                    text-[12px]
-                    leading-6
-                    text-white/45
-
-                    sm:mt-6
-                    sm:max-w-[400px]
-                    sm:text-[13px]
-                    sm:leading-7
-
-                    md:mt-7
-                    md:text-[15px]
-                    md:leading-8
-                  "
-                >
-                  {scene.description}
-                </p>
-
-                {/* TAG */}
-
-                <div
-                  className="
-                    mt-6
-                    flex
-                    items-center
-                    gap-3
-                    text-[8px]
-                    uppercase
-                    tracking-[0.16em]
-                    text-white/30
-
-                    sm:mt-7
-                    sm:text-[9px]
-                    sm:tracking-[0.18em]
-
-                    md:mt-8
-                  "
-                >
-                  <span>{scene.tag}</span>
-
-                  <ArrowUpRight size={13} />
-                </div>
               </div>
 
-              {/* ==================================================
-                  VIDEO
-              ================================================== */}
+              <p className="mb-1 hidden max-w-[300px] text-[13px] leading-6 text-white/50 lg:block">
+                Understand the challenge. Connect the knowledge. Build
+                systems that help work move forward.
+              </p>
+            </div>
 
-              <div
-                className={`
-                  absolute
-                  z-20
+            {/* CONNECTED BEFORE → AI → AFTER VISUALIZATION */}
+            <div className="relative z-10 mt-[5vh] grid h-[min(49vh,470px)] min-h-[370px] grid-cols-[0.92fr_1.2fr_0.92fr] items-stretch gap-5 xl:gap-8">
+              {stages.map((stage, index) => {
+                const InputIcon = inputIcons[index];
+                const OutputIcon = outputIcons[index];
 
-                  left-5
-                  right-5
-                  top-[69%]
+                return (
+                  <div
+                    key={stage.id}
+                    ref={(el) => {
+                      stageRefs.current[index] = el;
+                    }}
+                    className="absolute inset-0 grid grid-cols-[0.92fr_1.2fr_0.92fr] items-stretch gap-5 xl:gap-8"
+                  >
+                    {/* LEFT: BUSINESS INPUTS */}
+                    <div className="flex min-w-0 flex-col justify-center">
+                      <div className="mb-4 flex items-center gap-2">
+                        <span className="text-[9px] tracking-[0.18em] text-white/30">
+                          {stage.id} / INPUT
+                        </span>
+                        
+                      </div>
 
-                  h-[28vh]
-                  min-h-[190px]
+                      <p className="mb-4 text-[10px] font-medium tracking-[0.15em] text-white/65">
+                        {stage.inputTitle}
+                      </p>
 
-                  -translate-y-1/2
+                      <div className="space-y-2.5">
+                        {stage.inputs.map((item, itemIndex) => (
+                          <div
+                            key={item}
+                            className="
+                              group flex items-center gap-3
+                              border border-white/[0.10]
+                              bg-white/[0.025]
+                              px-3 py-3.5
+                              transition-colors duration-300
+                              hover:border-white/25
+                              hover:bg-white/[0.05]
+                              xl:px-4
+                            "
+                          >
+                            <InputIcon
+                              size={15}
+                              strokeWidth={1.5}
+                              className="shrink-0 text-white/45"
+                            />
+                            <span className="text-[11px] leading-4 text-white/70 xl:text-xs">
+                              {item}
+                            </span>
+                            <span className="ml-auto text-[8px] text-white/25">
+                              0{itemIndex + 1}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
 
-                  sm:left-6
-                  sm:right-6
-                  sm:top-[69%]
-                  sm:h-[30vh]
-                  sm:min-h-[210px]
+                      <div className="mt-5 flex items-center gap-2 text-[8px] uppercase tracking-[0.16em] text-white/30">
+                        <ArrowDownRight size={13} />
+                        <span>Business context</span>
+                      </div>
+                    </div>
 
-                  md:top-1/2
-                  md:h-[48vh]
-                  md:w-[min(48vw,650px)]
-                  md:min-h-[300px]
+                    {/* CENTER: INTELLIGENCE ENGINE */}
+                    <div className="relative flex min-w-0 flex-col items-center justify-center overflow-hidden border border-white/[0.12] bg-[#0d0d0d] px-4 py-5 xl:px-6">
+                      <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 opacity-30"
+                        style={{
+                          backgroundImage:
+                            "radial-gradient(rgba(255,255,255,.28) .7px, transparent .7px)",
+                          backgroundSize: "12px 12px",
+                        }}
+                      />
 
-                  lg:h-[52vh]
-                  lg:w-[min(50vw,760px)]
+                      <div className="relative z-10 mb-3 flex w-full items-center justify-between gap-2">
+                       
+                        <span className="flex items-center gap-1.5 text-[8px] text-white/50">
+                          <span className="h-1.5 w-1.5 rounded-full bg-white/70" />
+                          SYSTEM FLOW
+                        </span>
+                      </div>
 
-                  xl:w-[min(52vw,820px)]
+                      <div className="relative flex w-full flex-1 items-center justify-center overflow-hidden">
+                        <div className="absolute h-[230px] w-[230px] rounded-full border border-white/[0.09] xl:h-[270px] xl:w-[270px]" />
 
-                  ${
-                    textLeft
-                      ? `
-                        md:right-[4vw]
-                        md:left-auto
-                      `
-                      : `
-                        md:left-[4vw]
-                        md:right-auto
-                      `
-                  }
-                `}
+                        <div
+                          ref={orbitRef}
+                          className="absolute h-[185px] w-[185px] rounded-full border border-dashed border-white/20 xl:h-[220px] xl:w-[220px]"
+                        >
+                          <span className="absolute -left-1 top-1/2 h-2 w-2 rounded-full bg-white/70" />
+                          <span className="absolute right-5 top-5 h-1.5 w-1.5 rounded-full bg-white/45" />
+                        </div>
+
+                        <div className="absolute h-[138px] w-[138px] rounded-full border border-white/[0.14] xl:h-[164px] xl:w-[164px]" />
+
+                        {/* Stage-specific video */}
+                        <div className="relative z-10 h-[118px] w-[118px] overflow-hidden rounded-full border border-white/25 bg-black shadow-[0_0_70px_rgba(255,255,255,0.06)] xl:h-[140px] xl:w-[140px]">
+                          <video
+                            ref={(el) => {
+                              videoRefs.current[index] = el;
+                            }}
+                            src={stage.video}
+                            muted
+                            loop
+                            playsInline
+                            preload={index === 0 ? "metadata" : "none"}
+                            aria-label={`${stage.tag} visual`}
+                            className="absolute inset-0 h-full w-full object-cover opacity-80"
+                          />
+
+                          <div className="pointer-events-none absolute inset-0 bg-black/20" />
+
+                          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-center">
+                            <BrainCircuit size={23} strokeWidth={1.2} />
+                            <span className="text-[8px] uppercase tracking-[0.14em]">
+                              AI CORE
+                            </span>
+                          </div>
+                        </div>
+
+                        <span className="absolute left-[7%] top-1/2 h-px w-[18%] bg-gradient-to-r from-transparent via-white/40 to-white/70" />
+                        <span className="absolute right-[7%] top-1/2 h-px w-[18%] bg-gradient-to-l from-transparent via-white/40 to-white/70" />
+                      </div>
+
+                      <div className="relative z-10 mt-2 w-full border-t border-white/10 pt-3">
+                        <p className="text-center text-[9px] uppercase tracking-[0.18em] text-white/70">
+                          {stage.engineLabel}
+                        </p>
+                        <p className="mt-1 text-center text-[9px] leading-4 text-white/35">
+                          Data <span className="px-1 text-white/60">/</span>
+                          Intelligence <span className="px-1 text-white/60">/</span>
+                          Action
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* RIGHT: OUTCOMES */}
+                    <div className="flex min-w-0 flex-col justify-center">
+                      <div className="mb-4 flex items-center gap-2">
+                        <span className="text-[9px] tracking-[0.18em] text-white/30">
+                          OUTPUT / {stage.id}
+                        </span>
+                     
+                      </div>
+
+                      <p className="mb-4 text-[10px] font-medium tracking-[0.15em] text-white/65">
+                        {stage.outputTitle}
+                      </p>
+
+                      <div className="space-y-2.5">
+                        {stage.outputs.map((item) => (
+                          <div
+                            key={item}
+                            className="flex items-center gap-3 border border-white/[0.10] bg-white/[0.025] px-3 py-3.5 xl:px-4"
+                          >
+                            <span className="flex h-5 w-5 shrink-0 items-center justify-center border border-white/20 text-white/65">
+                              <Check size={11} />
+                            </span>
+                            <span className="text-[11px] leading-4 text-white/70 xl:text-xs">
+                              {item}
+                            </span>
+                           
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-5 flex items-center gap-2 text-[8px] uppercase tracking-[0.16em] text-white/30">
+                        <ArrowUpRight size={13} />
+                        <span>Designed around your workflow</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* SCROLL PROGRESS */}
+            <div className="relative z-10 mt-5 flex items-center justify-between gap-6 border-t border-white/[0.12] pt-4">
+              <p className="max-w-[320px] text-[10px] leading-5 text-white/40">
+                AI should do more than answer. It should help move the work
+                forward.
+              </p>
+
+              <div className="flex w-[48%] max-w-[520px] items-center gap-5">
+                {stages.map((stage, index) => (
+                  <div key={stage.id} className="min-w-0 flex-1">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="text-[8px] tracking-[0.16em] text-white/55">
+                        {stage.id}
+                      </span>
+                      <span className="truncate text-[8px] uppercase tracking-[0.12em] text-white/50">
+                        {stage.tag}
+                      </span>
+                    </div>
+
+                    <div className="h-px overflow-hidden bg-white/15">
+                      <div
+                        ref={(el) => {
+                          progressRefs.current[index] = el;
+                        }}
+                        className="h-full w-full origin-left bg-white"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* MOBILE: NATURAL SCROLLING */}
+      <div className="px-5 pb-16 pt-16 sm:px-7 sm:pt-20 md:hidden">
+        <div className="mb-10">
+          <div className="mb-4 flex items-center gap-3">
+            {/* <span className="h-1.5 w-1.5 bg-white" /> */}
+            {/* <span className="text-[9px] uppercase tracking-[0.2em] text-white/45">
+              HOW MENTROID WORKS / 02
+            </span> */}
+          </div>
+
+          <h2 className="text-[clamp(2.6rem,11vw,4.4rem)] font-medium leading-[0.9] tracking-[-0.07em]">
+            From business complexity
+            <br />
+            <span className="text-white/35">to intelligent action.</span>
+          </h2>
+
+          <p className="mt-5 max-w-[420px] text-[13px] leading-6 text-white/55">
+            Understand the challenge. Connect the knowledge. Build systems
+            that help work move forward.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          {stages.map((stage, index) => {
+            const InputIcon = inputIcons[index];
+            const OutputIcon = outputIcons[index];
+
+            return (
+              <article
+                key={stage.id}
+                ref={(el) => {
+                  mobileStageRefs.current[index] = el;
+                }}
+                className="border border-white/[0.12] bg-white/[0.025] p-4 sm:p-5"
               >
-                {/* OUTER FRAME */}
+                <div className="mb-5 flex items-center justify-between gap-3">
+                  <span className="text-[9px] uppercase tracking-[0.18em] text-white/45">
+                    {stage.id} / {stage.tag}
+                  </span>
+                  <ArrowUpRight size={15} className="text-white/45" />
+                </div>
 
-                <div
-                  className="
-                    pointer-events-none
-                    absolute
-                    -inset-2
-                    rounded-[20px]
-                    border
-                    border-white/[0.04]
+                <h3 className="text-[clamp(2rem,8vw,3rem)] font-medium leading-[0.94] tracking-[-0.06em]">
+                  {stage.title}
+                  <br />
+                  <span className="text-white/35">{stage.accent}</span>
+                </h3>
 
-                    sm:-inset-3
-                    sm:rounded-[22px]
+                <p className="mt-4 text-[12px] leading-6 text-white/55">
+                  {stage.description}
+                </p>
 
-                    md:-inset-4
-                    md:rounded-[24px]
-                  "
-                />
-
-                {/* INNER FRAME */}
-
-                <div
-                  className="
-                    pointer-events-none
-                    absolute
-                    -inset-1
-                    rounded-[16px]
-                    border
-                    border-white/[0.025]
-
-                    sm:-inset-2
-                    sm:rounded-[18px]
-
-                    md:rounded-[20px]
-                  "
-                />
-
-                {/* VIDEO */}
-
-                <div
-                  ref={(element) => {
-                    visualRefs.current[index] = element;
-                  }}
-                  className="
-                    relative
-                    h-full
-                    w-full
-                    overflow-hidden
-                    rounded-[16px]
-                    border
-                    border-white/[0.08]
-                    bg-[#080808]
-                    shadow-[0_25px_70px_rgba(0,0,0,0.5)]
-
-                    sm:rounded-[17px]
-
-                    md:rounded-[18px]
-                    md:shadow-[0_40px_100px_rgba(0,0,0,0.5)]
-                  "
-                >
+                <div className="relative mt-5 h-[180px] overflow-hidden border border-white/10 bg-black sm:h-[220px]">
                   <video
-                    src={scene.video}
-                    autoPlay
+                    src={stage.video}
                     muted
                     loop
                     playsInline
-                    preload={index === 0 ? "auto" : "metadata"}
-                    className="
-                      h-full
-                      w-full
-                      object-cover
-                      opacity-90
-                    "
+                    preload="none"
+                    aria-label={`${stage.tag} visual`}
+                    className="h-full w-full object-cover opacity-80"
                   />
 
-                  {/* VIDEO OVERLAY */}
+                  <div className="absolute inset-0 bg-black/15" />
 
-                  <div
-                    className="
-                      pointer-events-none
-                      absolute
-                      inset-0
-                      bg-black/[0.08]
-                    "
-                  />
+                  {/* <span className="absolute left-3 top-3 text-[8px] uppercase tracking-[0.18em] text-white/55">
+                    MENTROID / SYSTEMS
+                  </span> */}
 
-                  {/* VIDEO LABEL */}
-
-                  <span
-                    className="
-                      absolute
-                      left-4
-                      top-4
-                      text-[7px]
-                      uppercase
-                      tracking-[0.18em]
-                      text-white/30
-
-                      sm:left-5
-                      sm:top-5
-                      sm:text-[8px]
-                      sm:tracking-[0.2em]
-                    "
-                  >
-                    MENTROID
-                  </span>
-
-                  <span
-                    className="
-                      absolute
-                      bottom-4
-                      right-4
-                      text-[7px]
-                      uppercase
-                      tracking-[0.18em]
-                      text-white/25
-
-                      sm:bottom-5
-                      sm:right-5
-                      sm:text-[8px]
-                      sm:tracking-[0.2em]
-                    "
-                  >
-                    {scene.id}
+                  <span className="absolute bottom-3 right-3 text-[8px] tracking-[0.16em] text-white/55">
+                    {stage.id} / 03
                   </span>
                 </div>
-              </div>
-            </div>
-          );
-        })}
+
+                <div className="mt-5 grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="mb-3 text-[8px] uppercase tracking-[0.16em] text-white/40">
+                      {stage.inputTitle}
+                    </p>
+
+                    <div className="space-y-2">
+                      {stage.inputs.map((item) => (
+                        <div
+                          key={item}
+                          className="flex items-start gap-2 text-[10px] leading-4 text-white/65"
+                        >
+                          {/* <InputIcon size={13} className="mt-0.5 shrink-0 text-white/40" /> */}
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="mb-3 text-[8px] uppercase tracking-[0.16em] text-white/40">
+                      {stage.outputTitle}
+                    </p>
+
+                    <div className="space-y-2">
+                      {stage.outputs.map((item) => (
+                        <div
+                          key={item}
+                          className="flex items-start gap-2 text-[10px] leading-4 text-white/65"
+                        >
+                          {/* <OutputIcon size={13} className="mt-0.5 shrink-0 text-white/40" /> */}
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        <div className="mt-6 flex items-center gap-2 text-[10px] text-white/45">
+          {/* <Bot size={15} /> */}
+          <span>Purpose-built AI. Connected to real business workflows.</span>
+        </div>
       </div>
     </section>
   );
