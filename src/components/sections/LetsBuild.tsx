@@ -1323,32 +1323,7 @@ export default function LetsBuild() {
               Start Your Project
             </span>
 
-            <span
-              data-arrow
-              className="
-                flex
-                h-6
-                w-6
-                shrink-0
-                items-center
-                justify-center
-                border
-                border-white/25
-
-                transition-all
-                duration-500
-
-                group-hover:border-white
-
-                md:h-7
-                md:w-7
-              "
-            >
-              <ArrowUpRight
-                size={13}
-                strokeWidth={1.5}
-              />
-            </span>
+          
 
             <span
               className="
@@ -1367,7 +1342,7 @@ export default function LetsBuild() {
           </a>
 
           <a
-            href="https://wa.me/?text=Hi%20Mentroid%2C%20I%27d%20like%20to%20discuss%20an%20AI%20project."
+            href="https://wa.me/919950882655?text=Hi%20Mentroid%2C%20I%27d%20like%20to%20discuss%20an%20AI%20project."
             target="_blank"
             rel="noopener noreferrer"
             className="group inline-flex min-h-12 items-center justify-center gap-2 border border-white/20 px-4 py-3 text-[9px] font-medium uppercase tracking-[0.14em] text-white/75 transition-colors duration-300 hover:border-white hover:text-white sm:px-5 md:text-[10px]"

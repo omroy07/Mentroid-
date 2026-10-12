@@ -574,10 +574,7 @@ export default function IntelligenceSystem() {
       <div className="px-5 pb-16 pt-16 sm:px-7 sm:pt-20 md:hidden">
         <div className="mb-10">
           <div className="mb-4 flex items-center gap-3">
-            {/* <span className="h-1.5 w-1.5 bg-white" /> */}
-            {/* <span className="text-[9px] uppercase tracking-[0.2em] text-white/45">
-              HOW MENTROID WORKS / 02
-            </span> */}
+          
           </div>
 
           <h2 className="text-[clamp(2.6rem,11vw,4.4rem)] font-medium leading-[0.9] tracking-[-0.07em]">
@@ -594,9 +591,7 @@ export default function IntelligenceSystem() {
 
         <div className="space-y-4">
           {stages.map((stage, index) => {
-            const InputIcon = inputIcons[index];
-            const OutputIcon = outputIcons[index];
-
+           
             return (
               <article
                 key={stage.id}
@@ -623,21 +618,22 @@ export default function IntelligenceSystem() {
                 </p>
 
                 <div className="relative mt-5 h-[180px] overflow-hidden border border-white/10 bg-black sm:h-[220px]">
-                  <video
-                    src={stage.video}
-                    muted
-                    loop
-                    playsInline
-                    preload="none"
-                    aria-label={`${stage.tag} visual`}
-                    className="h-full w-full object-cover opacity-80"
-                  />
+                 
+<video
+  src={stage.video}
+  autoPlay
+  muted
+  loop
+  playsInline
+  preload="metadata"
+  aria-label={`${stage.tag} visual`}
+  className="block h-full w-full object-cover opacity-80"
+/>
+
 
                   <div className="absolute inset-0 bg-black/15" />
 
-                  {/* <span className="absolute left-3 top-3 text-[8px] uppercase tracking-[0.18em] text-white/55">
-                    MENTROID / SYSTEMS
-                  </span> */}
+                 
 
                   <span className="absolute bottom-3 right-3 text-[8px] tracking-[0.16em] text-white/55">
                     {stage.id} / 03
@@ -656,7 +652,6 @@ export default function IntelligenceSystem() {
                           key={item}
                           className="flex items-start gap-2 text-[10px] leading-4 text-white/65"
                         >
-                          {/* <InputIcon size={13} className="mt-0.5 shrink-0 text-white/40" /> */}
                           <span>{item}</span>
                         </div>
                       ))}
@@ -674,7 +669,6 @@ export default function IntelligenceSystem() {
                           key={item}
                           className="flex items-start gap-2 text-[10px] leading-4 text-white/65"
                         >
-                          {/* <OutputIcon size={13} className="mt-0.5 shrink-0 text-white/40" /> */}
                           <span>{item}</span>
                         </div>
                       ))}
@@ -687,7 +681,6 @@ export default function IntelligenceSystem() {
         </div>
 
         <div className="mt-6 flex items-center gap-2 text-[10px] text-white/45">
-          {/* <Bot size={15} /> */}
           <span>Purpose-built AI. Connected to real business workflows.</span>
         </div>
       </div>

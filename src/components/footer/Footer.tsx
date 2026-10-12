@@ -75,109 +75,53 @@ const footerColumns = [
 /*                              SOCIAL ICONS                                  */
 /* -------------------------------------------------------------------------- */
 
-function InstagramIcon({
-  size = 15,
-}: {
-  size?: number;
-}) {
+function FacebookIcon({ size = 15 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <rect
-        x="3"
-        y="3"
-        width="18"
-        height="18"
-        rx="5"
-        stroke="currentColor"
-        strokeWidth="1.7"
-      />
-      <circle
-        cx="12"
-        cy="12"
-        r="4"
-        stroke="currentColor"
-        strokeWidth="1.7"
-      />
-      <circle
-        cx="17.5"
-        cy="6.5"
-        r="1"
-        fill="currentColor"
-      />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M13.5 21v-8.2h2.75l.41-3.2H13.5V7.56c0-.93.26-1.56 1.6-1.56h1.7V3.14C16.5 3.05 15.5 3 14.35 3c-2.42 0-4.08 1.48-4.08 4.2v2.4H7.5v3.2h2.77V21h3.23Z" />
     </svg>
   );
 }
 
-function LinkedinIcon({
-  size = 15,
-}: {
-  size?: number;
-}) {
+function XIcon({ size = 15 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <path
-        d="M5 8.5V19"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path
-        d="M5 5.25V5.3"
-        stroke="currentColor"
-        strokeWidth="2.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M10 19V8.5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path
-        d="M10 13.2C10 10.55 11.45 8.5 14.05 8.5C16.65 8.5 18 10.2 18 13.2V19"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M18.9 2H22l-6.78 7.75L23.2 22h-6.25l-4.9-7.38L5.6 22H2.48l7.25-8.29L1.8 2h6.4l4.43 6.74L18.9 2Zm-1.1 18h1.73L7.27 3.88H5.41L17.8 20Z" />
     </svg>
   );
 }
 
-function GithubIcon({
-  size = 15,
-}: {
-  size?: number;
-}) {
+function YouTubeIcon({ size = 16 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <path
-        d="M9.25 19.5C5.6 20.6 5.6 17.7 4.15 17.2M14.75 19.5V17.15C14.75 16.5 14.5 15.9 14.05 15.45C17.35 15.05 20.75 13.8 20.75 8.35C20.75 6.95 20.25 5.75 19.45 4.8C19.6 4.4 20.1 2.9 19.3 1.05C19.3 1.05 18.05 0.65 15.1 2.65C12.7 2 10.3 2 7.9 2.65C4.95 0.65 3.7 1.05 3.7 1.05C2.9 2.9 3.4 4.4 3.55 4.8C2.75 5.75 2.25 6.95 2.25 8.35C2.25 13.8 5.65 15.05 8.95 15.45C8.5 15.9 8.25 16.5 8.25 17.15V19.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.56 12 3.56 12 3.56s-7.55 0-9.4.52A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.85.52 9.4.52 9.4.52s7.55 0 9.4-.52a3 3 0 0 0 2.1-2.12A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8ZM9.55 15.6V8.4L15.8 12l-6.25 3.6Z" />
+    </svg>
+  );
+}
+
+function ThreadsIcon({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M18.1 11.1c-.35-4.2-2.5-6.4-6.1-6.4-4.1 0-6.7 2.8-6.7 7.3 0 4.6 2.5 7.4 6.6 7.4 3.3 0 5.5-1.7 5.5-4.3 0-2.1-1.5-3.5-3.8-3.5-2 0-3.4 1-3.4 2.6 0 1.2.9 2 2.2 2 1.8 0 3-1.4 3-3.6 0-2.7-1.4-4.3-3.8-4.3-1.2 0-2.1.4-2.8 1.2" />
+      <path d="M14.7 8.1c2.8.7 4.7 2.4 5.1 5.1" />
+    </svg>
+  );
+}
+
+function InstagramIcon({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.7" />
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.7" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function LinkedinIcon({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M5.2 8.5H2.1V21h3.1V8.5ZM3.65 2.5a1.8 1.8 0 1 0 0 3.6 1.8 1.8 0 0 0 0-3.6ZM21.9 13.8c0-3.75-2-5.5-4.65-5.5a4 4 0 0 0-3.6 1.98V8.5h-3.1V21h3.1v-6.2c0-1.64.31-3.23 2.35-3.23 2.01 0 2.03 1.88 2.03 3.34V21h3.1l.77-7.2Z" />
     </svg>
   );
 }
@@ -196,7 +140,7 @@ function FooterColumn({
   return (
     <div className="footer-column">
       <div className="mb-5 flex items-center gap-2">
-        <span className="h-[4px] w-[4px] rounded-full bg-current opacity-60" />
+      
 
         <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-neutral-500">
           {title}
@@ -244,7 +188,7 @@ function SocialLink({
       aria-label={label}
       target="_blank"
       rel="noreferrer"
-      className="group flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-neutral-400 transition-all duration-300 hover:border-white/30 hover:bg-white hover:text-black"
+      className="group flex h-9 w-9 items-center justify-center rounded-full border  hover:border-black hover:bg-black hover:text-white"
     >
       <span className="transition-transform duration-300 group-hover:scale-110">
         {icon}
@@ -389,11 +333,7 @@ export default function Footer() {
       </div>
 
       <div className="relative z-[1]">
-      {/* ------------------------------------------------------------------ */}
-      {/* TOP CTA                                                             */}
-      {/* ------------------------------------------------------------------ */}
-
-    
+     
   
       {/* ------------------------------------------------------------------ */}
       {/* MAIN FOOTER                                                         */}
@@ -445,7 +385,7 @@ export default function Footer() {
                     className="text-neutral-500"
                   />
 
-                  <span>hello@mentroid.co.in</span>
+                  <span>mentroid@mentroid.co.in</span>
 
                   <ArrowUpRight
                     size={11}
@@ -528,21 +468,39 @@ export default function Footer() {
           {/* SOCIALS + BACK TO TOP */}
           <div className="flex items-center gap-3">
             <SocialLink
-              href="https://www.instagram.com/"
-              label="Instagram"
-              icon={<InstagramIcon />}
+              href="https://www.facebook.com/profile.php?id=61581668020163"
+              label="Facebook"
+              icon={<FacebookIcon />}
             />
 
             <SocialLink
-              href="https://www.linkedin.com/"
+              href="https://x.com/mentroid29"
+              label="X"
+              icon={<XIcon />}
+            />
+
+            <SocialLink
+              href="https://www.youtube.com/@MENTROID"
+              label="YouTube"
+              icon={<YouTubeIcon />}
+            />
+
+            <SocialLink
+              href="https://www.linkedin.com/company/mentroid1/"
               label="LinkedIn"
               icon={<LinkedinIcon />}
             />
 
             <SocialLink
-              href="https://github.com/"
-              label="GitHub"
-              icon={<GithubIcon />}
+              href="https://www.instagram.com/mentroid_sol/"
+              label="Instagram"
+              icon={<InstagramIcon />}
+            />
+
+            <SocialLink
+              href="https://www.threads.com/@mentroid_sol"
+              label="Threads"
+              icon={<ThreadsIcon />}
             />
 
             <button
@@ -572,14 +530,14 @@ export default function Footer() {
       {/* GIANT BRAND MARK                                                    */}
       {/* ------------------------------------------------------------------ */}
 
-      <div
+      {/* <div
         aria-hidden="true"
         className="pointer-events-none overflow-hidden px-4 pb-[-1px] pt-10 sm:px-8"
       >
         <div className="select-none whitespace-nowrap text-center text-[25vw] font-semibold leading-[0.72] tracking-[-0.09em] text-white/[0.035]">
           mentroid
         </div>
-      </div>
+      </div> */}
       </div>
     </footer>
   );
