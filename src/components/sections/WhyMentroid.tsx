@@ -483,24 +483,27 @@ export default function WhyMentroid() {
             </span>
           </div>
           <div className="md:col-span-9">
-            <p
-              data-word-reveal
-              aria-label="We combine technical depth with real-world understanding to build intelligent systems around the way your business actually works."
-              className="max-w-[1050px] text-[clamp(1.7rem,4.8vw,4.7rem)] font-normal leading-[1.02] tracking-[-0.065em]"
-            >
-              {["We", "combine", "technical", "depth", "with", "real-world", "understanding", "to", "build", "intelligent", "systems", "around"].map((word, index) => (
-                <span key={`${word}-${index}`} data-reveal-word aria-hidden="true" className="inline-block">
-                  {word}{" "}
-                </span>
-              ))}
-              <span className="text-black/30">
-                {["the", "way", "your", "business", "actually", "works."].map((word, index) => (
-                  <span key={`${word}-${index}`} data-reveal-word aria-hidden="true" className="inline-block">
-                    {word}{index < 5 ? " " : ""}
-                  </span>
-                ))}
-              </span>
-            </p>
+           
+<p
+  data-word-reveal
+  aria-label="We combine technical depth with real-world understanding to build intelligent systems around the way your business actually works."
+  className="max-w-[1050px] text-[clamp(1.7rem,4.8vw,4.7rem)] font-normal leading-[1.02] tracking-[-0.065em]"
+>
+  {["We", "combine", "technical", "depth", "with", "real-world", "understanding", "to", "build", "intelligent", "systems", "around", "the", "way", "your", "business", "actually", "works."].map((word, index) => (
+    
+<span
+  key={`${word}-${index}`}
+  data-reveal-word
+  aria-hidden="true"
+  className="inline-block mr-[0.18em]"
+>
+
+
+      {word}{" "}
+    </span>
+  ))}
+</p>
+
             <div data-manifesto-line className="mt-7 flex items-center gap-3 text-[9px] uppercase tracking-[0.16em] text-black/40 sm:mt-9 sm:text-[10px]">
               <ArrowDownRight size={15} strokeWidth={1.3} />
               <span>Scroll to see what that means</span>
@@ -581,9 +584,7 @@ export default function WhyMentroid() {
                   <span className="mt-3 block text-[8px] uppercase tracking-[0.16em] text-black/40 sm:text-[9px]">{reason.proof}</span>
                 </div>
                 <p data-principle-description className="max-w-[520px] text-[13px] leading-6 text-black/55 sm:col-span-5 sm:pt-1 sm:text-sm sm:leading-7">{reason.description}</p>
-                <div className="hidden justify-end sm:col-span-1 sm:flex">
-                  <Icon size={18} strokeWidth={1.3} className="text-black/35 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" />
-                </div>
+                
                 <div data-principle-rule className="absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-black/50" aria-hidden="true" />
               </article>
             );

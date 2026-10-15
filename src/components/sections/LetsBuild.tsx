@@ -908,7 +908,7 @@ export default function LetsBuild() {
         lg:-mt-[60vh]
 
         xl:h-[560vh]
-        xl:-mt-[51vh]
+        xl:-mt-[4vh]
       "
     >
       <div

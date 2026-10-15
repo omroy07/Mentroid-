@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const metrics = [
   {
-    number: "15+",
+    number: "5+",
     label: "AI & ML SOLUTIONS",
     title: "Intelligence that earns its place.",
     description:
@@ -18,7 +18,7 @@ const metrics = [
     tone: "dark",
   },
   {
-    number: "4+",
+    number: "5+",
     label: "PROJECTS COMPLETED",
     title: "From idea to something real.",
     description:
@@ -272,7 +272,7 @@ export default function WhatWeBringTogether() {
       {/* CINEMATIC HORIZONTAL SHOWCASE */}
       <div
         ref={showcaseRef}
-        className="relative z-10 min-h-0 overflow-hidden border-y border-black/15 py-8 md:flex md:h-[100svh] md:min-h-[650px] md:flex-col md:justify-center md:py-12"
+        className="relative z-10 min-h-0 overflow-hidden  py-8 md:flex md:h-[100svh] md:min-h-[650px] md:flex-col md:justify-center md:py-12"
       >
         <div className="mb-6 flex items-center justify-between px-5 sm:px-8 md:mb-8 md:px-12 lg:px-20 xl:px-24">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/50">
@@ -322,11 +322,7 @@ export default function WhatWeBringTogether() {
                 }`}>
                   {metric.label}
                 </p>
-                {/* <span className={`text-[10px] uppercase tracking-[0.16em] ${
-                  metric.tone === "light" ? "text-black/45" : "text-white/50"
-                }`}>
-                  0{index + 1} / 03
-                </span> */}
+              
               </div>
 
               <div className="relative mt-20 md:mt-12">
@@ -355,125 +351,10 @@ export default function WhatWeBringTogether() {
           ))}
         </div>
 
-        <div className="mt-6 flex items-center justify-between px-5 sm:px-8 md:px-12 lg:px-20 xl:px-24">
-          <p className="text-[10px] uppercase tracking-[0.16em] text-black/45">
-            Scroll to move through the work
-          </p>
-          <div className="hidden h-px w-32 bg-black/20 md:block">
-            <div className="h-px w-1/3 bg-black" />
-          </div>
-        </div>
+       
       </div>
 
-      {/* BENEFITS: EDITORIAL NUMBERED ROWS */}
-      <section className="relative border-b border-black/15 bg-[#e5e4df]">
-        <div className="mx-auto max-w-[1600px] px-5 py-20 sm:px-8 md:px-12 md:py-28 lg:px-20 xl:px-24">
-          <div className="mb-14 grid gap-8 md:mb-20 md:grid-cols-12 md:items-end">
-            <div className="md:col-span-8">
-              <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.2em] text-black/50">
-                WHY MENTROID
-              </p>
-              <h2 className="text-[clamp(3rem,7.5vw,7.5rem)] font-medium leading-[0.82] tracking-[-0.085em]">
-                Good technology.
-                <br />
-                <span className="text-[#85857f]">Better outcomes.</span>
-              </h2>
-            </div>
-            <p className="max-w-[360px] text-sm leading-relaxed text-black/60 sm:text-base md:col-span-4 md:justify-self-end">
-              The value is not in adding more technology. It is in making the
-              right things work better.
-            </p>
-          </div>
-
-          <div ref={benefitsRef} className="border-t border-black/20">
-            {benefits.map((benefit) => (
-              <article
-                key={benefit.no}
-                data-benefit-row
-                className="benefit-hover-card group relative isolate grid grid-cols-12 gap-3 overflow-hidden border-b border-black/20 px-0 py-7 transition-[padding] duration-500 hover:px-4 sm:py-9 md:gap-6 md:py-11 md:hover:px-6"
-              >
-                {/* Black reveal layer: rises from the bottom on hover/focus. */}
-                <span
-                  aria-hidden="true"
-                  className="benefit-hover-ink pointer-events-none absolute inset-0 z-0 origin-bottom scale-y-0 bg-[#101112] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-y-100 group-focus-within:scale-y-100 motion-reduce:transition-none"
-                />
-                <p className="relative z-10 col-span-2 pt-1 text-[10px] tracking-[0.15em] text-black/45 transition-colors duration-500 group-hover:text-white/45 group-focus-within:text-white/45 md:col-span-1">
-                  {benefit.no}
-                </p>
-                <h3 className="relative z-10 col-span-10 text-[clamp(1.45rem,3.3vw,3.4rem)] font-medium leading-[0.98] tracking-[-0.06em] text-[#141414] transition-[transform,color] duration-500 group-hover:translate-x-2 group-hover:text-white group-focus-within:text-white md:col-span-5">
-                  {benefit.title}
-                </h3>
-                <p className="relative z-10 col-span-10 col-start-3 mt-2 max-w-[510px] text-sm leading-relaxed text-black/60 transition-colors duration-500 group-hover:text-white/65 group-focus-within:text-white/65 sm:text-base md:col-span-5 md:col-start-auto md:mt-0 md:justify-self-end">
-                  {benefit.text}
-                </p>
-                {/* <span className="relative z-10 col-span-2 hidden justify-self-end text-2xl text-black transition-[transform,color] duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-white group-focus-within:text-white md:flex">
-                  ↗
-                </span> */}
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* AUDIENCE SPLIT SCREEN */}
-      <section className="audience-feature relative overflow-hidden bg-[#121416] text-white">
-        <div className="mx-auto grid max-w-[1600px] md:min-h-[680px] md:grid-cols-2">
-          <div className="audience-left flex flex-col justify-between px-5 py-16 sm:px-8 sm:py-20 md:px-12 md:py-16 lg:px-20 lg:py-20 xl:px-24">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50">
-              WHO WE BUILD WITH
-            </p>
-            <div className="mt-16">
-              <h2 className="text-[clamp(3rem,7vw,7rem)] font-medium leading-[0.82] tracking-[-0.085em]">
-                Your next
-                <br />
-                <span className="text-white/45">move starts here.</span>
-              </h2>
-              <p className="mt-7 max-w-[440px] text-sm leading-relaxed text-white/65 sm:text-base">
-                Whether you are building a new product or making an established
-                operation more effective, start with the challenge worth solving.
-              </p>
-            </div>
-            <p className="mt-12 text-[10px] uppercase tracking-[0.17em] text-white/40">
-              Start with the problem. Build what matters.
-            </p>
-          </div>
-
-          <div className="audience-right grid grid-rows-2 border-t border-white/15 md:border-l md:border-t-0">
-            <article className="group flex min-h-[270px] flex-col justify-between border-b border-white/15 p-6 sm:p-8 md:p-10 lg:p-12">
-              <div className="flex items-center justify-between">
-                <p className="text-[10px] uppercase tracking-[0.18em] text-white/45">
-                  01 / STARTUPS & SAAS
-                </p>
-                <span className="text-2xl transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
-              </div>
-              <div>
-                <h3 className="max-w-[440px] text-3xl font-medium leading-[0.95] tracking-[-0.06em] sm:text-4xl">
-                  From promising idea to useful product.
-                </h3>
-                <p className="mt-4 max-w-[450px] text-sm leading-relaxed text-white/60">
-                  Explore, validate and build AI-enabled products with a practical path to growth.
-                </p>
-              </div>
-            </article>
-            <article className="group flex min-h-[270px] flex-col justify-between p-6 sm:p-8 md:p-10 lg:p-12">
-              <div className="flex items-center justify-between">
-                <p className="text-[10px] uppercase tracking-[0.18em] text-white/45">
-                  02 / SMES & GROWING TEAMS
-                </p>
-                <span className="text-2xl transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
-              </div>
-              <div>
-                <h3 className="max-w-[440px] text-3xl font-medium leading-[0.95] tracking-[-0.06em] sm:text-4xl">
-                  Less repetitive work. More room to grow.
-                </h3>
-                <p className="mt-4 max-w-[450px] text-sm leading-relaxed text-white/60">
-                  Connect tools, simplify workflows and give people more time for meaningful work.
-                </p>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
+    
 
       {/* PARTNERS */}
       <section className="partner-strip relative overflow-hidden border-b border-black/15 bg-[#f1f0ec] py-12 sm:py-16 md:py-20">
