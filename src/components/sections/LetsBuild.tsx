@@ -54,12 +54,7 @@ export default function LetsBuild() {
             reduced: boolean;
           };
 
-          const {
-            desktop,
-            tablet,
-            mobile,
-            reduced,
-          } = conditions;
+          const { desktop, tablet, mobile, reduced } = conditions;
 
           /* =========================================================
              REDUCED MOTION
@@ -87,7 +82,7 @@ export default function LetsBuild() {
                 scale: 1,
                 rotation: 0,
                 clipPath: "inset(0% 0% 0% 0%)",
-              }
+              },
             );
 
             if (imageInnerRef.current) {
@@ -194,7 +189,7 @@ export default function LetsBuild() {
                   duration: 0.5,
                   ease: "power3.out",
                 },
-                0
+                0,
               )
 
               /* AXIS */
@@ -205,7 +200,7 @@ export default function LetsBuild() {
                   duration: 0.7,
                   ease: "power3.inOut",
                 },
-                0
+                0,
               )
 
               /* BUILD */
@@ -217,7 +212,7 @@ export default function LetsBuild() {
                   duration: 0.8,
                   ease: "power4.out",
                 },
-                0.15
+                0.15,
               )
 
               /* WITH */
@@ -230,7 +225,7 @@ export default function LetsBuild() {
                   duration: 0.8,
                   ease: "power4.out",
                 },
-                0.32
+                0.32,
               )
 
               /* INTELLIGENCE */
@@ -242,7 +237,7 @@ export default function LetsBuild() {
                   duration: 0.8,
                   ease: "power4.out",
                 },
-                0.48
+                0.48,
               )
 
               /* IMAGE */
@@ -255,7 +250,7 @@ export default function LetsBuild() {
                   duration: 0.9,
                   ease: "power3.inOut",
                 },
-                0.7
+                0.7,
               )
 
               .to(
@@ -265,16 +260,12 @@ export default function LetsBuild() {
                   duration: 1,
                   ease: "none",
                 },
-                0.7
+                0.7,
               )
 
               /* COMPOSITION EXIT */
               .to(
-                [
-                  buildRef.current,
-                  withRef.current,
-                  intelligenceRef.current,
-                ],
+                [buildRef.current, withRef.current, intelligenceRef.current],
                 {
                   opacity: 0,
                   scale: 0.92,
@@ -282,7 +273,7 @@ export default function LetsBuild() {
                   stagger: 0.04,
                   ease: "power3.in",
                 },
-                1.45
+                1.45,
               )
 
               /* IMAGE EXIT */
@@ -294,7 +285,7 @@ export default function LetsBuild() {
                   duration: 0.55,
                   ease: "power3.inOut",
                 },
-                1.62
+                1.62,
               )
 
               /* FINAL STATEMENT */
@@ -306,7 +297,7 @@ export default function LetsBuild() {
                   duration: 0.75,
                   ease: "power3.out",
                 },
-                1.82
+                1.82,
               )
 
               /* FINAL LINE 1 */
@@ -318,7 +309,7 @@ export default function LetsBuild() {
                   duration: 0.65,
                   ease: "power4.out",
                 },
-                2
+                2,
               )
 
               /* FINAL LINE 2 */
@@ -330,7 +321,7 @@ export default function LetsBuild() {
                   duration: 0.65,
                   ease: "power4.out",
                 },
-                2.12
+                2.12,
               )
 
               /* CTA */
@@ -343,7 +334,7 @@ export default function LetsBuild() {
                   duration: 0.7,
                   ease: "power3.out",
                 },
-                2.38
+                2.38,
               )
 
               /* FOOTER */
@@ -355,7 +346,7 @@ export default function LetsBuild() {
                   duration: 0.5,
                   ease: "power3.out",
                 },
-                2.65
+                2.65,
               );
 
             return;
@@ -388,7 +379,7 @@ export default function LetsBuild() {
                   duration: 0.7,
                   ease: "power3.out",
                 },
-                0
+                0,
               )
 
               /* AXIS */
@@ -399,7 +390,7 @@ export default function LetsBuild() {
                   duration: 1,
                   ease: "power3.inOut",
                 },
-                0.1
+                0.1,
               )
 
               /* BUILD */
@@ -411,7 +402,7 @@ export default function LetsBuild() {
                   duration: 1,
                   ease: "power4.out",
                 },
-                0.25
+                0.25,
               )
 
               /* WITH */
@@ -424,7 +415,7 @@ export default function LetsBuild() {
                   duration: 0.95,
                   ease: "power4.out",
                 },
-                0.45
+                0.45,
               )
 
               /* INTELLIGENCE */
@@ -436,7 +427,7 @@ export default function LetsBuild() {
                   duration: 1,
                   ease: "power4.out",
                 },
-                0.65
+                0.65,
               )
 
               /* HOLD */
@@ -452,7 +443,7 @@ export default function LetsBuild() {
                   duration: 1.15,
                   ease: "power3.inOut",
                 },
-                "+=0.1"
+                "+=0.1",
               )
 
               .to(
@@ -463,16 +454,12 @@ export default function LetsBuild() {
                   duration: 1.5,
                   ease: "none",
                 },
-                "<"
+                "<",
               )
 
               /* EXIT */
               .to(
-                [
-                  buildRef.current,
-                  withRef.current,
-                  intelligenceRef.current,
-                ],
+                [buildRef.current, withRef.current, intelligenceRef.current],
                 {
                   opacity: 0,
                   scale: 0.9,
@@ -480,7 +467,7 @@ export default function LetsBuild() {
                   stagger: 0.05,
                   ease: "power4.in",
                 },
-                "+=0.15"
+                "+=0.15",
               )
 
               .to(
@@ -490,7 +477,7 @@ export default function LetsBuild() {
                   scale: 1.08,
                   duration: 0.75,
                 },
-                "-=0.45"
+                "-=0.45",
               )
 
               /* FINAL */
@@ -504,7 +491,7 @@ export default function LetsBuild() {
                   duration: 1,
                   ease: "power4.out",
                 },
-                "+=0.1"
+                "+=0.1",
               )
 
               .to(
@@ -515,7 +502,7 @@ export default function LetsBuild() {
                   duration: 0.85,
                   ease: "power4.out",
                 },
-                "-=0.6"
+                "-=0.6",
               )
 
               .to(
@@ -526,7 +513,7 @@ export default function LetsBuild() {
                   duration: 0.85,
                   ease: "power4.out",
                 },
-                "-=0.65"
+                "-=0.65",
               )
 
               .to({}, { duration: 0.5 })
@@ -540,7 +527,7 @@ export default function LetsBuild() {
                   duration: 0.8,
                   ease: "power3.out",
                 },
-                "+=0.1"
+                "+=0.1",
               )
 
               .to(
@@ -550,7 +537,7 @@ export default function LetsBuild() {
                   y: 0,
                   duration: 0.65,
                 },
-                "-=0.25"
+                "-=0.25",
               );
 
             return;
@@ -585,7 +572,7 @@ export default function LetsBuild() {
                 duration: 0.8,
                 ease: "power3.out",
               },
-              0
+              0,
             );
 
             desktopTl.to(
@@ -595,7 +582,7 @@ export default function LetsBuild() {
                 duration: 1.5,
                 ease: "power3.inOut",
               },
-              0.1
+              0.1,
             );
 
             /* -------------------------------------------------------
@@ -616,7 +603,7 @@ export default function LetsBuild() {
                 duration: 1.35,
                 ease: "power4.out",
               },
-              "+=0.1"
+              "+=0.1",
             );
 
             /* -------------------------------------------------------
@@ -632,7 +619,7 @@ export default function LetsBuild() {
                 duration: 1.2,
                 ease: "power4.out",
               },
-              "-=0.65"
+              "-=0.65",
             );
 
             /* -------------------------------------------------------
@@ -647,7 +634,7 @@ export default function LetsBuild() {
                 duration: 1.35,
                 ease: "power4.out",
               },
-              "-=0.65"
+              "-=0.65",
             );
 
             /* -------------------------------------------------------
@@ -669,7 +656,7 @@ export default function LetsBuild() {
                 duration: 1.4,
                 ease: "power3.inOut",
               },
-              "+=0.1"
+              "+=0.1",
             );
 
             desktopTl.to(
@@ -679,7 +666,7 @@ export default function LetsBuild() {
                 duration: 1.8,
                 ease: "none",
               },
-              "<"
+              "<",
             );
 
             /* -------------------------------------------------------
@@ -693,7 +680,7 @@ export default function LetsBuild() {
                 duration: 1.2,
                 ease: "none",
               },
-              "-=0.4"
+              "-=0.4",
             );
 
             /* -------------------------------------------------------
@@ -701,11 +688,7 @@ export default function LetsBuild() {
             ------------------------------------------------------- */
 
             desktopTl.to(
-              [
-                buildRef.current,
-                withRef.current,
-                intelligenceRef.current,
-              ],
+              [buildRef.current, withRef.current, intelligenceRef.current],
               {
                 opacity: 0,
                 scale: 0.88,
@@ -713,7 +696,7 @@ export default function LetsBuild() {
                 stagger: 0.06,
                 ease: "power4.in",
               },
-              "+=0.2"
+              "+=0.2",
             );
 
             desktopTl.to(
@@ -724,7 +707,7 @@ export default function LetsBuild() {
                 duration: 0.9,
                 ease: "power3.inOut",
               },
-              "-=0.5"
+              "-=0.5",
             );
 
             /* -------------------------------------------------------
@@ -745,7 +728,7 @@ export default function LetsBuild() {
                 duration: 1.2,
                 ease: "power4.out",
               },
-              "+=0.1"
+              "+=0.1",
             );
 
             /* -------------------------------------------------------
@@ -760,7 +743,7 @@ export default function LetsBuild() {
                 duration: 1.1,
                 ease: "power4.out",
               },
-              "-=0.7"
+              "-=0.7",
             );
 
             desktopTl.to(
@@ -771,7 +754,7 @@ export default function LetsBuild() {
                 duration: 1.1,
                 ease: "power4.out",
               },
-              "-=0.85"
+              "-=0.85",
             );
 
             /* -------------------------------------------------------
@@ -793,7 +776,7 @@ export default function LetsBuild() {
                 duration: 1,
                 ease: "power3.out",
               },
-              "+=0.15"
+              "+=0.15",
             );
 
             /* -------------------------------------------------------
@@ -808,7 +791,7 @@ export default function LetsBuild() {
                 duration: 0.8,
                 ease: "power3.out",
               },
-              "-=0.35"
+              "-=0.35",
             );
 
             /* -------------------------------------------------------
@@ -817,7 +800,7 @@ export default function LetsBuild() {
 
             desktopTl.to({}, { duration: 1.4 });
           }
-        }
+        },
       );
 
       /* =========================================================
@@ -827,9 +810,7 @@ export default function LetsBuild() {
       const cta = ctaRef.current;
 
       if (cta) {
-        const arrow = cta.querySelector(
-          "[data-arrow]"
-        ) as HTMLElement | null;
+        const arrow = cta.querySelector("[data-arrow]") as HTMLElement | null;
 
         const enter = () => {
           gsap.to(cta, {
@@ -1250,10 +1231,9 @@ export default function LetsBuild() {
               </div>
             </div>
 
-            <p
-              className="mx-auto mt-6 max-w-[560px] px-4 text-center text-[12px] leading-6 text-white/60 sm:mt-8 sm:text-sm sm:leading-7 md:mt-10 md:text-[15px]"
-            >
-              Tell us what you’re trying to build, automate or improve. We’ll review your requirements and suggest the right technical approach.
+            <p className="mx-auto mt-6 max-w-[560px] px-4 text-center text-[12px] leading-6 text-white/60 sm:mt-8 sm:text-sm sm:leading-7 md:mt-10 md:text-[15px]">
+              Tell us what you’re trying to build, automate or improve. We’ll
+              review your requirements and suggest the right technical approach.
             </p>
           </div>
         </div>
@@ -1319,11 +1299,7 @@ export default function LetsBuild() {
               md:tracking-[0.2em]
             "
           >
-            <span>
-              Start Your Project
-            </span>
-
-          
+            <span>Start Your Project</span>
 
             <span
               className="
@@ -1348,7 +1324,11 @@ export default function LetsBuild() {
             className="group inline-flex min-h-12 items-center justify-center gap-2 border border-white/20 px-4 py-3 text-[9px] font-medium uppercase tracking-[0.14em] text-white/75 transition-colors duration-300 hover:border-white hover:text-white sm:px-5 md:text-[10px]"
           >
             WhatsApp Us
-            <ArrowUpRight size={13} strokeWidth={1.5} className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            <ArrowUpRight
+              size={13}
+              strokeWidth={1.5}
+              className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            />
           </a>
         </div>
 

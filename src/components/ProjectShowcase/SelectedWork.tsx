@@ -1,3 +1,5 @@
+// WE can use this for future any project showcasing or else if required scroll animation
+
 "use client";
 
 import { useLayoutEffect, useRef } from "react";

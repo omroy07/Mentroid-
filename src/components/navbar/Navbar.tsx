@@ -1,33 +1,15 @@
+
 "use client";
 
-import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-
-import {
-  AnimatePresence,
-  motion,
-} from "framer-motion";
-
-import {
-  ArrowUpRight,
-  Menu,
-  X,
-} from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 
 import { navigation } from "@/data/navigation";
-
 import DesktopNav from "./DesktopNav";
 import MegaMenu from "./MegaMenu";
 import MobileNav from "./MobileNav";
-
-/* =========================================================
-   TYPES
-========================================================= */
 
 export type MenuKey =
   | "services"
@@ -54,10 +36,6 @@ export type MenuData = {
   groups: MenuGroup[];
 };
 
-/* =========================================================
-   MENU ORDER
-========================================================= */
-
 export const menuOrder: MenuKey[] = [
   "services",
   "solutions",
@@ -65,10 +43,6 @@ export const menuOrder: MenuKey[] = [
   "industries",
   "company",
 ];
-
-/* =========================================================
-   MEGA MENU PREVIEW IMAGES
-========================================================= */
 
 export const menuPreviewImages: Record<MenuKey, string> = {
   services: "/assets/navbar/Ai-automation.webp",
@@ -78,10 +52,6 @@ export const menuPreviewImages: Record<MenuKey, string> = {
   company: "/assets/navbar/Ai-automation.webp",
 };
 
-/* =========================================================
-   FALLBACK PREVIEW IMAGES
-========================================================= */
-
 export const fallbackPreviewImages = [
   "/assets/navbar/services.webp",
   "/assets/navbar/solutions.webp",
@@ -89,214 +59,42 @@ export const fallbackPreviewImages = [
   "/assets/navbar/industries.webp",
 ];
 
-/* =========================================================
-   NAVBAR
-========================================================= */
-
 export default function Navbar() {
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [activeMenu, setActiveMenu] = useState<MenuKey | null>(null);
+    const [announcementVisible, setAnnouncementVisible] = useState(true);
+
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isNavVisible, setIsNavVisible] = useState(true);
-
-  const [navTheme, setNavTheme] = useState<"dark" | "light">("dark");
-
   const [previewImage, setPreviewImage] = useState(
     menuPreviewImages.services
   );
 
-  /* =======================================================
-     NAVBAR THEME DETECTION
-  ======================================================= */
-
-  useEffect(() => {
-    let ticking = false;
-
-    const updateNavbarTheme = () => {
-      const sections = Array.from(
-        document.querySelectorAll<HTMLElement>(
-          "[data-navbar-theme]"
-        )
-      );
-
-      if (!sections.length) {
-        ticking = false;
-        return;
-      }
-
-      /*
-       * The navbar occupies the top of the viewport.
-       * Check slightly below it so the correct section
-       * controls the text color.
-       */
-      const checkPoint = 120;
-
-      let activeSection: HTMLElement | null = null;
-
-      for (const section of sections) {
-        const rect = section.getBoundingClientRect();
-
-        if (
-          rect.top <= checkPoint &&
-          rect.bottom >= checkPoint
-        ) {
-          activeSection = section;
-          break;
-        }
-      }
-
-      /*
-       * Fallback:
-       * Find the section closest to the navbar.
-       */
-      if (!activeSection) {
-        let closestDistance = Infinity;
-
-        for (const section of sections) {
-          const rect = section.getBoundingClientRect();
-
-          const distance =
-            rect.top > checkPoint
-              ? rect.top - checkPoint
-              : checkPoint - rect.bottom;
-
-          if (distance < closestDistance) {
-            closestDistance = distance;
-            activeSection = section;
-          }
-        }
-      }
-
-      if (activeSection) {
-        const theme = activeSection.dataset.navbarTheme;
-
-        if (theme === "dark" || theme === "light") {
-          setNavTheme(theme);
-        }
-      }
-
-      ticking = false;
-    };
-
-    const handleScroll = () => {
-      if (ticking) return;
-
-      ticking = true;
-
-      requestAnimationFrame(updateNavbarTheme);
-    };
-
-    updateNavbarTheme();
-
-    window.addEventListener(
-      "scroll",
-      handleScroll,
-      { passive: true }
-    );
-
-    window.addEventListener(
-      "resize",
-      handleScroll,
-      { passive: true }
-    );
-
-    return () => {
-      window.removeEventListener(
-        "scroll",
-        handleScroll
-      );
-
-      window.removeEventListener(
-        "resize",
-        handleScroll
-      );
-    };
-  }, []);
-
-  /* =======================================================
-     HIDE NAVBAR ON SCROLL DOWN, SHOW ON SCROLL UP
-  ======================================================= */
-
-  useEffect(() => {
-    let previousScrollY = window.scrollY;
-    let ticking = false;
-
-    const updateNavbarVisibility = () => {
-      const currentScrollY = window.scrollY;
-      const delta = currentScrollY - previousScrollY;
-
-      // Keep the navbar visible at the very top.
-      if (currentScrollY <= 12) {
-        setIsNavVisible(true);
-      } else if (Math.abs(delta) > 4) {
-        // Scrolling down: hide. Scrolling up: show.
-        setIsNavVisible(delta < 0);
-      }
-
-      previousScrollY = currentScrollY;
-      ticking = false;
-    };
-
-    const handleScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(updateNavbarVisibility);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  /* =======================================================
-     ESCAPE
-  ======================================================= */
-
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-
-      setActiveMenu(null);
-      setMobileOpen(false);
+      if (event.key === "Escape") {
+        setActiveMenu(null);
+        setMobileOpen(false);
+      }
     };
 
-    document.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-
-  /* =======================================================
-     BODY SCROLL LOCK
-  ======================================================= */
 
   useEffect(() => {
     if (!mobileOpen) return;
 
-    const previousOverflow =
-      document.body.style.overflow;
-
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
+      document.body.style.overflow = previousOverflow;
     };
   }, [mobileOpen]);
-
-  /* =======================================================
-     OPEN MENU
-  ======================================================= */
 
   const openMenu = (menu: MenuKey) => {
     if (closeTimer.current) {
@@ -317,20 +115,12 @@ export default function Navbar() {
     openMenu(menu);
   };
 
-  /* =======================================================
-     CANCEL CLOSE
-  ======================================================= */
-
   const cancelClose = () => {
     if (!closeTimer.current) return;
 
     clearTimeout(closeTimer.current);
     closeTimer.current = null;
   };
-
-  /* =======================================================
-     CLOSE MENU
-  ======================================================= */
 
   const scheduleClose = () => {
     if (closeTimer.current) {
@@ -343,441 +133,305 @@ export default function Navbar() {
     }, 180);
   };
 
-  /* =======================================================
-     CLOSE EVERYTHING
-  ======================================================= */
-
   const closeNavigation = () => {
     setActiveMenu(null);
     setMobileOpen(false);
   };
-
-  /* =======================================================
-     MOBILE MENU
-  ======================================================= */
 
   const toggleMobile = () => {
     setMobileOpen((current) => !current);
     setActiveMenu(null);
   };
 
-  /* =======================================================
-     NAVBAR
-  ======================================================= */
-
   return (
-    <>
-      <header
+    <header className="fixed inset-x-0 top-0 z-[100] w-full overflow-x-clip">
+       {announcementVisible && (
+        <div className="relative flex min-h-12 items-center justify-center bg-[#29443b] text-white px-10 py-2 text-center text-[12px] leading-4 text-white sm:text-[12px] lg:text-[15px]">
+          <p>
+           Introducing Mentroid AI-powered solutions{" "}
+            <Link href="/about" className="ml-1 underline underline-offset-4 hover:opacity-75">
+              Meet Mentroid <span aria-hidden="true">↗</span>
+            </Link>
+          </p>
+          <button
+            type="button"
+            aria-label="Dismiss announcement"
+            onClick={() => setAnnouncementVisible(false)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-white/80 transition hover:text-white"
+          >
+            <X size={16} strokeWidth={1.6} />
+          </button>
+        </div>
+      )}
+      {/* MAIN NAVBAR */}
+      <motion.nav
+        initial={false}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0 }}
         className="
-          fixed
-          inset-x-0
-          top-0
-          z-[100]
+          pointer-events-auto
+          relative
+          z-20
           w-full
-          overflow-x-clip
-          pointer-events-none
+          bg-white
+          text-[#07111f]
         "
       >
-        {/* =================================================
-            MAIN NAVBAR
-        ================================================= */}
-
-        <motion.nav
-          initial={false}
-          animate={{
-            y: isNavVisible || activeMenu || mobileOpen ? 0 : "-110%",
-            opacity: isNavVisible || activeMenu || mobileOpen ? 1 : 0,
-          }}
-          transition={{
-            y: {
-              duration: 0.55,
-              ease: [0.22, 1, 0.36, 1],
-            },
-            opacity: {
-              duration: 0.3,
-              ease: "easeOut",
-            },
-          }}
+        <div
           className="
-            pointer-events-auto
-            w-full
+            mx-auto flex h-[60px] w-full max-w-[1600px]
+            items-center justify-center px-4 
+            min-[480px]:px-5
+            sm:px-7
+            lg:grid lg:grid-cols-[auto_minmax(0,1fr)_auto]
+lg:gap-x-8 lg:px-10
+xl:gap-x-10 xl:px-12
+2xl:px-14
           "
         >
-         <div
-  className="
-    mx-auto
-    flex
-    w-full
-    max-w-[1600px]
-    items-center
-    justify-between
-    px-4
-    py-3
+          {/* LOGO */}
+          <div className="relative z-20 flex shrink-0  items-center">
+            <Link
+              href="/"
+              onClick={closeNavigation}
+              aria-label="Mentroid home"
+              className="group flex items-center"
+            >
+              <div className="flex h-10 w-auto items-center sm:h-11 lg:h-12">
+                <img
+                  src="/assets/mentroid-logo.png"
+                  width={52}
+                  height={52}
+                  alt="Mentroid"
+                  className="
+                    h-10 w-10 shrink-0 object-contain
+                    transition-transform duration-300
+                    group-hover:scale-[1.04]
+                    sm:h-11 sm:w-11
+                    lg:h-10 lg:w-12
+                  "
+                />
 
-    min-[480px]:px-5
+                <span className="ml-1.5 flex min-w-0 flex-col justify-center gap-[4px]">
+                  <span className="whitespace-nowrap text-[19px] font-semibold leading-none tracking-[-0.045em] text-[#07111f] transition-colors duration-300 sm:text-[20px] lg:text-[18px]">
+                    Mentroid
+                  </span>
 
-    sm:px-7
-    sm:py-3.5
+                  <span className="whitespace-nowrap text-[7px] font-medium uppercase leading-none tracking-[0.16em] text-[#079dad] sm:text-[7px]">
+                    AI · ML SERVICES
+                  </span>
+                </span>
+              </div>
+            </Link>
+          </div>
 
-    lg:grid
-    lg:grid-cols-[auto_minmax(0,1fr)_auto]
-    lg:gap-3
-    lg:px-10
-    lg:py-4
+          {/* DESKTOP NAVIGATION */}
+          <DesktopNav
+            activeMenu={activeMenu}
+            onOpenMenu={openMenu}
+            onToggleMenu={toggleMenu}
+          />
 
-    xl:px-12
-    2xl:px-14
-  "
->
-            {/* =================================================
-                LOGO
-            ================================================= */}
-
-            <div
+          {/* RIGHT ACTIONS */}
+          <div className="relative z-20 flex shrink-0 items-center gap-2 sm:gap-2.5 lg:gap-3">
+            {/* ORIGINAL LET'S TALK BUTTON — STYLING PRESERVED */}
+            <Link
+              href="/contact"
+              onClick={closeNavigation}
               className="
+                mentroid-gradient-border
+                group
                 relative
-                z-20
-                flex
+                hidden
+                h-10
                 shrink-0
                 items-center
+                justify-center
+                overflow-hidden
+                rounded-[10px]
+                p-[1.5px]
+                text-[16px]
+                font-semibold 
+                leading-none
+                text-white
+                transition-transform
+                duration-300
+                hover:scale-[1.015]
+                lg:inline-flex
+                lg:h-11
               "
             >
-              <Link
-                href="/"
-                onClick={closeNavigation}
-                aria-label="Mentroid home"
+              <span
                 className="
-                  group
+                  relative
                   flex
+                  h-full
+                  w-full
                   items-center
+                  justify-center
+                  gap-2
+                  overflow-hidden
+                  rounded-[8.5px]
+                  bg-transparent
+                  px-3.5
+                  text-[#07111f]
+                  lg:px-5
                 "
               >
-                <div
+                <span
                   className="
-                    flex
-                    h-10
-                    w-auto
-                    items-center
-
-                    sm:h-11
-
-                    lg:h-12
+                    absolute
+                    inset-0
+                    translate-y-full
+                    transition-transform
+                    duration-300
                   "
-                >
-                  <img
-                    src="/assets/mentroid-logo.png"
-                    width={52}
-                    height={52}
-                    alt="Mentroid"
+                />
+
+                <span className="relative z-[1] flex items-center gap-2 whitespace-nowrap">
+                  Let's Talk
+
+                  <ArrowUpRight
+                    size={14}
+                    strokeWidth={1.7}
                     className="
-                      h-10
-                      w-10
                       shrink-0
-                      object-contain
                       transition-transform
                       duration-300
-                      group-hover:scale-[1.04]
-
-                      sm:h-11
-                      sm:w-11
-
-                      lg:h-12
-                      lg:w-12
+                      group-hover:-translate-y-0.5
+                      group-hover:translate-x-0.5
+                      lg:size-[15px]
                     "
                   />
+                </span>
+              </span>
+            </Link>
 
-                  <span className="ml-1.5 flex min-w-0 flex-col justify-center gap-[4px]">
-                    <span
-                      className={`
-                        whitespace-nowrap
-                        text-[19px]
-                        font-semibold
-                        leading-none
-                        tracking-[-0.045em]
-                        transition-colors
-                        duration-300
-                        sm:text-[20px]
-                        lg:text-[21px]
-                        ${
-                          navTheme === "dark"
-                            ? "text-white"
-                            : "text-[#07111f]"
-                        }
-                      `}
-                    >
-                      Mentroid
-                    </span>
-                   <span
-  className="
-    whitespace-nowrap
-    text-[7px]
-    font-medium
-    uppercase
-    leading-none
-    tracking-[0.16em]
-    text-[#079dad]
-    transition-colors
-    duration-300
-    sm:text-[8px]
-  "
->
-  AI · ML SERVICES
-</span>
-                  </span>
-                </div>
-              </Link>
-            </div>
-
-            {/* =================================================
-                DESKTOP NAV
-            ================================================= */}
-
-            <DesktopNav
-              activeMenu={activeMenu}
-              navTheme={navTheme}
-              onOpenMenu={openMenu}
-              onToggleMenu={toggleMenu}
-            />
-
-            {/* =================================================
-                RIGHT ACTIONS
-            ================================================= */}
-
-            <div
+            {/* MOBILE MENU BUTTON */}
+            <button
+              type="button"
+              onClick={toggleMobile}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
               className="
-                relative
-                z-20
-                flex
-                shrink-0
-                items-center
-                gap-2
-
-                sm:gap-2.5
-
-                lg:gap-3
-              "
-            >
-              {/* =================================================
-                  LET'S TALK
-              ================================================= */}
-
-           
-
-<Link
-  href="/contact"
-  onClick={closeNavigation}
-  className="
-    mentroid-gradient-border
-    group
-    relative
-    hidden
-    h-10
-    shrink-0
-    items-center
-    justify-center
-    overflow-hidden
-    rounded-[10px]
-    p-[1.5px]
-    text-[13px]
-    font-semibold
-    leading-none
-    text-white
-    transition-transform
-    duration-300
-    hover:scale-[1.015]
-    lg:inline-flex
-    lg:h-11
-  "
->
-  <span
-    className={`
-      relative
-      flex
-      h-full
-      w-full
-      items-center
-      justify-center
-      gap-2
-      overflow-hidden
-      rounded-[8.5px]
-      bg-transparent
-      px-3.5
-      lg:px-5
-     ${
-                          navTheme === "dark"
-                            ? "text-white"
-                            : "text-[#07111f]"
-                        }
-                      `}
-  >
-    <span
-      className="
-        absolute
-        inset-0
-        translate-y-full
-       
-        transition-transform
-        duration-300
-        
-      "
-    />
-
-    <span className="relative z-[1] flex items-center gap-2 whitespace-nowrap">
-      Let's Talk
-
-      <ArrowUpRight
-        size={14}
-        strokeWidth={1.7}
-        className="
-          shrink-0
-          transition-transform
-          duration-300
-          group-hover:-translate-y-0.5
-          group-hover:translate-x-0.5
-          lg:size-[15px]
-        "
-      />
-    </span>
-  </span>
-</Link>
-
-
-
-              {/* =================================================
-                  MOBILE / TABLET BUTTON
-              ================================================= */}
-
-           <button
-  type="button"
-  onClick={toggleMobile}
-  aria-label={mobileOpen ? "Close menu" : "Open menu"}
-  aria-expanded={mobileOpen}
-  className="
-    flex
-    h-10
-    w-10
-    shrink-0
-    items-center
-    justify-center
-    rounded-[9px]
-    
-    text-white
-    transition-transform
-    duration-300
-    active:scale-95
-
-    sm:h-10
-    sm:w-10
-
-    lg:hidden
-  "
->
-  {mobileOpen ? (
-    <X size={20} strokeWidth={1.8} />
-  ) : (
-    <Menu size={20} strokeWidth={1.8} />
-  )}
-</button>
-             
-            </div>
-          </div>
-        </motion.nav>
-
-        {/* =====================================================
-            DESKTOP MEGA MENU
-        ===================================================== */}
-
-        <AnimatePresence>
-          {activeMenu && (
-            <motion.div
-              initial={{
-                opacity: 0,
-                y: -8,
-              }}
-              animate={{
-                opacity: 1,
-                y: 0,
-              }}
-              exit={{
-                opacity: 0,
-                y: -8,
-              }}
-              transition={{
-                duration: 0.22,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              onMouseEnter={cancelClose}
-              onMouseLeave={scheduleClose}
-              className="
-                pointer-events-auto
-                absolute
-                left-0
-                right-0
-                top-full
-                hidden
-                w-full
-                overflow-x-clip
-                lg:block
-              "
-            >
-              <MegaMenu
-                menu={
-                  navigation[activeMenu] as MenuData
-                }
-                menuKey={activeMenu}
-                previewImage={previewImage}
-                onPreviewChange={setPreviewImage}
-                onNavigate={closeNavigation}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* =====================================================
-            MOBILE NAVIGATION
-        ===================================================== */}
-
-        <AnimatePresence>
-          {mobileOpen && (
-            <motion.div
-              initial={{
-                opacity: 0,
-                height: 0,
-              }}
-              animate={{
-                opacity: 1,
-                height:
-                  "calc(100dvh - 68px)",
-              }}
-              exit={{
-                opacity: 0,
-                height: 0,
-              }}
-              transition={{
-                duration: 0.3,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="
-                pointer-events-auto
-                absolute
-                left-0
-                right-0
-                top-[68px]
-                max-h-[calc(100dvh-68px)]
-                overflow-hidden
-                overflow-y-auto
-                overscroll-contain
-                bg-white
+                flex h-10 w-10 shrink-0
+                items-center justify-center
+                rounded-[9px]
+                text-[#07111f]
+                transition-transform duration-300
+                active:scale-95
+                sm:h-10 sm:w-10
                 lg:hidden
               "
             >
-              <MobileNav
-                onClose={closeNavigation}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
-    </>
+              {mobileOpen ? (
+                <X size={20} strokeWidth={1.8} />
+              ) : (
+                <Menu size={20} strokeWidth={1.8} />
+              )}
+            </button>
+          </div>
+        </div>
+      </motion.nav>
+
+   
+      {/* DESKTOP MEGA MENU — SMOOTH COHERE-STYLE TRANSITION */}
+      <AnimatePresence initial={false}>
+        {activeMenu && (
+          <motion.div
+            key="mentroid-mega-menu"
+            initial={{
+              opacity: 0,
+              y: -10,
+              scaleY: 0.985,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scaleY: 1,
+            }}
+            exit={{
+              opacity: 0,
+              y: -6,
+              scaleY: 0.99,
+            }}
+            transition={{
+              opacity: {
+                duration: 0.2,
+                ease: "easeOut",
+              },
+              y: {
+                duration: 0.28,
+                ease: [0.22, 1, 0.36, 1],
+              },
+              scaleY: {
+                duration: 0.28,
+                ease: [0.22, 1, 0.36, 1],
+              },
+            }}
+            style={{
+              transformOrigin: "top center",
+            }}
+            onMouseEnter={cancelClose}
+            onMouseLeave={scheduleClose}
+            className="
+              pointer-events-auto
+              absolute
+              left-0
+              right-0
+              top-full
+              z-10
+              hidden
+              w-full
+              overflow-x-clip
+              bg-white
+              lg:block
+            "
+          >
+            <MegaMenu
+              menu={navigation[activeMenu] as MenuData}
+              menuKey={activeMenu}
+              previewImage={previewImage}
+              onPreviewChange={setPreviewImage}
+              onNavigate={closeNavigation}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* MOBILE NAVIGATION */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{
+              opacity: 1,
+              height: "calc(100dvh - 60px)",
+            }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{
+              duration: 0.3,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="
+              pointer-events-auto
+              absolute
+              left-0
+              right-0
+              top-[60px]
+              z-10
+              max-h-[calc(100dvh-60px)]
+              overflow-hidden
+              overflow-y-auto
+              overscroll-contain
+              bg-white
+              lg:hidden
+            "
+          >
+            <MobileNav onClose={closeNavigation} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
   );
 }

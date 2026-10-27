@@ -318,19 +318,12 @@ export default function Footer() {
         loop
         playsInline
         preload="metadata"
-        className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover opacity-35 mix-blend-screen"
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover opacity-10 mix-blend-screen"
       >
         <source src="/videos/footer-smoke.webm" type="video/webm" />
       </video>
 
-      {/* Soft monochrome mist adds depth without a neon glow. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-0 overflow-hidden"
-      >
-        <div className="footer-fog footer-fog--one absolute -left-24 top-[18%] h-64 w-[70%] rounded-full bg-white/[0.07] blur-[90px] opacity-[0.08]" />
-        <div className="footer-fog footer-fog--two absolute -right-24 top-[48%] h-72 w-[65%] rounded-full bg-[#079dad]/[0.08] blur-[110px] opacity-[0.06]" />
-      </div>
+      
 
       <div className="relative z-[1]">
      
@@ -339,7 +332,7 @@ export default function Footer() {
       {/* MAIN FOOTER                                                         */}
       {/* ------------------------------------------------------------------ */}
 
-      <section data-navbar-theme="dark" >
+      <section >
         <div className="mx-auto max-w-[1500px] px-5 py-16 sm:px-8 md:py-20 lg:px-12">
           <div className="grid gap-16 lg:grid-cols-[280px_1fr] xl:grid-cols-[340px_1fr]">
             {/* BRAND */}
@@ -367,7 +360,7 @@ export default function Footer() {
                   </span>
                 </Link>
 
-                <p className="mt-5 max-w-[250px] text-[13px] leading-6 text-neutral-500">
+                <p className="mt-5 max-w-[250px] text-[13px] leading-6 text-white">
                   AI, software and automation systems engineered for
                   businesses ready to build what&apos;s next.
                 </p>
@@ -377,7 +370,7 @@ export default function Footer() {
               <div className="mt-10 space-y-3">
                 <Link
                   href="mailto:hello@mentroid.co.in"
-                  className="group flex items-center gap-3 text-[13px] text-neutral-300 transition-colors hover:text-white"
+                  className="group flex items-center gap-3 text-[13px] text-white transition-colors hover:text-white"
                 >
                   <Mail
                     size={14}
@@ -394,7 +387,7 @@ export default function Footer() {
                   />
                 </Link>
 
-                <div className="flex items-center gap-3 text-[13px] text-neutral-500">
+                <div className="flex items-center gap-3 text-[13px] text-white">
                   <MapPin
                     size={14}
                     strokeWidth={1.5}
@@ -426,7 +419,7 @@ export default function Footer() {
       {/* LOWER BAR                                                           */}
       {/* ------------------------------------------------------------------ */}
 
-      <section className="border-t border-white/10">
+      <section>
         <div
           ref={bottomRef}
           className="mx-auto flex max-w-[1500px] flex-col gap-8 px-5 py-7 sm:px-8 md:flex-row md:items-center md:justify-between lg:px-12"
