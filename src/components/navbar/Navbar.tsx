@@ -180,7 +180,7 @@ export default function Navbar() {
         <div
           className="
             mx-auto flex h-[60px] w-full max-w-[1600px]
-            items-center justify-center px-4 
+            items-center justify-between px-4 
             min-[480px]:px-5
             sm:px-7
             lg:grid lg:grid-cols-[auto_minmax(0,1fr)_auto]
