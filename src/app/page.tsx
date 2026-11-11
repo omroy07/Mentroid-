@@ -8,9 +8,11 @@ import CTASection from "@/components/sections/CTASection";
 import SolutionExpertise from "@/components/sections/SolutionExpertise";
 
 
+
 export default function Home() {
   return (
     <main className="min-h-screen  ">
+      
       {/* <Hero /> */}
       <HeroSection />
 

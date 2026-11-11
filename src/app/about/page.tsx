@@ -1,28 +1,35 @@
 
+import type { Metadata } from "next";
+import AboutHero from "@/components/about/AboutHero";
 
-import AboutCTA from "./components/AboutCta";
-import AboutFaq from "./components/AboutFAQ";
-import AboutHero from "./components/AboutHero";
-import CapabilitiesSection from "./components/CapabilitiesSection";
-import CaseStudies from "./components/CaseStudies";
-import MissionSection from "./components/MissionSection";
-import TeamStrip from "./components/TeamStrip";
-import TechStackSection from "./components/TechStackSection";
-import ValuesSection from "./components/ValuesSection";
+import VisionMission from "@/components/about/VisionMission";
 
-export default function About() {
+// import WhyMentroid from "@/components/sections/WhyMentroid";
+import OurTeam from "@/components/about/OurTeam";
+import WhyMentroid from "@/components/about/WhyMentroid";
+import WhoWeWork from "@/components/about/WhoWeWork";
+import BuildWithMentroid from "@/components/about/BuildWithMentroid";
+import CaseStudies from "@/components/about/CaseStudies";
+import FinalCTA from "@/components/about/FinalCTA";
+WhyMentroid
+export const metadata: Metadata = {
+  title: "About Mentroid | AI, Automation & Software Development",
+  description:
+    "Discover Mentroid — a team bringing AI, machine learning, automation, and software development together to solve real-world business challenges.",
+};
+
+export default function AboutPage() {
   return (
-    <main className="min-h-screen  ">
-      <AboutHero/>
-      <MissionSection/>
-      <CapabilitiesSection/>
-      <ValuesSection/>
-      <TechStackSection/>
-      <TeamStrip/>
-      <CaseStudies/>
-  <AboutFaq/>
-      <AboutCTA/>
-      
+    <main className="overflow-hidden">
+      <AboutHero />
+      <VisionMission/>
+      <WhoWeWork/>
+<OurTeam/>
+      {/* <WhyMentroid/> */}
+<WhyMentroid/>
+<BuildWithMentroid/>
+<CaseStudies/>
+<FinalCTA/> 
     </main>
   );
 }

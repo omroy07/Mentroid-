@@ -455,7 +455,7 @@ export default function WhyMentroid() {
             ref={manifestoRef}
             className="grid grid-cols-1 items-stretch gap-3 md:grid-cols-12 md:gap-4"
           >
-            <div className="relative min-h-[250px] overflow-hidden rounded-2xl bg-[#080b0d] sm:min-h-[340px] md:col-span-4 md:min-h-[40svh] md:rounded-[24px]">
+            <div className="relative min-h-[150px] overflow-hidden rounded-2xl bg-[#080b0d] sm:min-h-[340px] md:col-span-4 md:min-h-[40svh] md:rounded-[24px]">
               <video
                 className="absolute inset-0 h-full w-full object-cover"
                 autoPlay
@@ -476,7 +476,7 @@ export default function WhyMentroid() {
               <p
                 data-word-reveal
                 aria-label="We combine technical depth with real-world understanding to build intelligent systems around the way your business actually works."
-                className="max-w-[1050px] text-[clamp(2rem,5.1vw,3.25rem)] font-normal leading-[1.02] tracking-[-0.065em] text-balance"
+                className="max-w-[1050px] text-[clamp(2rem,5.1vw,3.55rem)] font-normal leading-[1.02] tracking-[-0.065em] text-balance"
               >
                 {[
                   "We",

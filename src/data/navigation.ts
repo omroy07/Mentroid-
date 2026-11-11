@@ -424,7 +424,7 @@ export const navigation = {
             title: "About Mentroid",
             description:
               "Learn about Mentroid, our capabilities and what we build.",
-            href: "/company/about",
+            href: "/about",
             image:
               "/assets/navbar/company/about.webp",
           },
