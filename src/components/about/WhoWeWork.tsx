@@ -285,12 +285,7 @@ const [activeIndex, setActiveIndex] = useState(0);
     w-full
     items-end
     justify-between
-    gap-8
-
-  
-
-   
-  "
+    gap-8 "
 >
   
 
@@ -298,13 +293,13 @@ const [activeIndex, setActiveIndex] = useState(0);
 
   <div
     className="
-      ml-auto
-      flex
-       hidden
-      shrink-0
-      items-center
-      
-      gap-3
+     ml-auto
+  hidden
+  shrink-0
+  items-center
+  gap-3
+
+  sm:flex
     "
   >
     <button
