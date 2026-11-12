@@ -102,31 +102,124 @@ export default function MentroidHero() {
         </div>
       </div>
 
-      {/* Oversized editorial image cards, visible at the bottom of the first viewport */}
-      <div className="mx-auto  max-w-[1660px] gap-3 px-5 pb-5 sm:px-8 md:grid-cols-[1.9fr_1fr] lg:gap-4 lg:px-12">
-        <div
-          
-          data-hero-card
-          className="group relative min-h-[250px] overflow-hidden rounded-[14px] bg-[#e9d5e8] sm:min-h-[320px] lg:min-h-[850px]"
-          aria-label="Explore Mentroid AI solutions"
-        >
-          <img
-            data-float
-            src="/assets/hero/hero.webp"
-            alt="Abstract sculptural shapes in warm, soft colors"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
-            loading="eager"
-            fetchPriority="high"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
-          <div className="absolute bottom-5 left-5 flex items-end justify-between right-5 sm:bottom-7 sm:left-7 sm:right-7">
-            
-            
-          </div>
-        </div>
+     <div className="mx-auto max-w-[1660px] gap-3 px-5 pb-5 sm:px-8 md:grid-cols-[1.9fr_1fr] lg:gap-4 lg:px-12">
+  <div
+    data-hero-card
+    className="
+      group
+      relative
+      min-h-[250px]
+      overflow-hidden
+      rounded-[14px]
+      bg-[#e9d5e8]
 
-       
-      </div>
+      sm:min-h-[320px]
+
+      lg:min-h-[650px]
+    "
+    aria-label="Explore Mentroid AI solutions"
+  >
+
+    {/* ==========================================================
+        VIDEO BACKGROUND
+    ========================================================== */}
+
+    <video
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="auto"
+      className="
+        absolute
+        inset-0
+        h-full
+        w-full
+        object-cover
+      "
+    >
+      <source
+        src="/assets/hero/hero-video.webm"
+        type="video/mp4"
+      />
+    </video>
+
+
+    {/* ==========================================================
+        IMAGE OVER VIDEO
+    ========================================================== */}
+
+    <img
+  data-float
+  src="/assets/hero/hero.webp"
+  alt="Abstract sculptural shapes in warm, soft colors"
+  className="
+    absolute
+    left-[10%]
+    top-[10%]
+    z-[2]
+rounded-[14px]
+    h-[110%]
+    w-[80%]
+
+    -translate-x-1/2
+    -translate-y-1/2
+
+    object-cover
+
+    transition-transform
+    duration-700
+    ease-out
+
+    group-hover:scale-[1.035]
+  "
+  loading="eager"
+  fetchPriority="high"
+/>
+
+
+    {/* ==========================================================
+        SUBTLE OVERLAY
+    ========================================================== */}
+
+    <div
+      className="
+        pointer-events-none
+        absolute
+        inset-0
+        z-[3]
+        bg-gradient-to-t
+        from-black/25
+        via-transparent
+        to-transparent
+      "
+    />
+
+
+    {/* ==========================================================
+        CONTENT
+    ========================================================== */}
+
+    <div
+      className="
+        absolute
+        bottom-5
+        left-5
+        right-5
+        z-[4]
+        flex
+        items-end
+        justify-between
+
+        sm:bottom-7
+        sm:left-7
+        sm:right-7
+      "
+    >
+    </div>
+
+  </div>
+</div>
     </section>
   );
 }

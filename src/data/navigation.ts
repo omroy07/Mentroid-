@@ -438,23 +438,23 @@ export const navigation = {
               "/assets/navbar/company/work.webp",
           },
 
-          {
-            title: "Our Team",
-            description:
-              "Meet the people building intelligent technology at Mentroid.",
-            href: "/team",
-            image:
-              "/assets/navbar/company/team.webp",
-          },
+          // {
+          //   title: "Our Team",
+          //   description:
+          //     "Meet the people building intelligent technology at Mentroid.",
+          //   href: "/team",
+          //   image:
+          //     "/assets/navbar/company/team.webp",
+          // },
 
-          {
-            title: "Our Process",
-            description:
-              "See how we move from ideas and problems to working solutions.",
-            href: "/process",
-            image:
-              "/assets/navbar/company/process.webp",
-          },
+          // {
+          //   title: "Our Process",
+          //   description:
+          //     "See how we move from ideas and problems to working solutions.",
+          //   href: "/process",
+          //   image:
+          //     "/assets/navbar/company/process.webp",
+          // },
         ],
       },
 
