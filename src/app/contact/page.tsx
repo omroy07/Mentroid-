@@ -1,8 +1,6 @@
 import ContactHero from "@/components/contact/ContactHero";
 import ContactForm from "@/components/contact/ContactForm";
-
 import ContactFAQ from "@/components/contact/ContactFAQ";
-import ContactFinalCTA from "@/components/contact/ContactCTA";
 
 export const metadata = {
   title: "Discuss Your AI or Software Project | Mentroid",
@@ -14,14 +12,8 @@ export default function ContactPage() {
   return (
     <main className="bg-[#f0eee9] text-[#202020]">
       <ContactHero />
-
       <ContactForm />
-
-     
-
       <ContactFAQ />
-
-      {/* <ContactFinalCTA /> */}
     </main>
   );
 }
