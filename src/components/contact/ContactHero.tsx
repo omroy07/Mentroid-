@@ -25,7 +25,7 @@ export default function ContactHero() {
       className="px-5 pb-5 pt-34 sm:px-8 sm:pb-8 sm:pt-28 md:px-10 md:pb-10 md:pt-32 lg:px-12 lg:pb-12 lg:pt-36 xl:px-16 2xl:px-20"
     >
       <div className="mx-auto max-w-[1660px]">
-        <div className="contact-hero-content group relative flex min-h-[220px] items-center justify-center overflow-hidden rounded-[14px] bg-[#171717] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[520px]">
+        <div className="contact-hero-content group relative flex min-h-[220px] items-center justify-center overflow-hidden rounded-[14px] bg-[#171717] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[565px]">
           
           {/* Background Video */}
           <video
@@ -37,7 +37,7 @@ export default function ContactHero() {
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1600ms] ease-out group-hover:scale-[1.015]"
           >
             <source
-              src="/assets/contact/contactcta.webm"
+              src="/assets/contact/contact-.webm"
               type="video/webm"
             />
           </video>
