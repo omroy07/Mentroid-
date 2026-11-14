@@ -46,41 +46,72 @@ export default function WorkHero() {
             lg:gap-16
 
             xl:gap-24
+            
           "
         >
 
           <div>
             <p
               className="
-                mb-6
-                text-[11px]
-                font-medium
-                uppercase
-                tracking-[0.05em]
-                text-[#202020]
+                mb-5
+            text-[12px]
+            font-medium
+            uppercase
+            leading-[1.4]
+            tracking-[0.035em]
 
-                sm:mb-7
-                sm:text-[12px]
+            md:mb-5
+
+            max-sm:mb-[19px]
+            max-sm:text-[11px]
               "
             >
-              Selected Work
+              Case Studies
             </p>
 
             <h1
               className="
-                max-w-[1050px]
-                text-[clamp(48px,7vw,92px)]
-                font-[450]
-                leading-[1.01]
-                tracking-[-0.065em]
+                 mx-auto
+    max-w-[1220px]
+    text-[clamp(48px,6.15vw,90px)]
+    font-[450]
+    leading-[1.035]
+    tracking-[-0.065em]
+    [text-wrap:balance]
 
-                sm:text-[clamp(56px,7vw,82px)]
+    /* Large desktop */
+    min-[1500px]:max-w-[1350px]
+    min-[1500px]:text-[clamp(90px,6vw,104px)]
 
-                md:text-[clamp(62px,7vw,88px)]
+    /* Desktop */
+    xl:max-w-[1220px]
+    xl:text-[clamp(64px,6.15vw,90px)]
 
-                lg:text-[clamp(68px,6.8vw,92px)]
+    /* Laptop */
+    lg:max-w-[1050px]
+    lg:text-[clamp(56px,6.5vw,78px)]
+    lg:leading-[1.045]
 
-                xl:text-[clamp(74px,6.3vw,96px)]
+    /* Tablet */
+    md:max-w-[850px]
+    md:text-[clamp(48px,7.2vw,68px)]
+    md:leading-[1.06]
+
+    /* Small tablet */
+    sm:max-w-[680px]
+    sm:text-[clamp(44px,8vw,62px)]
+
+    /* Mobile */
+    max-sm:mx-auto
+    max-sm:max-w-[390px]
+    max-sm:text-[clamp(40px,9.5vw,48px)]
+    max-sm:leading-[1.08]
+    max-sm:tracking-[-0.055em]
+    max-sm:[text-wrap:pretty]
+
+    /* Small mobile */
+    max-[380px]:max-w-[340px]
+    max-[380px]:text-[40px]
               "
             >
               Explore selected AI

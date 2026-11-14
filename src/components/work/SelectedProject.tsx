@@ -94,9 +94,9 @@ export default function SelectedProjects() {
 
                 md:text-[clamp(62px,7vw,88px)]
 
-                lg:text-[clamp(68px,6.8vw,92px)]
+                lg:text-[clamp(68px,6.8vw,90px)]
 
-                xl:text-[clamp(74px,6.3vw,96px)]
+                xl:text-[clamp(74px,6.3vw,90px)]
               "
             >
               Different problems.

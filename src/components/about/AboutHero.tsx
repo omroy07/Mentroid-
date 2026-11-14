@@ -118,7 +118,7 @@ export default function AboutHero() {
         className="
           relative
           z-[2]
-          mx-auto
+         
           w-full
           max-w-[1320px]
           text-center
@@ -159,7 +159,7 @@ export default function AboutHero() {
           About
         </p>
 
-     <h1
+    <h1
   id="ma-about-hero-title"
   className="
     mx-auto
@@ -194,15 +194,15 @@ export default function AboutHero() {
 
     /* Mobile */
     max-sm:mx-auto
-    max-sm:max-w-[390px]
-    max-sm:text-[clamp(40px,9.5vw,48px)]
-    max-sm:leading-[1.08]
-    max-sm:tracking-[-0.055em]
+    max-sm:max-w-[350px]
+    max-sm:text-[clamp(32px,8.5vw,40px)]
+    max-sm:leading-[1.1]
+    max-sm:tracking-[-0.045em]
     max-sm:[text-wrap:pretty]
 
     /* Small mobile */
-    max-[380px]:max-w-[340px]
-    max-[380px]:text-[40px]
+    max-[380px]:max-w-[310px]
+    max-[380px]:text-[32px]
   "
 >
   <span
